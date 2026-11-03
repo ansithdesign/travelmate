@@ -1,13 +1,15 @@
 import type { CategoryId } from '../../types'
+import { useSky } from '../../store/sky'
 import { cx } from '../../utils/cx'
 
-// The category artwork: flat-lit 3D objects on transparent backgrounds, used exactly as drawn.
-const FILES = import.meta.glob('../../assets/categories/*.png', { eager: true, query: '?url', import: 'default' }) as Record<string, string>
-const SRC = (id: CategoryId) => FILES[`../../assets/categories/${id}.png`]
+// Two artwork sets of the same fifteen icons: the original set for the light theme and the newer set for dark.
+const FILES = import.meta.glob('../../assets/categories/*/*.png', { eager: true, query: '?url', import: 'default' }) as Record<string, string>
+const src = (set: 'light' | 'dark', id: CategoryId) => FILES[`../../assets/categories/${set}/${id}.png`]
 
 /** A category icon with no container and no shadow. */
 export function CategoryIcon({ id, size = 24, className }: { id: CategoryId; size?: number; className?: string }) {
-  return <img src={SRC(id)} alt="" aria-hidden width={size} height={size} draggable={false} className={cx('shrink-0 select-none object-contain', className)} />
+  const { phase } = useSky()
+  return <img src={src(phase === 'night' ? 'dark' : 'light', id)} alt="" aria-hidden width={size} height={size} draggable={false} className={cx('shrink-0 select-none object-contain', className)} />
 }
 
 /**
