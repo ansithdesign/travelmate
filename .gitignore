@@ -1,0 +1,6 @@
+node_modules
+dist
+.impeccable/review
+.impeccable/questions
+.impeccable/config.local.json
+*.log
