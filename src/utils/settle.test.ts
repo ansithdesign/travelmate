@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Expense, Split } from '../types'
-import { buildLedger, suggestTransfers } from './settle'
+import { buildLedger, countGrossDebts, suggestTransfers } from './settle'
 import { apportion, computeSplit } from './split'
 import { parseMoney, formatMoney } from './money'
 
@@ -76,5 +76,58 @@ describe('money', () => {
     expect(parseMoney('abc')).toBeNull()
     expect(formatMoney(12000000)).toBe('₹1,20,000')
     expect(formatMoney(125050)).toBe('₹1,250.50')
+  })
+})
+
+describe('mutual debts cancel out', () => {
+  const only = (who: string): Split => ({ method: 'equal', participants: [who], values: {} })
+
+  it('four pairwise debts collapse into two payments to whoever lent the most', () => {
+    // A owes B 500, A owes C 500, B owes A 500, B owes C 500.
+    const members = ['A', 'B', 'C']
+    const expenses = [
+      exp('1', 50000, 'B', only('A')), // A owes B 500
+      exp('2', 50000, 'C', only('A')), // A owes C 500
+      exp('3', 50000, 'A', only('B')), // B owes A 500
+      exp('4', 50000, 'C', only('B')), // B owes C 500
+    ]
+    const net = buildLedger(members, expenses).net
+    expect(net).toEqual({ A: -50000, B: -50000, C: 100000 })
+    expect(suggestTransfers(net)).toEqual([
+      { from: 'A', to: 'C', amount: 50000 },
+      { from: 'B', to: 'C', amount: 50000 },
+    ])
+  })
+
+  it('a chain A to B to C becomes one payment A to C', () => {
+    const members = ['A', 'B', 'C']
+    const expenses = [exp('1', 50000, 'B', only('A')), exp('2', 50000, 'C', only('B'))]
+    expect(suggestTransfers(buildLedger(members, expenses).net)).toEqual([{ from: 'A', to: 'C', amount: 50000 }])
+  })
+
+  it('a full circle of equal debts cancels completely', () => {
+    const members = ['A', 'B', 'C']
+    const expenses = [exp('1', 50000, 'B', only('A')), exp('2', 50000, 'C', only('B')), exp('3', 50000, 'A', only('C'))]
+    const net = buildLedger(members, expenses).net
+    expect(suggestTransfers(net)).toEqual([])
+  })
+
+  it('the biggest debtor pays the biggest creditor first', () => {
+    const net = { A: -70000, B: -30000, C: 80000, D: 20000 }
+    expect(suggestTransfers(net)).toEqual([
+      { from: 'A', to: 'C', amount: 70000 },
+      { from: 'B', to: 'D', amount: 20000 },
+      { from: 'B', to: 'C', amount: 10000 },
+    ])
+  })
+
+  it('counts the separate debts before netting', () => {
+    const expenses = [
+      exp('1', 50000, 'B', only('A')),
+      exp('2', 50000, 'C', only('A')),
+      exp('3', 50000, 'A', only('B')),
+      exp('4', 50000, 'C', only('B')),
+    ]
+    expect(countGrossDebts(expenses)).toBe(4)
   })
 })

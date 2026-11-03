@@ -1,5 +1,5 @@
 import type { Expense, ID, Paise, Payment } from '../types'
-import { apportion, rawShares } from './split'
+import { apportion, computeSplit, rawShares } from './split'
 
 export interface Ledger {
   /** What each person paid for the group */
@@ -84,4 +84,18 @@ export function suggestTransfers(net: Record<ID, Paise>): Transfer[] {
 
 export function isSettled(net: Record<ID, Paise>): boolean {
   return Object.values(net).every((v) => v === 0)
+}
+
+/**
+ * How many separate "A owes B" debts the expenses create before anything is netted.
+ * Used to show how much the suggested payments simplify.
+ */
+export function countGrossDebts(expenses: Expense[]): number {
+  const pairs = new Set<string>()
+  for (const e of expenses) {
+    for (const [p, share] of Object.entries(computeSplit(e.amount, e.split).shares)) {
+      if (p !== e.paidBy && share > 0) pairs.add(`${p}>${e.paidBy}`)
+    }
+  }
+  return pairs.size
 }

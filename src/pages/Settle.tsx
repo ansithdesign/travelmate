@@ -17,7 +17,7 @@ import { cx } from '../utils/cx'
 import { fmt } from '../utils/dates'
 import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
-import type { Transfer } from '../utils/settle'
+import { countGrossDebts, type Transfer } from '../utils/settle'
 import { NotFound } from './NotFound'
 
 export function Settle() {
@@ -46,6 +46,7 @@ function SettleBody({ view }: { view: TripView }) {
   const [pending, setPending] = useState<Transfer | null>(null)
   const [stamping, setStamping] = useState<Transfer | null>(null)
   const members = trip.members.map(person).filter(Boolean) as Person[]
+  const gross = countGrossDebts(expenses)
   const name = (id: string) => (id === me.id ? 'You' : firstName(person(id)?.name ?? 'Someone'))
 
   if (expenses.length === 0) {
@@ -62,7 +63,9 @@ function SettleBody({ view }: { view: TripView }) {
         <p className="on-sky mt-1.5 max-w-[56ch] px-0.5 text-body">
           {settled && !stamping
             ? 'Every balance on this trip is at zero.'
-            : 'The fewest payments that square everyone up. Tap Paid once the money has changed hands.'}
+            : gross > transfers.length && payments.length === 0
+              ? `${gross} debts between the group, netted into ${transfers.length} ${transfers.length === 1 ? 'payment' : 'payments'}. Whoever is owed the most is paid first. Tap Paid once the money has changed hands.`
+              : 'The fewest payments that square everyone up. Tap Paid once the money has changed hands.'}
         </p>
 
         {settled && !stamping ? (
