@@ -106,6 +106,17 @@ export interface InfoItem {
   url?: string
 }
 
+/** A ticket, booking PDF or photo attached to a trip. The file itself lives in the browser's file store. */
+export interface TripFile {
+  id: ID
+  /** The name people see, which they can change */
+  name: string
+  fileName: string
+  mime: string
+  size: number
+  addedAt: string
+}
+
 export interface ItineraryDay {
   id: ID
   date: string
@@ -135,6 +146,7 @@ export interface Trip {
   completed: boolean
   completedAt?: string
   info: InfoItem[]
+  files?: TripFile[]
   itinerary: ItineraryDay[]
   notes: string
   journal: {

@@ -168,7 +168,7 @@ export function Home() {
             </div>
           ) : null}
 
-          <div className="mx-auto flex max-w-[680px] flex-col gap-9">
+          <div className="mx-auto flex w-full max-w-[680px] flex-col gap-9">
             <section aria-labelledby="just-in">
               <div className="flex min-h-11 items-center justify-between gap-3 px-0.5">
                 <h2 id="just-in" className="text-title">

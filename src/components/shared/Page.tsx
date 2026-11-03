@@ -32,7 +32,7 @@ export function ContentSheet({ children, className }: { children: ReactNode; cla
 }
 
 export function SheetBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx('flex flex-1 flex-col px-6 pt-4 pb-12 lg:px-10', className)}>{children}</div>
+  return <div className={cx('flex flex-1 flex-col px-6 pt-4 pb-12 lg:px-10 [&>*]:min-w-0', className)}>{children}</div>
 }
 
 /** The signature blue full stop that ends a page title. */

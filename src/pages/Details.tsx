@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { AirplaneTilt, ArrowSquareOut, Bed, Copy, type Icon, LinkSimple, MapPin, PencilSimple, Trash } from '@phosphor-icons/react'
+import { TripFiles } from '../components/trips/TripFiles'
 import { TripSkyHeader } from '../components/trips/TripHeader'
 import { ContentSheet, SheetBody } from '../components/shared/Page'
 import { Button } from '../components/ui/Button'
@@ -92,6 +93,8 @@ function DetailsBody({ view }: { view: TripView }) {
             </button>
           ))}
         </div>
+
+        <TripFiles trip={trip} />
 
         <section aria-labelledby="notes" className="mt-14">
           <h2 id="notes" className="flex min-h-11 items-center px-0.5 text-title">
