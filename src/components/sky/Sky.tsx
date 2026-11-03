@@ -144,17 +144,17 @@ function useWide() {
 
 /**
  * Sun or moon. Phones have controls and titles across the whole top edge, so the
- * disc sits just above the frame and only its rim and glow show. Desktop has open
- * sky at the top right, so the disc is shown whole there.
+ * disc sits just above the frame and only its rim and glow show. Desktop keeps the disc
+ * whole in the open sky right of centre, clear of the header actions.
  */
 function Luminary({ phase }: { phase: SkyPhase }) {
   const wide = useWide()
   const pos: Record<SkyPhase, { x: string; y: string; size: number; core: string; glow: string }> = wide
     ? {
-        dawn: { x: '84%', y: '9%', size: 64, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
-        day: { x: '84%', y: '7%', size: 78, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
-        golden: { x: '84%', y: '10%', size: 72, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
-        night: { x: '85%', y: '8%', size: 44, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
+        dawn: { x: '70%', y: '8%', size: 64, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
+        day: { x: '70%', y: '6.5%', size: 78, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
+        golden: { x: '70%', y: '9%', size: 72, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
+        night: { x: '71%', y: '7.5%', size: 44, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
       }
     : {
         dawn: { x: '58%', y: '-4.6%', size: 76, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
