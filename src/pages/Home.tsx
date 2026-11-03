@@ -71,7 +71,12 @@ export function Home() {
               <Dot />
             </h1>
             <Link to="/profile" aria-label="Profile" className="press rounded-full">
-              <Avatar person={me} size={40} className="!bg-[rgba(8,18,48,0.4)] !bg-none" style={{ background: "rgba(8,18,48,0.4)" }} />
+              <Avatar
+                person={me}
+                size={42}
+                className="backdrop-blur-[10px] tracking-[0.04em] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_6px_16px_-8px_rgba(5,12,34,0.6)]"
+                style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.2), rgba(8,18,48,0.42) 70%)', fontSize: 14 }}
+              />
             </Link>
           </header>
 
