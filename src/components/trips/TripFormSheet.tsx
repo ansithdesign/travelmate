@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Check, ImageUp, MapPin } from 'lucide-react'
+import { CaretDown, Check, MapPin, UploadSimple } from '@phosphor-icons/react'
 import { COVER_LIBRARY } from '../../data/photos'
 import { DESTINATIONS } from '../../data/destinations'
 import { useStore } from '../../store/store'
@@ -163,18 +163,21 @@ export function TripFormSheet() {
 
         <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-3">
           <Field label="Currency" htmlFor="trip-currency">
-            <select id="trip-currency" className={cx(inputClass, 'appearance-none bg-[url("data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b716c%22 stroke-width=%222%22><path d=%22m6 9 6 6 6-6%22/></svg>")] bg-[position:right_12px_center] bg-no-repeat pr-9')} value={draft.currency} onChange={(e) => set('currency', e.target.value as CurrencyCode)}>
-              {CURRENCIES.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {c.code} ({c.symbol.trim()})
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select id="trip-currency" className={cx(inputClass, 'appearance-none pr-10 font-semibold')} value={draft.currency} onChange={(e) => set('currency', e.target.value as CurrencyCode)}>
+                {CURRENCIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.code} ({c.symbol.trim()})
+                  </option>
+                ))}
+              </select>
+              <CaretDown size={16} weight="bold" className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-ink-3" aria-hidden />
+            </div>
           </Field>
           <Field label="Budget" optional htmlFor="trip-budget" error={show('budget')}>
             <div className="relative">
               <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-ink-3">{currencySymbol(draft.currency).trim()}</span>
-              <TextInput id="trip-budget" inputMode="decimal" placeholder="1,20,000" className="pl-9 num" value={draft.budget} invalid={!!show('budget')} onChange={(e) => set('budget', e.target.value)} />
+              <TextInput id="trip-budget" inputMode="decimal" placeholder="1,20,000" className="pl-9 num" value={draft.budget} invalid={!!show('budget')} onChange={(e) => /^[\d,]*\.?\d{0,2}$/.test(e.target.value) && set('budget', e.target.value)} />
             </div>
           </Field>
         </div>
@@ -249,7 +252,7 @@ function DestinationPicker({ value, onChange, error }: { value: string; onChange
           }}
         />
         {open && matches.length > 0 && !exact ? (
-          <ul id={listId} role="listbox" className="absolute inset-x-0 top-[calc(100%+6px)] z-10 overflow-hidden rounded-md bg-surface py-1 shadow-pop hairline">
+          <ul id={listId} role="listbox" className="glass-bar absolute inset-x-0 top-[calc(100%+8px)] z-10 overflow-hidden rounded-[20px] p-1.5 [animation:pop_240ms_var(--ease-glide)]">
             {matches.map((d, i) => (
               <li
                 key={d.name}
@@ -261,7 +264,7 @@ function DestinationPicker({ value, onChange, error }: { value: string; onChange
                   pick(i)
                 }}
                 onMouseEnter={() => setActive(i)}
-                className={cx('flex cursor-pointer items-baseline justify-between gap-3 px-3.5 py-2.5', i === active && 'bg-ground')}
+                className={cx('flex cursor-pointer items-baseline justify-between gap-3 rounded-[14px] px-3.5 py-3', i === active && 'bg-accent-soft')}
               >
                 <span className="font-medium">{d.name}</span>
                 <span className="text-meta text-ink-3">{d.region}</span>
@@ -291,15 +294,15 @@ function CoverPicker({ value, onChange, destination }: { value?: Photo; onChange
           type="button"
           onClick={() => file.current?.click()}
           className={cx(
-            'relative flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded-md text-caption font-medium text-ink-2 hairline hover:bg-ground',
-            custom && 'ring-2 ring-forest ring-offset-2',
+            'relative flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded-[16px] text-caption font-medium text-ink-2 ring-line hover:bg-well',
+            custom && 'ring-2 ring-accent ring-offset-2',
           )}
         >
           {custom ? (
-            <Cover photo={custom} fallbackLabel="" className="absolute inset-0" />
+            <Cover photo={custom} className="absolute inset-0" />
           ) : (
             <>
-              <ImageUp size={20} strokeWidth={1.7} aria-hidden />
+              <UploadSimple size={20} weight="bold" aria-hidden />
               {busy ? 'Loading' : 'Upload'}
             </>
           )}
@@ -313,12 +316,12 @@ function CoverPicker({ value, onChange, destination }: { value?: Photo; onChange
               aria-pressed={on}
               aria-label={p.alt}
               onClick={() => onChange(on ? undefined : p)}
-              className={cx('relative aspect-square overflow-hidden rounded-md transition-shadow', on && 'ring-2 ring-forest ring-offset-2')}
+              className={cx('relative aspect-square overflow-hidden rounded-[16px] transition-shadow', on && 'ring-2 ring-accent ring-offset-2')}
             >
-              <Cover photo={p} fallbackLabel="" className="absolute inset-0" />
+              <Cover photo={p} seed={COVER_LIBRARY.indexOf(p)} className="absolute inset-0" />
               {on ? (
-                <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-forest text-white">
-                  <Check size={13} strokeWidth={3} aria-hidden />
+                <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-accent text-white">
+                  <Check size={13} weight="bold" aria-hidden />
                 </span>
               ) : null}
             </button>

@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react'
-import { CircleAlert, CircleCheck } from 'lucide-react'
-import { cx } from '../../utils/cx'
+import { CheckCircle, WarningCircle } from '@phosphor-icons/react'
 
 interface ToastItem {
   id: number
@@ -16,6 +15,7 @@ interface ToastApi {
 
 const ToastContext = createContext<ToastApi | null>(null)
 
+/** Dark glass capsules that rise above the tab bar. */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([])
   const seq = useRef(0)
@@ -29,10 +29,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     },
     [dismiss],
   )
-  const api = useRef<ToastApi>({
-    success: (message, action) => push({ message, tone: 'success', action }),
-    error: (message) => push({ message, tone: 'error' }),
-  })
+  const api = useRef<ToastApi>({ success: () => {}, error: () => {} })
   api.current.success = (message, action) => push({ message, tone: 'success', action })
   api.current.error = (message) => push({ message, tone: 'error' })
 
@@ -41,20 +38,20 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(76px+env(safe-area-inset-bottom))] z-[70] flex flex-col items-center gap-2 px-4 md:bottom-6 md:left-auto md:right-6 md:items-end"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom))] z-[70] flex flex-col items-center gap-2 px-4 md:bottom-8"
       >
         {items.map((t) => (
           <div
             key={t.id}
             role={t.tone === 'error' ? 'alert' : 'status'}
-            className="pointer-events-auto flex w-full max-w-[420px] items-center gap-3 rounded-md bg-ink py-3 pr-2 pl-4 text-meta text-white shadow-pop [animation:toast-in_280ms_var(--ease-out-expo)]"
+            className="pointer-events-auto flex max-w-[440px] items-center gap-3 rounded-full bg-[#0b1433]/88 py-2 pr-2 pl-3 text-meta font-medium text-white shadow-[0_18px_40px_-14px_rgb(0_0_0/0.55),inset_0_1px_0_rgb(255_255_255/0.12)] backdrop-blur-xl [animation:toast-in_380ms_var(--ease-glide)]"
           >
             {t.tone === 'success' ? (
-              <CircleCheck size={18} className="shrink-0 text-forest-200" aria-hidden />
+              <CheckCircle size={22} weight="fill" className="shrink-0 text-[#6ee7c5]" aria-hidden />
             ) : (
-              <CircleAlert size={18} className="shrink-0 text-[#f0a594]" aria-hidden />
+              <WarningCircle size={22} weight="fill" className="shrink-0 text-[#ff9aa6]" aria-hidden />
             )}
-            <span className="flex-1 py-0.5">{t.message}</span>
+            <span className="py-1 pr-2">{t.message}</span>
             {t.action ? (
               <button
                 type="button"
@@ -62,7 +59,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   t.action?.onClick()
                   dismiss(t.id)
                 }}
-                className={cx('h-8 rounded-[8px] px-3 font-semibold text-amber-100 hover:bg-white/10')}
+                className="press h-8 rounded-full bg-white/14 px-3.5 font-semibold text-white hover:bg-white/22"
               >
                 {t.action.label}
               </button>

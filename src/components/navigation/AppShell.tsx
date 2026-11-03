@@ -1,97 +1,128 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Map, Plus, ReceiptText, UserRound, type LucideIcon } from 'lucide-react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { NavLink, Outlet, useLocation, useMatch } from 'react-router-dom'
+import { House, Plus, Receipt, User, type Icon } from '@phosphor-icons/react'
 import { useAllTripViews } from '../../hooks/useTrip'
+import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
+import { useSky, SKY_LABEL } from '../../store/sky'
 import { cx } from '../../utils/cx'
 import { fmt } from '../../utils/dates'
 import { BrandMark } from '../shared/BrandMark'
-import { useStore } from '../../store/store'
 import { Avatar } from '../ui/Avatar'
+import { Window } from '../ui/Cover'
+import { Sky } from '../sky/Sky'
 
-const NAV: { to: string; label: string; icon: LucideIcon; match: (p: string) => boolean }[] = [
-  { to: '/', label: 'Trips', icon: Map, match: (p) => p === '/' || p.startsWith('/trips') },
-  { to: '/expenses', label: 'Expenses', icon: ReceiptText, match: (p) => p.startsWith('/expenses') },
-  { to: '/profile', label: 'Profile', icon: UserRound, match: (p) => p.startsWith('/profile') },
+const NAV: { to: string; label: string; icon: Icon; match: (p: string) => boolean }[] = [
+  { to: '/', label: 'Trips', icon: House, match: (p) => p === '/' || p.startsWith('/trips') },
+  { to: '/expenses', label: 'Expenses', icon: Receipt, match: (p) => p.startsWith('/expenses') },
+  { to: '/profile', label: 'Profile', icon: User, match: (p) => p.startsWith('/profile') },
 ]
 
 export function AppShell() {
   const { pathname } = useLocation()
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[264px_1fr]">
-      <SideRail pathname={pathname} />
-      <main className="min-w-0 pb-[calc(72px+env(safe-area-inset-bottom))] lg:pb-0">
-        <Outlet />
-      </main>
-      <TabBar pathname={pathname} />
+    <>
+      <Sky />
+      <div className="min-h-dvh lg:pl-[296px]">
+        <SideRail pathname={pathname} />
+        <main className="min-w-0 lg:pt-2">
+          <Outlet />
+        </main>
+        <TabBar pathname={pathname} />
+      </div>
+    </>
+  )
+}
+
+/** Floating glass capsule with a sliding indicator, plus a separate add button. */
+function TabBar({ pathname }: { pathname: string }) {
+  const { openExpense } = useUI()
+  const { data } = useStore()
+  const tripMatch = useMatch('/trips/:tripId/*')
+  const list = useRef<HTMLUListElement>(null)
+  const active = NAV.findIndex((n) => n.match(pathname))
+  const [pill, setPill] = useState<{ x: number; w: number } | null>(null)
+
+  useLayoutEffect(() => {
+    const el = list.current?.children[active] as HTMLElement | undefined
+    if (el) setPill({ x: el.offsetLeft, w: el.offsetWidth })
+  }, [active])
+
+  return (
+    <div className="safe-bottom pointer-events-none fixed inset-x-0 bottom-0 z-40 flex items-end justify-center gap-3 px-4 pb-3 lg:hidden">
+      <nav aria-label="Primary" className="glass-bar pointer-events-auto rounded-full p-1.5">
+        <ul ref={list} className="relative flex">
+          {pill && active >= 0 ? (
+            <span
+              aria-hidden
+              className="absolute top-0 bottom-0 rounded-full bg-accent-soft shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--color-accent)_18%,transparent)] transition-[left,width] duration-500 ease-[var(--ease-glide)]"
+              style={{ left: pill.x, width: pill.w }}
+            />
+          ) : null}
+          {NAV.map(({ to, label, icon: I }, i) => {
+            const on = i === active
+            return (
+              <li key={to} className="relative">
+                <NavLink
+                  to={to}
+                  aria-current={on ? 'page' : undefined}
+                  className={cx('press flex h-[52px] w-[76px] flex-col items-center justify-center gap-0.5 rounded-full text-[11px] font-semibold', on ? 'text-accent' : 'text-ink-3 hover:text-ink')}
+                >
+                  <I size={23} weight={on ? 'fill' : 'duotone'} aria-hidden />
+                  {label}
+                </NavLink>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+      <button
+        type="button"
+        aria-label="Add expense"
+        disabled={data.trips.length === 0}
+        onClick={() => openExpense({ tripId: tripMatch?.params.tripId })}
+        className="press pointer-events-auto flex size-[64px] items-center justify-center rounded-full text-white disabled:opacity-50 bg-[radial-gradient(circle_at_35%_25%,#8fbaff_0%,#3b7bff_45%,#1d4fd8_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.5),inset_0_-4px_10px_rgb(10_30_110/0.35),0_14px_30px_-10px_rgb(29_79_216/0.75)]"
+      >
+        <Plus size={28} weight="bold" aria-hidden />
+      </button>
     </div>
   )
 }
 
-function TabBar({ pathname }: { pathname: string }) {
-  return (
-    <nav
-      aria-label="Primary"
-      className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/97 backdrop-blur-[2px] lg:hidden"
-    >
-      <ul className="mx-auto grid h-[64px] max-w-md grid-cols-3">
-        {NAV.map(({ to, label, icon: Icon, match }) => {
-          const active = match(pathname)
-          return (
-            <li key={to}>
-              <NavLink
-                to={to}
-                aria-current={active ? 'page' : undefined}
-                className={cx(
-                  'flex h-full flex-col items-center justify-center gap-1 text-[11px] font-medium tracking-[0.01em] transition-colors',
-                  active ? 'text-forest' : 'text-ink-3 hover:text-ink',
-                )}
-              >
-                <span className={cx('flex h-7 w-12 items-center justify-center rounded-full transition-colors', active && 'bg-forest-50')}>
-                  <Icon size={21} strokeWidth={active ? 2.1 : 1.8} aria-hidden />
-                </span>
-                {label}
-              </NavLink>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
-  )
-}
-
+/** Desktop: a floating dark-glass rail over the sky. */
 function SideRail({ pathname }: { pathname: string }) {
   const views = useAllTripViews()
-  const { openTrip } = useUI()
-  const { me } = useStore()
-  const active = views
-    .filter((v) => v.status.phase !== 'completed')
-    .sort((a, b) => a.trip.startDate.localeCompare(b.trip.startDate))
+  const { openTrip, openExpense } = useUI()
+  const { me, data } = useStore()
+  const { phase } = useSky()
+  const tripMatch = useMatch('/trips/:tripId/*')
+  const active = views.filter((v) => v.status.phase !== 'completed').sort((a, b) => a.trip.startDate.localeCompare(b.trip.startDate))
   const recent = views
     .filter((v) => v.status.phase === 'completed')
     .sort((a, b) => b.trip.endDate.localeCompare(a.trip.endDate))
     .slice(0, 4)
 
   return (
-    <aside className="sticky top-0 hidden h-dvh flex-col bg-forest-900 text-[#e9efe9] lg:flex">
-      <div className="flex h-[72px] items-center gap-2.5 px-6">
-        <BrandMark />
-        <span className="text-[17px] font-semibold tracking-[-0.02em] text-white">TripMate</span>
+    <aside className="on-sky fixed top-4 bottom-4 left-4 z-30 hidden w-[264px] flex-col overflow-hidden rounded-[30px] bg-[#0a1640]/30 text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),inset_0_0_0_1px_rgb(255_255_255/0.12),0_24px_60px_-24px_rgb(4_10_40/0.6)] backdrop-blur-2xl backdrop-saturate-150 lg:flex">
+      <div className="flex h-[76px] items-center gap-3 px-6">
+        <BrandMark size={32} />
+        <div>
+          <p className="text-[17px] leading-5 font-semibold tracking-[-0.02em]">TripMate</p>
+          <p className="text-caption text-white/65">{SKY_LABEL[phase]} sky</p>
+        </div>
       </div>
       <nav aria-label="Primary" className="px-3">
-        <ul className="flex flex-col gap-0.5">
-          {NAV.map(({ to, label, icon: Icon, match }) => {
+        <ul className="flex flex-col gap-1">
+          {NAV.map(({ to, label, icon: I, match }) => {
             const on = match(pathname)
             return (
               <li key={to}>
                 <NavLink
                   to={to}
                   aria-current={on ? 'page' : undefined}
-                  className={cx(
-                    'flex h-10 items-center gap-3 rounded-[10px] px-3 text-body font-medium transition-colors',
-                    on ? 'bg-white/[0.09] text-white' : 'text-[#b9c8be] hover:bg-white/[0.05] hover:text-white',
-                  )}
+                  className={cx('press flex h-11 items-center gap-3 rounded-full px-4 text-body font-semibold', on ? 'bg-white text-[#0c1736] shadow-[0_8px_22px_-10px_rgb(0_0_0/0.4)]' : 'text-white/85 hover:bg-white/10')}
                 >
-                  <Icon size={19} strokeWidth={1.8} aria-hidden />
+                  <I size={20} weight={on ? 'fill' : 'duotone'} aria-hidden />
                   {label}
                 </NavLink>
               </li>
@@ -100,25 +131,29 @@ function SideRail({ pathname }: { pathname: string }) {
         </ul>
       </nav>
 
-      <div className="mt-8 min-h-0 flex-1 overflow-y-auto px-3">
-        {active.length > 0 ? <RailGroup title="On the way" views={active} pathname={pathname} /> : null}
+      <div className="mt-7 min-h-0 flex-1 overflow-y-auto px-3">
+        {active.length > 0 ? <RailGroup title="Coming up" views={active} pathname={pathname} /> : null}
         {recent.length > 0 ? <RailGroup title="Past trips" views={recent} pathname={pathname} /> : null}
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-white/[0.08] p-4">
+      <div className="flex flex-col gap-2 p-3">
         <button
           type="button"
-          onClick={() => openTrip()}
-          className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-white text-meta font-semibold text-forest-900 transition-colors hover:bg-forest-50"
+          disabled={data.trips.length === 0}
+          onClick={() => openExpense({ tripId: tripMatch?.params.tripId })}
+          className="press flex h-11 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#5b96ff,#2563eb)] text-meta font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_10px_24px_-10px_rgb(37_99_235/0.8)] disabled:opacity-50"
         >
-          <Plus size={17} strokeWidth={2.2} aria-hidden />
+          <Plus size={17} weight="bold" aria-hidden />
+          Add expense
+        </button>
+        <button type="button" onClick={() => openTrip()} className="press flex h-11 items-center justify-center gap-2 rounded-full bg-white/12 text-meta font-semibold text-white hover:bg-white/20">
           New trip
         </button>
-        <NavLink to="/profile" className="flex items-center gap-2.5 rounded-[10px] p-1.5 hover:bg-white/[0.05]">
-          <Avatar person={me} size={30} />
+        <NavLink to="/profile" className="mt-1 flex items-center gap-3 rounded-[20px] p-2 hover:bg-white/10">
+          <Avatar person={me} size={34} />
           <span className="min-w-0">
-            <span className="block truncate text-meta font-medium text-white">{me.name}</span>
-            <span className="block truncate text-caption text-[#9fb2a6]">{me.email ?? 'Profile and settings'}</span>
+            <span className="block truncate text-meta font-semibold">{me.name}</span>
+            <span className="block truncate text-caption text-white/65">{me.email ?? 'Profile and settings'}</span>
           </span>
         </NavLink>
       </div>
@@ -129,22 +164,17 @@ function SideRail({ pathname }: { pathname: string }) {
 function RailGroup({ title, views, pathname }: { title: string; views: ReturnType<typeof useAllTripViews>; pathname: string }) {
   return (
     <div className="mb-6">
-      <h3 className="px-3 pb-2 text-caption font-medium text-[#8fa597]">{title}</h3>
+      <h3 className="px-4 pb-2 text-caption font-semibold text-white/60">{title}</h3>
       <ul className="flex flex-col gap-0.5">
-        {views.map(({ trip }) => {
+        {views.map(({ trip }, i) => {
           const on = pathname.startsWith(`/trips/${trip.id}`)
           return (
             <li key={trip.id}>
-              <NavLink
-                to={`/trips/${trip.id}`}
-                className={cx(
-                  'flex items-center gap-3 rounded-[10px] px-3 py-2 transition-colors',
-                  on ? 'bg-white/[0.09]' : 'hover:bg-white/[0.05]',
-                )}
-              >
+              <NavLink to={`/trips/${trip.id}`} className={cx('press flex items-center gap-3 rounded-[18px] px-2 py-1.5', on ? 'bg-white/16' : 'hover:bg-white/8')}>
+                <Window photo={trip.cover} seed={i + 1} shade={0} className="aspect-[0.8] w-8 shrink-0" />
                 <span className="min-w-0 flex-1">
-                  <span className={cx('block truncate text-meta font-medium', on ? 'text-white' : 'text-[#dce5de]')}>{trip.name}</span>
-                  <span className="block truncate text-caption text-[#8fa597]">{fmt.monthYear(trip.startDate)}</span>
+                  <span className="block truncate text-meta font-semibold">{trip.name}</span>
+                  <span className="block truncate text-caption text-white/60">{fmt.monthYear(trip.startDate)}</span>
                 </span>
               </NavLink>
             </li>

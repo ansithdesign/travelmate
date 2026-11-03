@@ -16,6 +16,7 @@ import { TripExpenses } from './pages/TripExpenses'
 import { TripOverview } from './pages/TripOverview'
 import { StoreProvider, useStore } from './store/store'
 import { UIProvider } from './store/ui'
+import { SkyProvider } from './store/sky'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -41,6 +42,7 @@ function Stores({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <SkyProvider>
       <ToastProvider>
         <Stores>
           <UIProvider>
@@ -65,6 +67,7 @@ export default function App() {
           </UIProvider>
         </Stores>
       </ToastProvider>
+      </SkyProvider>
     </BrowserRouter>
   )
 }

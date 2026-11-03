@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { BedDouble, Copy, ExternalLink, Link2, MapPin, Pencil, Plane, Plus, Trash2, type LucideIcon } from 'lucide-react'
-import { TripPage, TripSubnav } from '../components/trips/TripHeader'
+import { AirplaneTilt, ArrowSquareOut, Bed, Copy, type Icon, LinkSimple, MapPin, PencilSimple, Plus, Trash } from '@phosphor-icons/react'
+import { TripSkyHeader } from '../components/trips/TripHeader'
+import { ContentSheet, SheetBody } from '../components/shared/Page'
 import { Button } from '../components/ui/Button'
 import { Menu } from '../components/ui/Menu'
 import { Segmented } from '../components/ui/Controls'
@@ -16,11 +17,11 @@ import { cx } from '../utils/cx'
 import { uid } from '../utils/id'
 import { NotFound } from './NotFound'
 
-const KINDS: { kind: InfoItem['kind']; label: string; icon: LucideIcon; add: string }[] = [
-  { kind: 'stay', label: 'Stays', icon: BedDouble, add: 'Add a stay' },
-  { kind: 'transport', label: 'Getting around', icon: Plane, add: 'Add travel' },
+const KINDS: { kind: InfoItem['kind']; label: string; icon: Icon; add: string }[] = [
+  { kind: 'stay', label: 'Stays', icon: Bed, add: 'Add a stay' },
+  { kind: 'transport', label: 'Getting around', icon: AirplaneTilt, add: 'Add travel' },
   { kind: 'address', label: 'Addresses', icon: MapPin, add: 'Add an address' },
-  { kind: 'link', label: 'Links', icon: Link2, add: 'Add a link' },
+  { kind: 'link', label: 'Links', icon: LinkSimple, add: 'Add a link' },
 ]
 
 export function Details() {
@@ -29,10 +30,12 @@ export function Details() {
   if (!view) return <NotFound />
   return (
     <>
-      <TripSubnav view={view} />
-      <TripPage wide>
+      <TripSkyHeader view={view} title="Details" />
+      <ContentSheet>
+        <SheetBody>
         <DetailsBody view={view} />
-      </TripPage>
+        </SheetBody>
+      </ContentSheet>
     </>
   )
 }
@@ -56,16 +59,17 @@ function DetailsBody({ view }: { view: TripView }) {
   return (
     <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="min-w-0">
-        <h1 className="text-title">Trip details</h1>
-        <p className="mt-1 text-body text-ink-2">Bookings, addresses and links, so nobody scrolls back through the group chat.</p>
+        <p className="text-body text-ink-2">Bookings, addresses and links, so nobody scrolls back through the group chat.</p>
 
         {KINDS.map(({ kind, label, icon: Icon, add }) => {
           const items = trip.info.filter((i) => i.kind === kind)
           return (
-            <section key={kind} aria-labelledby={`k-${kind}`} className="mt-8">
+            <section key={kind} aria-labelledby={`k-${kind}`} className="mt-7">
               <div className="flex items-center justify-between">
                 <h2 id={`k-${kind}`} className="flex items-center gap-2 text-heading">
-                  <Icon size={17} strokeWidth={1.9} className="text-ink-3" aria-hidden />
+                  <span className="flex size-8 items-center justify-center rounded-full bg-accent-soft text-accent">
+                    <Icon size={18} weight="duotone" aria-hidden />
+                  </span>
                   {label}
                 </h2>
                 <Button size="sm" variant="quiet" icon={Plus} onClick={() => setEditing({ id: uid('i-'), kind, title: '' })}>
@@ -75,7 +79,7 @@ function DetailsBody({ view }: { view: TripView }) {
               {items.length === 0 ? (
                 <p className="mt-1 text-meta text-ink-3">Nothing added.</p>
               ) : (
-                <ul className="mt-1 divide-y divide-line-soft">
+                <ul className="panel mt-2 divide-y divide-line overflow-hidden rounded-[24px]">
                   {items.map((it) => (
                     <InfoRow key={it.id} item={it} onEdit={() => setEditing(it)} onDelete={() => setDeleting(it)} />
                   ))}
@@ -141,14 +145,14 @@ function DetailsBody({ view }: { view: TripView }) {
 function InfoRow({ item, onEdit, onDelete }: { item: InfoItem; onEdit: () => void; onDelete: () => void }) {
   const toast = useToast()
   return (
-    <li className="flex items-start gap-2 py-3.5">
+    <li className="flex items-start gap-2 py-3 pr-2 pl-4">
       <div className="min-w-0 flex-1">
         {item.kind === 'link' && item.url ? (
-          <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 font-medium text-forest hover:underline">
-            {item.title} <ExternalLink size={14} aria-hidden />
+          <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline">
+            {item.title} <ArrowSquareOut size={15} weight="bold" aria-hidden />
           </a>
         ) : (
-          <p className="font-medium">{item.title}</p>
+          <p className="font-semibold">{item.title}</p>
         )}
         {item.subtitle ? <p className="text-meta text-ink-2">{item.subtitle}</p> : null}
         {item.detail ? <p className="mt-0.5 text-meta text-ink-3">{item.detail}</p> : null}
@@ -163,19 +167,19 @@ function InfoRow({ item, onEdit, onDelete }: { item: InfoItem; onEdit: () => voi
                 toast.error('Could not copy')
               }
             }}
-            className="num mt-1.5 inline-flex h-7 items-center gap-1.5 rounded-[7px] bg-sunken px-2 text-caption font-medium tracking-[0.02em] text-ink-2 hover:bg-line-soft"
+            className="press mt-2 inline-flex h-7 items-center gap-1.5 rounded-full bg-well px-3 font-mono text-[11px] font-medium tracking-[0.06em] text-ink-2 hover:bg-accent-soft hover:text-accent"
             aria-label={`Copy reference ${item.reference}`}
           >
             {item.reference}
-            <Copy size={12} aria-hidden />
+            <Copy size={13} weight="bold" aria-hidden />
           </button>
         ) : null}
       </div>
       <Menu
         label={`Actions for ${item.title}`}
         items={[
-          { label: 'Edit', icon: Pencil, onSelect: onEdit },
-          { label: 'Remove', icon: Trash2, onSelect: onDelete, danger: true },
+          { label: 'Edit', icon: PencilSimple, onSelect: onEdit },
+          { label: 'Remove', icon: Trash, onSelect: onDelete, danger: true },
         ]}
       />
     </li>
@@ -251,7 +255,7 @@ function Itinerary({ view }: { view: TripView }) {
   }
 
   return (
-    <section aria-labelledby="itinerary" className="min-w-0 lg:pt-[68px]">
+    <section aria-labelledby="itinerary" className="min-w-0 lg:pt-[52px]">
       <h2 id="itinerary" className="text-heading">
         Day by day
       </h2>
@@ -267,22 +271,24 @@ function Itinerary({ view }: { view: TripView }) {
               aria-selected={on}
               onClick={() => setActive(d)}
               className={cx(
-                'flex h-[58px] w-[54px] shrink-0 flex-col items-center justify-center rounded-t-[27px] rounded-b-[8px] transition-colors',
-                on ? 'bg-forest text-white' : 'bg-surface text-ink hairline hover:bg-ground',
+                'press flex h-[68px] w-[56px] shrink-0 flex-col items-center justify-center rounded-[22px] transition-colors',
+                on
+                  ? 'bg-[linear-gradient(180deg,#4f8dff,#2563eb)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_10px_22px_-10px_rgb(37_99_235/0.8)]'
+                  : 'bg-panel-strong text-ink ring-line hover:bg-well',
               )}
             >
-              <span className={cx('text-[10px] font-semibold tracking-[0.06em] uppercase', on ? 'text-forest-100' : 'text-ink-3')}>Day {i + 1}</span>
-              <span className="num text-heading leading-5">{parseDate(d).getDate()}</span>
-              <span aria-hidden className={cx('mt-0.5 size-1 rounded-full', has ? (on ? 'bg-amber' : 'bg-forest') : 'bg-transparent')} />
+              <span className={cx('text-[10px] font-semibold tracking-[0.06em] uppercase', on ? 'text-white/80' : 'text-ink-3')}>Day {i + 1}</span>
+              <span className="num text-[22px] leading-7 font-light tracking-[-0.03em]">{parseDate(d).getDate()}</span>
+              <span aria-hidden className={cx('mt-0.5 size-1 rounded-full', has ? (on ? 'bg-sun' : 'bg-accent') : 'bg-transparent')} />
             </button>
           )
         })}
       </div>
-      <div className="mt-4 rounded-lg bg-surface p-4 hairline" role="tabpanel">
-        <p className="text-meta font-medium text-ink-2">{fmt.long(active)}</p>
+      <div className="panel mt-4 rounded-[28px] p-5" role="tabpanel">
+        <p className="text-heading">{fmt.long(active)}</p>
         <TextArea
           aria-label={`Plan for ${fmt.long(active)}`}
-          className="mt-2 min-h-28 shadow-none hover:shadow-none focus:shadow-[inset_0_0_0_1.5px_var(--color-forest)] bg-ground"
+          className="mt-3 min-h-32"
           placeholder="What is the plan? Keep it short: places, times, who is booking what."
           value={text}
           onChange={(e) => setText(e.target.value)}

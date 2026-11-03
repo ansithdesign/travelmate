@@ -1,50 +1,52 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
-import { Loader2, type LucideIcon } from 'lucide-react'
+import { CircleNotch, type Icon, type IconWeight } from '@phosphor-icons/react'
 import { cx } from '../../utils/cx'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'quiet' | 'accent' | 'onDark'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'quiet' | 'danger' | 'sky' | 'white'
 type Size = 'sm' | 'md' | 'lg'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant
   size?: Size
-  icon?: LucideIcon
-  iconRight?: LucideIcon
+  icon?: Icon
+  iconRight?: Icon
+  iconWeight?: IconWeight
   loading?: boolean
   block?: boolean
   children?: ReactNode
 }
 
 const variants: Record<Variant, string> = {
+  // Luminous sky-blue pill with a lit top edge
   primary:
-    'bg-forest text-white hover:bg-forest-700 active:bg-forest-900 disabled:bg-forest-200 disabled:text-white/90',
-  secondary:
-    'bg-surface text-ink hairline hover:bg-ground active:bg-sunken disabled:text-ink-3',
-  ghost: 'text-ink hover:bg-sunken/70 active:bg-sunken disabled:text-ink-3',
-  accent: 'bg-amber text-[#2b1d05] hover:bg-[#d69728] active:bg-[#b97d17] disabled:opacity-50',
-  onDark: 'text-white hover:bg-white/10 active:bg-white/15',
-  quiet: 'text-forest hover:bg-forest-50 active:bg-forest-100 disabled:text-ink-3',
-  danger: 'bg-brick text-white hover:bg-[#8c3523] active:bg-[#762c1d] disabled:opacity-50',
+    'text-white bg-[linear-gradient(180deg,#4f8dff_0%,#2563eb_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_1px_2px_rgb(23_73_196/0.3),0_10px_24px_-10px_rgb(37_99_235/0.7)] hover:brightness-[1.06] disabled:opacity-45 disabled:shadow-none',
+  secondary: 'bg-panel-strong text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong),0_1px_2px_rgb(var(--t-shadow)/0.06)] hover:bg-panel disabled:text-ink-3',
+  ghost: 'text-ink hover:bg-well disabled:text-ink-3',
+  quiet: 'text-accent hover:bg-accent-soft disabled:text-ink-3',
+  danger:
+    'text-white bg-[linear-gradient(180deg,#f2566a_0%,#d02c42_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_10px_24px_-12px_rgb(214_54_74/0.7)] hover:brightness-105 disabled:opacity-45',
+  sky: 'glass text-white [text-shadow:0_1px_8px_rgb(8_22_70/0.35)] hover:bg-white/30',
+  white: 'bg-white text-[#0c1736] shadow-[0_10px_30px_-12px_rgb(8_20_60/0.5),inset_0_-1px_0_rgb(12_23_54/0.08)] hover:bg-white/92',
 }
 
 const sizes: Record<Size, string> = {
-  sm: 'h-9 px-3 text-meta gap-1.5 rounded-[10px]',
-  md: 'h-11 px-4 text-body gap-2 rounded-md',
-  lg: 'h-13 px-5 text-body gap-2 rounded-md',
+  sm: 'h-9 px-3.5 text-meta gap-1.5',
+  md: 'h-11 px-5 text-body gap-2',
+  lg: 'h-[52px] px-6 text-body gap-2',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = 'primary', size = 'md', icon: Icon, iconRight: IconRight, loading, block, className, children, disabled, type = 'button', ...rest },
+  { variant = 'primary', size = 'md', icon: IconL, iconRight: IconR, iconWeight = 'bold', loading, block, className, children, disabled, type = 'button', ...rest },
   ref,
 ) {
-  const iconSize = size === 'sm' ? 16 : 18
+  const s = size === 'sm' ? 16 : 18
   return (
     <button
       ref={ref}
       type={type}
       disabled={disabled || loading}
       className={cx(
-        'inline-flex shrink-0 select-none items-center justify-center font-medium whitespace-nowrap transition-[background-color,color,box-shadow,transform] duration-150 active:scale-[0.985] disabled:cursor-not-allowed disabled:active:scale-100',
+        'press inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold tracking-[-0.005em] whitespace-nowrap disabled:cursor-not-allowed',
         variants[variant],
         sizes[size],
         block && 'w-full',
@@ -52,17 +54,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       )}
       {...rest}
     >
-      {loading ? <Loader2 size={iconSize} className="animate-spin" aria-hidden /> : Icon ? <Icon size={iconSize} strokeWidth={1.9} aria-hidden /> : null}
+      {loading ? <CircleNotch size={s} weight="bold" className="animate-spin" aria-hidden /> : IconL ? <IconL size={s} weight={iconWeight} aria-hidden /> : null}
       {children}
-      {IconRight && !loading ? <IconRight size={iconSize} strokeWidth={1.9} aria-hidden /> : null}
+      {IconR && !loading ? <IconR size={s} weight={iconWeight} aria-hidden /> : null}
     </button>
   )
 })
 
 export const IconButton = forwardRef<
   HTMLButtonElement,
-  ButtonHTMLAttributes<HTMLButtonElement> & { icon: LucideIcon; label: string; tone?: 'plain' | 'onImage' | 'surface' }
->(function IconButton({ icon: Icon, label, tone = 'plain', className, type = 'button', ...rest }, ref) {
+  ButtonHTMLAttributes<HTMLButtonElement> & { icon: Icon; label: string; tone?: 'plain' | 'sky' | 'panel'; weight?: IconWeight; size?: number }
+>(function IconButton({ icon: I, label, tone = 'plain', weight = 'bold', size = 20, className, type = 'button', ...rest }, ref) {
   return (
     <button
       ref={ref}
@@ -70,15 +72,15 @@ export const IconButton = forwardRef<
       aria-label={label}
       title={label}
       className={cx(
-        'inline-flex size-11 shrink-0 items-center justify-center rounded-full transition-colors duration-150',
-        tone === 'plain' && 'text-ink hover:bg-sunken/80 active:bg-sunken',
-        tone === 'surface' && 'bg-surface text-ink hairline hover:bg-ground',
-        tone === 'onImage' && 'bg-white/92 text-ink shadow-lift hover:bg-white',
+        'press inline-flex size-11 shrink-0 items-center justify-center rounded-full',
+        tone === 'plain' && 'text-ink hover:bg-well',
+        tone === 'panel' && 'bg-panel-strong text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong)] hover:bg-panel',
+        tone === 'sky' && 'glass text-white hover:bg-white/30',
         className,
       )}
       {...rest}
     >
-      <Icon size={20} strokeWidth={1.8} aria-hidden />
+      <I size={size} weight={weight} aria-hidden />
     </button>
   )
 })

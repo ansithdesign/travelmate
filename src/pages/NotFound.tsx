@@ -1,15 +1,16 @@
 import { Link } from 'react-router-dom'
-import { Milestone } from '../components/ui/Milestone'
+import { SkyHero } from '../components/shared/Page'
+import { Window } from '../components/ui/Cover'
 
 export function NotFound() {
   return (
-    <div className="mx-auto flex min-h-[70dvh] max-w-[440px] flex-col items-center justify-center px-6 text-center">
-      <Milestone tone="ink" cap="Road" value="end" size="lg" label="Dead end" />
-      <h1 className="mt-6 text-title">This page is not on the map</h1>
-      <p className="mt-2 text-body text-ink-2">The trip may have been deleted, or the link is wrong.</p>
-      <Link to="/" className="mt-6 inline-flex h-11 items-center rounded-md bg-forest px-4 font-medium text-white hover:bg-forest-700">
+    <SkyHero className="flex min-h-[80dvh] flex-col items-center justify-center text-center">
+      <Window seed={3} shade={0.55} className="aspect-[0.76] w-[150px]" />
+      <h1 className="text-sky mt-8 text-display">Lost in the clouds</h1>
+      <p className="text-sky-2 mt-2 max-w-[34ch] text-body">This trip may have been deleted, or the link is wrong.</p>
+      <Link to="/" className="press mt-6 inline-flex h-12 items-center rounded-full bg-white px-6 font-semibold text-[#0c1736] shadow-[0_10px_30px_-12px_rgb(8_20_60/0.5)]">
         Back to trips
       </Link>
-    </div>
+    </SkyHero>
   )
 }

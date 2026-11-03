@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowDownUp, Search, SlidersHorizontal, X } from 'lucide-react'
+import { ArrowsDownUp, MagnifyingGlass, SlidersHorizontal, X } from '@phosphor-icons/react'
 import { CATEGORIES } from '../../data/categories'
 import { useStore } from '../../store/store'
 import type { CategoryId, CurrencyCode, Expense, ID, Trip } from '../../types'
@@ -12,6 +12,7 @@ import { Field, TextInput, inputClass } from '../ui/Field'
 import { Sheet } from '../ui/Sheet'
 import { ExpenseDetailSheet } from './ExpenseDetailSheet'
 import { ExpenseRow } from './ExpenseRow'
+import { CategoryIcon } from '../icons/CategoryIcon'
 import { Avatar } from '../ui/Avatar'
 import { firstName } from '../../utils/id'
 
@@ -108,7 +109,7 @@ export function ExpenseList({
         title="No expenses yet"
         body="Add the first one when someone pays. Splits and balances update on their own."
         action={emptyAction}
-        marker={<span className="flex h-14 w-11 items-end justify-center rounded-t-full rounded-b-[6px] bg-surface pb-2 shadow-[0_0_0_1px_var(--color-line)]"><span className="h-1 w-5 rounded-full bg-line" /></span>}
+        art={<CategoryIcon id="other" size={64} />}
       />
     )
   }
@@ -117,30 +118,30 @@ export function ExpenseList({
     <div>
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search size={18} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-ink-3" aria-hidden />
+          <MagnifyingGlass size={19} weight="bold" className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-ink-3" aria-hidden />
           <TextInput
             type="search"
             aria-label="Search expenses"
             placeholder={multiTrip ? 'Search expenses, people, trips' : 'Search expenses or people'}
             value={f.q}
             onChange={(e) => setF((x) => ({ ...x, q: e.target.value }))}
-            className="h-11 pl-10"
+            className="h-12 rounded-full pl-11"
           />
         </div>
-        <Button variant="secondary" icon={SlidersHorizontal} onClick={() => setSheet(true)} aria-label="Filters and sort" className="relative px-3.5">
+        <Button variant="secondary" size="lg" icon={SlidersHorizontal} onClick={() => setSheet(true)} aria-label="Filters and sort" className="relative h-12 px-4">
           <span className="hidden sm:inline">Filters</span>
-          {advanced ? <span className="num ml-0.5 flex size-5 items-center justify-center rounded-full bg-forest text-[11px] font-semibold text-white">{advanced}</span> : null}
+          {advanced ? <span className="num absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-white">{advanced}</span> : null}
         </Button>
       </div>
 
-      <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 pb-1 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
         <Chip active={f.categories.length === 0} onClick={() => setF((x) => ({ ...x, categories: [] }))}>
           All
         </Chip>
         {CATEGORIES.filter((c) => catCounts[c.id]).map((c) => (
           <Chip
             key={c.id}
-            icon={c.icon}
+            leading={<CategoryIcon id={c.id} size={28} />}
             active={f.categories.includes(c.id)}
             count={catCounts[c.id]}
             onClick={() =>
@@ -152,16 +153,16 @@ export function ExpenseList({
         ))}
       </div>
 
-      <div className="mt-5 flex items-baseline justify-between gap-3 border-b border-line pb-2.5 text-meta">
+      <div className="mt-5 flex items-baseline justify-between gap-3 px-1 text-meta">
         <span className="text-ink-2">
           {filtered.length} {filtered.length === 1 ? 'expense' : 'expenses'}
           {anyFilter ? (
-            <button type="button" onClick={() => setF(EMPTY)} className="ml-2 inline-flex items-center gap-1 font-medium text-forest hover:underline">
+            <button type="button" onClick={() => setF(EMPTY)} className="press ml-2 inline-flex h-7 items-center gap-1 rounded-full bg-accent-soft px-2.5 font-semibold text-accent">
               <X size={13} aria-hidden /> Clear
             </button>
           ) : null}
         </span>
-        {singleCurrency ? <span className="num font-medium">{formatMoney(total, { currency: singleCurrency })}</span> : <span className="text-ink-3">Mixed currencies</span>}
+        {singleCurrency ? <span className="num text-heading">{formatMoney(total, { currency: singleCurrency })}</span> : <span className="text-ink-3">Mixed currencies</span>}
       </div>
 
       {filtered.length === 0 ? (
@@ -172,12 +173,12 @@ export function ExpenseList({
           return (
             <section key={g.key} className="mt-4">
               {g.label ? (
-                <h3 className="flex items-baseline justify-between py-1 text-meta">
-                  <span className="font-medium text-ink-2">{g.label}</span>
+                <h3 className="flex items-baseline justify-between px-1 pb-2 text-meta">
+                  <span className="font-semibold text-ink-2">{g.label}</span>
                   {singleCurrency ? <span className="num text-ink-3">{formatMoney(dayTotal, { currency: singleCurrency })}</span> : null}
                 </h3>
               ) : null}
-              <ul className="divide-y divide-line-soft">
+              <ul className="panel divide-y divide-line overflow-hidden rounded-[24px]">
                 {g.items.map((e) => (
                   <li key={e.id}>
                     <ExpenseRow
@@ -215,7 +216,7 @@ export function ExpenseList({
         <div className="flex flex-col gap-6">
           <div>
             <h3 className="mb-2 flex items-center gap-1.5 text-meta font-medium text-ink-2">
-              <ArrowDownUp size={14} aria-hidden /> Sort by
+              <ArrowsDownUp size={14} aria-hidden /> Sort by
             </h3>
             <Segmented
               label="Sort by"
@@ -241,9 +242,9 @@ export function ExpenseList({
                   type="button"
                   aria-pressed={f.paidBy === p.id}
                   onClick={() => setF((x) => ({ ...x, paidBy: p.id }))}
-                  className={cx('inline-flex h-9 items-center gap-1.5 rounded-full py-0.5 pr-3.5 pl-0.5 text-meta font-medium', f.paidBy === p.id ? 'bg-ink text-white' : 'bg-surface text-ink-2 hairline')}
+                  className={cx('press inline-flex h-10 items-center gap-1.5 rounded-full py-0.5 pr-4 pl-1 text-meta font-semibold', f.paidBy === p.id ? 'bg-ink text-ink-inverse' : 'bg-panel-strong text-ink-2 ring-line')}
                 >
-                  <Avatar person={p} size={28} />
+                  <Avatar person={p} size={32} />
                   {p.isYou ? 'You' : firstName(p.name)}
                 </button>
               ))}

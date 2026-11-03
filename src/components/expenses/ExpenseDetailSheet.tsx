@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pencil, Trash2 } from 'lucide-react'
+import { PencilSimple, Trash } from '@phosphor-icons/react'
 import { categoryById } from '../../data/categories'
 import { SAMPLE_RECEIPTS } from '../../data/sampleReceipts'
 import { useStore } from '../../store/store'
@@ -15,6 +15,7 @@ import { Figure } from '../ui/Money'
 import { ConfirmDialog, Sheet } from '../ui/Sheet'
 import { useToast } from '../ui/Toast'
 import { ReceiptPaper } from '../receipts/ReceiptPaper'
+import { CategoryIcon } from '../icons/CategoryIcon'
 
 const METHOD_LABEL = { equal: 'Split equally', exact: 'Split by amounts', percent: 'Split by percentage', shares: 'Split by shares' }
 
@@ -45,12 +46,12 @@ export function ExpenseDetailSheet({ expense, onClose }: { expense: Expense | nu
         description={trip?.name}
         footer={
           <div className="flex gap-2">
-            <Button variant="ghost" icon={Trash2} className="text-brick hover:bg-brick-50" onClick={() => setConfirm(true)}>
+            <Button variant="ghost" icon={Trash} className="text-loss hover:bg-loss-soft" onClick={() => setConfirm(true)}>
               Delete
             </Button>
             <Button
               className="flex-1"
-              icon={Pencil}
+              icon={PencilSimple}
               onClick={() => {
                 onClose()
                 openExpense({ expenseId: e.id, tripId: e.tripId })
@@ -63,12 +64,12 @@ export function ExpenseDetailSheet({ expense, onClose }: { expense: Expense | nu
       >
         <div className="flex items-end justify-between gap-4 pb-4">
           <Figure value={e.amount} currency={currency} />
-          <span className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-sunken px-3 py-1 text-meta font-medium text-ink-2">
-            <cat.icon size={15} aria-hidden />
+          <span className="mb-1.5 inline-flex items-center gap-1.5 rounded-full bg-well px-3 py-1 text-meta font-medium text-ink-2">
+            <CategoryIcon id={e.category} size={22} />
             {cat.label}
           </span>
         </div>
-        <dl className="divide-y divide-line-soft border-y border-line-soft">
+        <dl className="divide-y divide-line border-y border-line">
           <DetailRow label="Paid by">{payer?.isYou ? 'You' : payer?.name}</DetailRow>
           <DetailRow label="When">
             {fmt.weekday(e.date)}, {fmt.time(e.date)}
@@ -77,7 +78,7 @@ export function ExpenseDetailSheet({ expense, onClose }: { expense: Expense | nu
         </dl>
 
         <h3 className="mt-6 mb-1 text-meta font-medium text-ink-2">Who owes what</h3>
-        <ul className="divide-y divide-line-soft">
+        <ul className="divide-y divide-line">
           {e.split.participants.map((id) => {
             const p = person(id) as Person
             if (!p) return null
@@ -107,10 +108,10 @@ export function ExpenseDetailSheet({ expense, onClose }: { expense: Expense | nu
         {e.receipt ? (
           <>
             <h3 className="mt-6 mb-2 text-meta font-medium text-ink-2">Receipt</h3>
-            <div className="flex flex-col gap-4 rounded-lg bg-sunken p-4 sm:flex-row sm:items-start">
+            <div className="flex flex-col gap-4 rounded-[24px] bg-well p-4 sm:flex-row sm:items-start">
               <div className="mx-auto w-[180px] shrink-0">
                 {e.receipt.image ? (
-                  <img src={e.receipt.image} alt={`Receipt from ${e.receipt.merchant || 'merchant'}`} className="w-full rounded-[6px] shadow-lift" />
+                  <img src={e.receipt.image} alt={`Receipt from ${e.receipt.merchant || 'merchant'}`} className="w-full rounded-[6px] shadow-[0_8px_20px_-10px_rgb(var(--t-shadow)/0.4)]" />
                 ) : sample ? (
                   <ReceiptPaper receipt={sample} compact />
                 ) : null}

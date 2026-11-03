@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CircleCheck, Pencil, RotateCcw, Trash2 } from 'lucide-react'
+import { ArrowCounterClockwise, CheckCircle, PencilSimple, Trash } from '@phosphor-icons/react'
 import type { TripView } from '../../hooks/useTrip'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
@@ -18,18 +18,18 @@ export function useTripActions(view: TripView) {
   const { trip, status, settled, expenses } = view
 
   const items: MenuItem[] = [
-    { label: 'Edit trip', icon: Pencil, onSelect: () => openTrip(trip.id) },
+    { label: 'Edit trip', icon: PencilSimple, onSelect: () => openTrip(trip.id) },
     status.phase === 'completed'
       ? {
           label: 'Reopen trip',
-          icon: RotateCcw,
+          icon: ArrowCounterClockwise,
           onSelect: () => {
             saveTrip({ ...trip, completed: false, completedAt: undefined })
             toast.success('Trip reopened')
           },
         }
-      : { label: 'Mark as completed', icon: CircleCheck, onSelect: () => setConfirm('complete') },
-    { label: 'Delete trip', icon: Trash2, danger: true, onSelect: () => setConfirm('delete') },
+      : { label: 'Mark as completed', icon: CheckCircle, onSelect: () => setConfirm('complete') },
+    { label: 'Delete trip', icon: Trash, danger: true, onSelect: () => setConfirm('delete') },
   ]
 
   const dialogs = (

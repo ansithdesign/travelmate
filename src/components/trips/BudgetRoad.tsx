@@ -1,78 +1,114 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { CurrencyCode, Paise } from '../../types'
 import { cx } from '../../utils/cx'
-import { formatCompact, formatMoney } from '../../utils/money'
+import { formatMoney } from '../../utils/money'
+
+const PATH = 'M 18 78 Q 160 -18 302 78'
 
 /**
- * Budget drawn as a road. Spending is the distance covered; small kilometre
- * stones stand at each quarter of the budget with the amount they mark, and an
- * amber stone shows where the group is now. Overrun turns the road brick.
+ * Budget as a flight path. The plane takes off from zero and flies along the arc
+ * to how much of the budget has been spent. The destination pin is the budget.
+ * Over budget, the plane lands past the pin and the trail turns coral.
  */
-export function BudgetRoad({ spent, budget, className, currency }: { spent: Paise; budget: Paise; className?: string; currency?: CurrencyCode }) {
+export function FlightPath({ spent, budget, className, currency }: { spent: Paise; budget: Paise; className?: string; currency?: CurrencyCode }) {
   const ratio = budget > 0 ? spent / budget : 0
-  const pct = Math.min(ratio, 1) * 100
+  const target = Math.min(ratio, 1)
   const over = spent > budget
   const left = budget - spent
-  const stones = [25, 50, 75]
-  // The one authored motion: the road fills and the amber stone travels to today's spend when the trip opens.
-  const [shown, setShown] = useState(0)
+  const pathRef = useRef<SVGPathElement>(null)
+  const [p, setP] = useState(0)
+  const [pt, setPt] = useState({ x: 18, y: 78, a: -50 })
+  const [len, setLen] = useState(400)
+  const u = useId().replace(/:/g, '')
+
+  // Fly the plane to the target with an exponential ease.
   useEffect(() => {
-    const r = requestAnimationFrame(() => setShown(pct))
-    return () => cancelAnimationFrame(r)
-  }, [pct])
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reduce) {
+      setP(target)
+      return
+    }
+    const start = performance.now()
+    let raf = 0
+    const from = 0
+    const tick = (t: number) => {
+      const k = Math.min(1, (t - start) / 1600)
+      const e = 1 - Math.pow(2, -10 * k)
+      setP(from + (target - from) * (k >= 1 ? 1 : e))
+      if (k < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [target])
+
+  useEffect(() => {
+    const path = pathRef.current
+    if (!path) return
+    const L = path.getTotalLength()
+    setLen(L)
+    const at = Math.max(0.001, Math.min(p, 0.999)) * L
+    const a = path.getPointAtLength(at)
+    const b = path.getPointAtLength(Math.min(L, at + 1))
+    setPt({ x: a.x, y: a.y, a: (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI })
+  }, [p])
 
   return (
     <div className={className}>
       <div className="flex items-baseline justify-between gap-3 text-meta">
         <span className="text-ink-2">
-          <span className="num font-medium text-ink">{Math.round(ratio * 100)}%</span> of {formatMoney(budget, { currency })} budget
+          <span className="num font-semibold text-ink">{Math.round(ratio * 100)}%</span> of the {formatMoney(budget, { currency })} budget
         </span>
-        <span className={cx('num font-medium', over ? 'text-brick' : 'text-ink')}>
+        <span className={cx('num font-semibold', over ? 'text-loss' : 'text-gain')}>
           {over ? `${formatMoney(-left, { currency })} over` : `${formatMoney(left, { currency })} left`}
         </span>
       </div>
-
-      <div
-        className="relative mt-3 pt-[18px] pb-5"
+      <svg
+        viewBox="0 0 320 92"
+        className="mx-auto mt-1 block w-full max-w-[440px] overflow-visible"
         role="meter"
         aria-valuemin={0}
         aria-valuemax={budget / 100}
         aria-valuenow={spent / 100}
         aria-label={`Budget used: ${formatMoney(spent, { currency })} of ${formatMoney(budget, { currency })}`}
       >
-        {/* Road surface with its centre line */}
-        <div className="relative h-3 overflow-hidden rounded-[3px] bg-[#dcd7cc]">
-          <div
-            className={cx('absolute inset-y-0 left-0 transition-[width] duration-[900ms] ease-[var(--ease-out-expo)]', over ? 'bg-brick' : 'bg-forest')}
-            style={{ width: `${shown}%` }}
+        <defs>
+          <linearGradient id={`${u}t`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stopColor={over ? '#ff8a8a' : '#60a5fa'} />
+            <stop offset="1" stopColor={over ? '#e5484d' : '#2563eb'} />
+          </linearGradient>
+        </defs>
+        {/* Planned route */}
+        <path d={PATH} fill="none" stroke="currentColor" className="text-ink/15" strokeWidth="2" strokeDasharray="2 7" strokeLinecap="round" />
+        {/* Flown */}
+        <path
+          ref={pathRef}
+          d={PATH}
+          fill="none"
+          stroke={`url(#${u}t)`}
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          strokeDasharray={`${len * p} ${len}`}
+        />
+        {/* Origin */}
+        <circle cx="18" cy="78" r="5" className="fill-panel-strong" stroke="currentColor" strokeWidth="2" style={{ color: over ? '#e5484d' : '#2563eb' }} />
+        {/* Destination pin */}
+        <g transform="translate(302 78)">
+          <circle r="11" fill={over ? 'rgb(229 72 77 / 0.15)' : 'rgb(37 99 235 / 0.12)'} />
+          <path d="M0 -9c-3.6 0-6.2 2.7-6.2 6 0 4.4 6.2 9.6 6.2 9.6s6.2-5.2 6.2-9.6c0-3.3-2.6-6-6.2-6z" fill={over ? '#e5484d' : '#ff8a5c'} />
+          <circle cy="-3" r="2.2" fill="#fff" />
+        </g>
+        {/* Plane */}
+        <g transform={`translate(${pt.x} ${pt.y}) rotate(${pt.a})`}>
+          <circle r="13" className="fill-panel-strong" style={{ filter: 'drop-shadow(0 4px 8px rgb(12 23 54 / 0.25))' }} />
+          <path
+            d="M7.2 0c0-.8-.7-1.4-1.6-1.4H1.6L-2.8-7.4h-2l2 6H-6l-1.6-2H-9l1 3.4L-9 3.4h1.4L-6 1.4h3.2l-2 6h2L1.6 1.4h4c.9 0 1.6-.6 1.6-1.4z"
+            fill={over ? '#e5484d' : '#2563eb'}
           />
-          <div
-            aria-hidden
-            className="absolute inset-x-1 top-1/2 h-px -translate-y-1/2 opacity-80"
-            style={{ backgroundImage: 'repeating-linear-gradient(90deg, #fff 0 8px, transparent 8px 16px)' }}
-          />
-        </div>
-
-        {/* Kilometre stones at each quarter */}
-        {stones.map((t) => (
-          <span key={t} aria-hidden className="absolute top-0 flex -translate-x-1/2 flex-col items-center" style={{ left: `${t}%` }}>
-            <span className="flex h-[13px] w-[10px] flex-col overflow-hidden rounded-t-full rounded-b-[2px] bg-surface shadow-[0_0_0_1px_rgb(27_32_29/0.25)]">
-              <span className={cx('h-[5px] transition-colors delay-300 duration-300', shown >= t ? 'bg-forest' : 'bg-ink-3/50')} />
-            </span>
-            <span className="num mt-[19px] text-[10px] leading-3 text-ink-3">{formatCompact(Math.round((budget * t) / 100), currency)}</span>
-          </span>
-        ))}
-
-        {/* Where the group is now */}
-        <span
-          aria-hidden
-          className="absolute top-[1px] flex -translate-x-1/2 flex-col items-center transition-[left] duration-[900ms] ease-[var(--ease-out-expo)]"
-          style={{ left: `${Math.max(shown, 1.5)}%` }}
-        >
-          <span className="flex h-[15px] w-3 flex-col overflow-hidden rounded-t-full rounded-b-[2px] bg-surface shadow-[0_0_0_1.5px_var(--color-ink)]">
-            <span className="h-[6px] bg-amber" />
-          </span>
-        </span>
+        </g>
+      </svg>
+      <div className="mx-auto -mt-1 flex max-w-[440px] justify-between text-caption text-ink-3">
+        <span className="num">Spent {formatMoney(spent, { currency })}</span>
+        <span>Budget</span>
       </div>
     </div>
   )

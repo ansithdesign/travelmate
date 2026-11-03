@@ -1,17 +1,17 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import type { LucideIcon } from 'lucide-react'
-import { MoreHorizontal } from 'lucide-react'
+import { DotsThree, type Icon } from '@phosphor-icons/react'
 import { cx } from '../../utils/cx'
 import { IconButton } from './Button'
 
 export interface MenuItem {
   label: string
-  icon?: LucideIcon
+  icon?: Icon
   onSelect: () => void
   danger?: boolean
 }
 
-export function Menu({ items, label = 'More actions', tone = 'plain' }: { items: MenuItem[]; label?: string; tone?: 'plain' | 'onImage' }) {
+/** Glass popover menu with full keyboard support. */
+export function Menu({ items, label = 'More actions', tone = 'plain' }: { items: MenuItem[]; label?: string; tone?: 'plain' | 'sky' | 'panel' }) {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
   const root = useRef<HTMLDivElement>(null)
@@ -19,8 +19,7 @@ export function Menu({ items, label = 'More actions', tone = 'plain' }: { items:
   const refs = useRef<(HTMLButtonElement | null)[]>([])
 
   useEffect(() => {
-    if (!open) return
-    refs.current[active]?.focus()
+    if (open) refs.current[active]?.focus()
   }, [open, active])
 
   useEffect(() => {
@@ -35,9 +34,10 @@ export function Menu({ items, label = 'More actions', tone = 'plain' }: { items:
   return (
     <div ref={root} className="relative">
       <IconButton
-        icon={MoreHorizontal}
+        icon={DotsThree}
         label={label}
         tone={tone}
+        size={22}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={id}
@@ -53,7 +53,7 @@ export function Menu({ items, label = 'More actions', tone = 'plain' }: { items:
           onKeyDown={(e) => {
             if (e.key === 'Escape') {
               setOpen(false)
-              ;(root.current?.querySelector('button') as HTMLButtonElement | null)?.focus()
+              root.current?.querySelector<HTMLButtonElement>('button')?.focus()
             }
             if (e.key === 'ArrowDown') {
               e.preventDefault()
@@ -65,7 +65,7 @@ export function Menu({ items, label = 'More actions', tone = 'plain' }: { items:
             }
             if (e.key === 'Tab') setOpen(false)
           }}
-          className="absolute top-[calc(100%+6px)] right-0 z-40 min-w-[220px] overflow-hidden rounded-md bg-surface py-1.5 shadow-pop hairline [animation:rise_180ms_var(--ease-out-expo)]"
+          className="glass-bar absolute top-[calc(100%+8px)] right-0 z-40 min-w-[224px] origin-top-right overflow-hidden rounded-[22px] p-1.5 text-ink [animation:pop_260ms_var(--ease-glide)]"
         >
           {items.map((it, i) => (
             <button
@@ -81,11 +81,11 @@ export function Menu({ items, label = 'More actions', tone = 'plain' }: { items:
                 it.onSelect()
               }}
               className={cx(
-                'flex h-11 w-full items-center gap-3 px-4 text-left text-body outline-none hover:bg-ground focus-visible:bg-ground',
-                it.danger ? 'text-brick' : 'text-ink',
+                'flex h-11 w-full items-center gap-3 rounded-[14px] px-3 text-left text-body font-medium outline-none hover:bg-well focus-visible:bg-well',
+                it.danger ? 'text-loss' : 'text-ink',
               )}
             >
-              {it.icon ? <it.icon size={18} strokeWidth={1.8} className={it.danger ? '' : 'text-ink-2'} aria-hidden /> : null}
+              {it.icon ? <it.icon size={19} weight="duotone" aria-hidden /> : null}
               {it.label}
             </button>
           ))}

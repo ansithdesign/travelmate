@@ -1,15 +1,16 @@
 import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowRight, Check, CircleCheck, ImagePlus, Pencil, Plus, X } from 'lucide-react'
+import { AirplaneLanding, AirplaneTakeoff, ArrowLeft, ArrowRight, Check, CheckCircle, Images, PencilSimple, Plus, X } from '@phosphor-icons/react'
 import { CATEGORIES } from '../data/categories'
-import { TripSubnav } from '../components/trips/TripHeader'
+import { TripTabs } from '../components/trips/TripHeader'
+import { ContentSheet, SkyHero } from '../components/shared/Page'
+import { useNavigate } from 'react-router-dom'
 import { useTripActions } from '../components/trips/useTripActions'
 import { AvatarStack } from '../components/ui/Avatar'
 import { Button, IconButton } from '../components/ui/Button'
 import { Cover } from '../components/ui/Cover'
 import { TextArea, TextInput } from '../components/ui/Field'
 import { Menu } from '../components/ui/Menu'
-import { Milestone } from '../components/ui/Milestone'
 import { useToast } from '../components/ui/Toast'
 import { useTripView, type TripView } from '../hooks/useTrip'
 import { useStore } from '../store/store'
@@ -19,6 +20,8 @@ import { firstName, uid } from '../utils/id'
 import { readImage } from '../utils/image'
 import { formatMoney } from '../utils/money'
 import { NotFound } from './NotFound'
+import { Figure } from '../components/ui/Money'
+import { CategoryIcon } from '../components/icons/CategoryIcon'
 
 export function Journal() {
   const { tripId } = useParams()
@@ -32,6 +35,7 @@ function JournalBody({ view }: { view: TripView }) {
   const { person, saveTrip, me } = useStore()
   const toast = useToast()
   const { items, dialogs } = useTripActions(view)
+  const navigate = useNavigate()
   const members = trip.members.map(person).filter(Boolean) as Person[]
   const cur = trip.currency
   const days = tripLength(trip.startDate, trip.endDate)
@@ -51,50 +55,58 @@ function JournalBody({ view }: { view: TripView }) {
 
   return (
     <>
-      <TripSubnav view={view} title="Journal" actions={<Menu items={items} label="Trip actions" />} />
-      <article className="mx-auto max-w-[1080px] px-4 pt-6 pb-16 sm:px-6 lg:px-8 lg:pt-10">
-        {/* Title */}
-        <header className="grid items-end gap-x-6 gap-y-4 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
-          <Milestone tone="forest" cap={start.toLocaleString('en-IN', { month: 'short' })} value={start.getFullYear()} size="lg" label={`Travelled ${fmt.monthYear(trip.startDate)}`} />
-          <div className="min-w-0">
-            <h1 className="text-[clamp(2rem,5vw,2.75rem)] leading-[1.08] font-semibold tracking-[-0.035em]">{trip.name}</h1>
-            <p className="mt-2 text-body text-ink-2">
-              {trip.destination}
-              {trip.region && trip.region !== trip.destination ? `, ${trip.region}` : ''} · {formatRange(trip.startDate, trip.endDate)}
-            </p>
+      <SkyHero className="pt-[max(14px,env(safe-area-inset-top))] pb-6 lg:pt-8">
+        <div className="flex items-center justify-between gap-2">
+          <IconButton icon={ArrowLeft} label="Back to trips" tone="sky" onClick={() => navigate('/')} />
+          <div className="flex items-center gap-2">
+            {edit ? (
+              <Button
+                size="sm"
+                variant="white"
+                icon={Check}
+                onClick={() => {
+                  setJournal({ note: note.trim() })
+                  setEdit(false)
+                  toast.success('Journal saved')
+                }}
+              >
+                Done
+              </Button>
+            ) : (
+              <Button size="sm" variant="sky" icon={PencilSimple} onClick={() => (setNote(trip.journal.note), setEdit(true))}>
+                Edit
+              </Button>
+            )}
+            <Menu items={items} label="Trip actions" tone="sky" />
           </div>
-          {edit ? (
-            <Button
-              icon={Check}
-              onClick={() => {
-                setJournal({ note: note.trim() })
-                setEdit(false)
-                toast.success('Journal saved')
-              }}
-            >
-              Done
-            </Button>
-          ) : (
-            <Button variant="secondary" icon={Pencil} onClick={() => (setNote(trip.journal.note), setEdit(true))}>
-              Edit journal
-            </Button>
-          )}
+        </div>
+        <header className="mt-6">
+          <p className="text-sky num text-[72px] leading-[0.95] font-extralight tracking-[-0.06em] sm:text-[96px]">{start.getFullYear()}</p>
+          <p className="text-sky-2 mt-1 text-heading font-medium">{start.toLocaleString('en-IN', { month: 'long' })}</p>
+          <h1 className="text-sky mt-4 text-hero">{trip.name}</h1>
+          <p className="text-sky-2 mt-1 text-body">
+            {trip.destination}
+            {trip.region && trip.region !== trip.destination ? `, ${trip.region}` : ''} · {formatRange(trip.startDate, trip.endDate)}
+          </p>
         </header>
-
+        <TripTabs view={view} className="mt-6" />
+      </SkyHero>
+      <ContentSheet>
+      <article className="px-5 pt-6 pb-12 sm:px-7 lg:px-10 lg:pt-8">
         {/* Photos */}
-        <section aria-label="Photos" className="mt-8">
+        <section aria-label="Photos">
           {photos.length ? (
             <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-4 sm:grid-rows-[180px_180px] sm:overflow-visible sm:px-0 lg:grid-rows-[220px_220px]">
               {photos.slice(0, 5).map((p, i) => (
                 <figure
                   key={p.id + i}
-                  className={`group relative w-[82%] shrink-0 snap-center overflow-hidden rounded-lg sm:w-auto ${mosaicCell(i, Math.min(photos.length, 5))}`}
+                  className={`group relative w-[82%] shrink-0 snap-center overflow-hidden rounded-[24px] sm:w-auto ${mosaicCell(i, Math.min(photos.length, 5))}`}
                 >
-                  <Cover photo={p} fallbackLabel={i === 0 ? trip.destination : ''} showCredit className="aspect-[4/3] h-full w-full sm:aspect-auto" />
+                  <Cover photo={p} seed={i} showCredit className="aspect-[4/3] h-full w-full sm:aspect-auto" />
                   {edit && trip.journal.photos.some((x) => x.id === p.id) ? (
                     <IconButton
                       icon={X}
-                      tone="onImage"
+                      tone="sky"
                       label="Remove photo"
                       className="absolute top-2 right-2 size-9"
                       onClick={() => setJournal({ photos: trip.journal.photos.filter((x) => x.id !== p.id) })}
@@ -105,7 +117,7 @@ function JournalBody({ view }: { view: TripView }) {
             </div>
           ) : null}
           {edit || photos.length === 0 ? (
-            <Button variant="ghost" size="sm" icon={ImagePlus} className="mt-3 -ml-2" onClick={() => fileRef.current?.click()}>
+            <Button variant="ghost" size="sm" icon={Images} className="mt-3 -ml-2" onClick={() => fileRef.current?.click()}>
               Add photos
             </Button>
           ) : null}
@@ -172,19 +184,23 @@ function JournalBody({ view }: { view: TripView }) {
                 Places along the way
               </h2>
               {trip.journal.places.length ? (
-                <ol className="relative mt-4 ml-[7px] border-l-2 border-dashed border-line pl-6">
+                <ol className="relative mt-4 ml-[13px] border-l-2 border-dashed border-accent/35 pl-7">
                   {trip.journal.places.map((p, i) => (
                     <li key={p + i} className="group relative flex min-h-10 items-center justify-between gap-3 py-1.5">
-                      <span aria-hidden className="absolute top-1/2 -left-[33px] h-[18px] w-4 -translate-y-1/2 overflow-hidden rounded-t-full rounded-b-[3px] bg-surface shadow-[0_0_0_1.5px_var(--color-ink)]">
-                        <span className={`block h-[7px] ${i === 0 || i === trip.journal.places.length - 1 ? 'bg-amber' : 'bg-forest'}`} />
-                      </span>
-                      <span className="font-medium">{p}</span>
+                      {i === 0 || i === trip.journal.places.length - 1 ? (
+                        <span aria-hidden className="absolute top-1/2 -left-[39px] flex size-7 -translate-y-1/2 items-center justify-center rounded-full bg-[linear-gradient(180deg,#4f8dff,#2563eb)] text-white shadow-[0_4px_12px_-4px_rgb(37_99_235/0.8)]">
+                          {i === 0 ? <AirplaneTakeoff size={15} weight="fill" /> : <AirplaneLanding size={15} weight="fill" />}
+                        </span>
+                      ) : (
+                        <span aria-hidden className="absolute top-1/2 -left-[31px] size-3 -translate-y-1/2 rounded-full bg-panel-strong shadow-[0_0_0_3px_var(--color-accent)]" />
+                      )}
+                      <span className="font-semibold">{p}</span>
                       {edit ? (
                       <button
                         type="button"
                         aria-label={`Remove ${p}`}
                         onClick={() => setJournal({ places: trip.journal.places.filter((_, j) => j !== i) })}
-                        className="flex size-9 items-center justify-center rounded-full text-ink-3 hover:bg-sunken hover:text-ink"
+                        className="flex size-9 items-center justify-center rounded-full text-ink-3 hover:bg-well hover:text-ink"
                       >
                         <X size={15} aria-hidden />
                       </button>
@@ -219,20 +235,21 @@ function JournalBody({ view }: { view: TripView }) {
                 <h2 id="spend" className="text-heading">
                   What it cost
                 </h2>
-                <Link to={`/trips/${trip.id}/expenses`} className="text-meta font-medium text-forest hover:underline">
+                <Link to={`/trips/${trip.id}/expenses`} className="text-meta font-medium text-accent hover:underline">
                   {view.expenses.length} expenses
                 </Link>
               </div>
-              <p className="num mt-2 text-[28px] leading-9 font-semibold tracking-[-0.03em]">{formatMoney(ledger.total, { currency: cur })}</p>
+              <Figure value={ledger.total} currency={cur} size="md" className="mt-2" />
               <p className="num text-meta text-ink-3">
                 {formatMoney(Math.round(ledger.total / Math.max(days, 1)), { currency: cur })} a day for the group
               </p>
               <ul className="mt-5 flex flex-col gap-3">
                 {byCat.map(({ c, v }) => (
-                  <li key={c.id} className="grid grid-cols-[110px_minmax(0,1fr)_auto] items-center gap-3 text-meta">
+                  <li key={c.id} className="grid grid-cols-[28px_84px_minmax(0,1fr)_auto] items-center gap-2.5 text-meta">
+                    <CategoryIcon id={c.id} size={28} />
                     <span className="truncate text-ink-2">{c.short}</span>
-                    <span className="h-1.5 rounded-full bg-sunken">
-                      <span className="block h-full rounded-full bg-forest" style={{ width: `${(v / ledger.total) * 100}%` }} />
+                    <span className="h-2 rounded-full bg-well">
+                      <span className="block h-full rounded-full" style={{ width: `${(v / ledger.total) * 100}%`, background: c.tint }} />
                     </span>
                     <span className="num w-[72px] text-right font-medium">{formatMoney(v, { currency: cur })}</span>
                   </li>
@@ -245,12 +262,12 @@ function JournalBody({ view }: { view: TripView }) {
                 How it settled
               </h2>
               {settled ? (
-                <p className="mt-2 flex items-center gap-2 text-meta font-medium text-forest">
-                  <CircleCheck size={16} aria-hidden /> All square
+                <p className="mt-2 flex items-center gap-2 text-meta font-medium text-accent">
+                  <CheckCircle size={16} aria-hidden /> All square
                   {payments[0] ? <span className="font-normal text-ink-3">since {fmt.dayMonth(payments[0].date)}</span> : null}
                 </p>
               ) : (
-                <div className="mt-2 rounded-md bg-amber-50 p-3.5 text-meta text-amber-ink">
+                <div className="mt-2 rounded-[16px] bg-sun-soft p-3.5 text-meta text-sun">
                   {transfers.length} {transfers.length === 1 ? 'payment' : 'payments'} still open.{' '}
                   <Link to={`/trips/${trip.id}/settle`} className="inline-flex items-center gap-1 font-semibold underline">
                     Settle up <ArrowRight size={13} aria-hidden />
@@ -258,7 +275,7 @@ function JournalBody({ view }: { view: TripView }) {
                 </div>
               )}
               {payments.length ? (
-                <ul className="mt-2 divide-y divide-line-soft">
+                <ul className="mt-2 divide-y divide-line">
                   {payments.map((p) => (
                     <li key={p.id} className="flex items-baseline justify-between gap-3 py-2.5 text-meta">
                       <span className="min-w-0 truncate">
@@ -274,6 +291,7 @@ function JournalBody({ view }: { view: TripView }) {
           </aside>
         </div>
       </article>
+      </ContentSheet>
       {dialogs}
     </>
   )

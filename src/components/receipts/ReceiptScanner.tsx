@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Camera, ImageUp, Info, Plus, Trash2 } from 'lucide-react'
+import { Camera, Info, Plus, Trash, UploadSimple } from '@phosphor-icons/react'
 import { SAMPLE_RECEIPTS, type SampleReceipt } from '../../data/sampleReceipts'
 import type { CurrencyCode, Receipt, ReceiptLineItem } from '../../types'
 import { cx } from '../../utils/cx'
@@ -148,7 +148,7 @@ export function ReceiptScanner({
               type="button"
               onClick={() => loadSample(sample)}
               aria-label="Capture"
-              className="flex size-16 items-center justify-center rounded-full bg-surface shadow-[0_0_0_3px_var(--color-ink)] transition-transform active:scale-95"
+              className="flex size-16 items-center justify-center rounded-full bg-panel-strong shadow-[0_0_0_3px_var(--color-ink)] transition-transform active:scale-95"
             >
               <span className="size-[52px] rounded-full bg-ink" />
             </button>
@@ -165,9 +165,9 @@ export function ReceiptScanner({
               type="button"
               data-autofocus
               onClick={() => setStage('camera')}
-              className="flex h-28 flex-col items-start justify-between rounded-md bg-ink p-4 text-left text-white transition-colors hover:bg-[#2a302c]"
+              className="flex h-28 flex-col items-start justify-between rounded-[16px] bg-ink p-4 text-left text-white transition-colors hover:bg-[#2a302c]"
             >
-              <Camera size={22} strokeWidth={1.8} aria-hidden />
+              <Camera size={22} weight="bold" aria-hidden />
               <span>
                 <span className="block font-medium">Scan with camera</span>
                 <span className="block text-caption text-white/70">Simulated</span>
@@ -176,9 +176,9 @@ export function ReceiptScanner({
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex h-28 flex-col items-start justify-between rounded-md bg-surface p-4 text-left hairline transition-colors hover:bg-ground"
+              className="flex h-28 flex-col items-start justify-between rounded-[16px] bg-panel-strong p-4 text-left ring-line transition-colors hover:bg-well"
             >
-              <ImageUp size={22} strokeWidth={1.8} aria-hidden />
+              <UploadSimple size={22} weight="bold" aria-hidden />
               <span>
                 <span className="block font-medium">Upload a photo</span>
                 <span className="block text-caption text-ink-3">Fields entered by you</span>
@@ -187,10 +187,10 @@ export function ReceiptScanner({
           </div>
           <div>
             <h3 className="text-meta font-medium text-ink-2">Or try a sample receipt</h3>
-            <ul className="mt-2 divide-y divide-line-soft">
+            <ul className="mt-2 divide-y divide-line">
               {SAMPLE_RECEIPTS.map((s) => (
                 <li key={s.id}>
-                  <button type="button" onClick={() => loadSample(s)} className="flex w-full items-center justify-between gap-3 py-3 text-left hover:text-forest">
+                  <button type="button" onClick={() => loadSample(s)} className="flex w-full items-center justify-between gap-3 py-3 text-left hover:text-accent">
                     <span className="min-w-0">
                       <span className="block truncate font-medium">{s.merchant}</span>
                       <span className="block truncate text-meta text-ink-3">{s.address}</span>
@@ -219,7 +219,7 @@ export function ReceiptScanner({
 
       {stage === 'camera' || stage === 'reading' ? (
         <div className="mt-5">
-          <div className="relative flex aspect-[3/4] max-h-[56dvh] w-full items-center justify-center overflow-hidden rounded-lg bg-[#2a2f2b]">
+          <div className="relative flex aspect-[3/4] max-h-[56dvh] w-full items-center justify-center overflow-hidden rounded-[24px] bg-[radial-gradient(120%_80%_at_50%_0%,#1b2a5c_0%,#0b1433_70%)]">
             <div className={cx('w-[64%] max-w-[260px] transition-transform duration-500', stage === 'reading' ? 'scale-[1.04]' : 'rotate-[-2deg]')}>
               <ReceiptPaper receipt={sample} compact />
             </div>
@@ -239,7 +239,7 @@ export function ReceiptScanner({
             {stage === 'reading' ? (
               <div aria-hidden className="pointer-events-none absolute inset-x-[9%] top-[9%] bottom-[9%] overflow-hidden">
                 <div className="h-full w-full [animation:scanline_1.3s_var(--ease-out-expo)_infinite]">
-                  <div className="h-[2px] w-full bg-amber shadow-[0_0_14px_2px_rgb(201_138_30/0.55)]" />
+                  <div className="h-[2px] w-full bg-[#7fb0ff] shadow-[0_0_16px_3px_rgb(127_176_255/0.75)]" />
                 </div>
               </div>
             ) : null}
@@ -255,7 +255,7 @@ export function ReceiptScanner({
                   type="button"
                   onClick={() => setSample(s)}
                   aria-pressed={s.id === sample.id}
-                  className={cx('h-9 shrink-0 rounded-full px-3.5 text-meta font-medium', s.id === sample.id ? 'bg-ink text-white' : 'bg-surface text-ink-2 hairline')}
+                  className={cx('h-9 shrink-0 rounded-full px-3.5 text-meta font-medium', s.id === sample.id ? 'bg-ink text-white' : 'bg-panel-strong text-ink-2 ring-line')}
                 >
                   {s.merchant}
                 </button>
@@ -267,9 +267,9 @@ export function ReceiptScanner({
 
       {stage === 'review' ? (
         <div className="mt-5 grid gap-6 md:grid-cols-1">
-          <div className="flex justify-center rounded-lg bg-sunken p-4">
+          <div className="flex justify-center rounded-[24px] bg-well p-4">
             {source === 'upload' && image ? (
-              <img src={image} alt="Uploaded receipt" className="max-h-[300px] rounded-[6px] object-contain shadow-lift" />
+              <img src={image} alt="Uploaded receipt" className="max-h-[300px] rounded-[6px] object-contain shadow-[0_8px_20px_-10px_rgb(var(--t-shadow)/0.4)]" />
             ) : (
               <div className="w-full max-w-[280px]">
                 <ReceiptPaper receipt={sample} />
@@ -319,7 +319,7 @@ export function ReceiptScanner({
                       small
                     />
                   </div>
-                  <IconButton icon={Trash2} label={`Remove ${it.name || 'item'}`} onClick={() => setItems((xs) => xs.filter((x) => x.id !== it.id))} className="size-10 text-ink-3" />
+                  <IconButton icon={Trash} label={`Remove ${it.name || 'item'}`} onClick={() => setItems((xs) => xs.filter((x) => x.id !== it.id))} className="size-10 text-ink-3" />
                 </li>
               ))}
             </ul>
@@ -327,7 +327,7 @@ export function ReceiptScanner({
               Add item
             </Button>
             {mismatch ? (
-              <p className="mt-2 text-meta text-amber-ink">
+              <p className="mt-2 text-meta text-sun">
                 Items and tax come to {formatMoney(itemsTotal + taxP, { currency })}, the total says {formatMoney(totalP, { currency })}.
               </p>
             ) : null}
@@ -340,7 +340,7 @@ export function ReceiptScanner({
 
 function SimulationNote() {
   return (
-    <p className="flex items-start gap-2 rounded-md bg-amber-50 px-3 py-2.5 text-meta text-amber-ink">
+    <p className="flex items-start gap-2 rounded-[16px] bg-sun-soft px-3 py-2.5 text-meta text-sun">
       <Info size={16} className="mt-px shrink-0" aria-hidden />
       Scanning is a simulation in this version. Sample receipts fill the fields; you can correct anything.
     </p>

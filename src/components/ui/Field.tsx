@@ -1,4 +1,5 @@
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react'
+import { WarningCircle } from '@phosphor-icons/react'
 import { cx } from '../../utils/cx'
 
 export function Field({
@@ -20,24 +21,26 @@ export function Field({
 }) {
   return (
     <div className={cx('flex flex-col gap-1.5', className)}>
-      <label htmlFor={htmlFor} className="flex items-baseline gap-1.5 text-meta font-medium text-ink-2">
+      <label htmlFor={htmlFor} className="flex items-baseline gap-1.5 pl-1 text-meta font-medium text-ink-2">
         {label}
         {optional ? <span className="font-normal text-ink-3">Optional</span> : null}
       </label>
       {children}
       {error ? (
-        <p className="text-meta text-brick" role="alert">
+        <p className="flex items-center gap-1.5 pl-1 text-meta text-loss" role="alert">
+          <WarningCircle size={15} weight="fill" aria-hidden />
           {error}
         </p>
       ) : hint ? (
-        <p className="text-meta text-ink-3">{hint}</p>
+        <p className="pl-1 text-meta text-ink-3">{hint}</p>
       ) : null}
     </div>
   )
 }
 
+/** Soft filled input that lifts and glows on focus. */
 export const inputClass =
-  'h-12 w-full rounded-md bg-surface px-3.5 text-body hairline outline-none transition-shadow duration-150 hover:shadow-[inset_0_0_0_1px_#cfc9bd] focus:shadow-[inset_0_0_0_1.5px_var(--color-forest),0_0_0_3px_var(--color-forest-50)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--color-brick)]'
+  'h-[52px] w-full rounded-[16px] bg-panel-strong px-4 text-body text-ink outline-none transition-[box-shadow,background-color] duration-200 shadow-[inset_0_0_0_1px_var(--color-line-strong),0_1px_2px_rgb(var(--t-shadow)/0.04)] hover:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--color-ink)_22%,transparent)] focus:shadow-[inset_0_0_0_1.5px_var(--color-accent),0_0_0_4px_var(--color-accent-soft)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--color-loss),0_0_0_4px_var(--color-loss-soft)]'
 
 export const TextInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean }>(
   function TextInput({ className, invalid, ...rest }, ref) {
@@ -45,14 +48,10 @@ export const TextInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLIn
   },
 )
 
-export const TextArea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function TextArea(
-  { className, ...rest },
-  ref,
-) {
-  return <textarea ref={ref} className={cx(inputClass, 'h-auto min-h-24 resize-y py-3 leading-[1.4]', className)} {...rest} />
+export const TextArea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function TextArea({ className, ...rest }, ref) {
+  return <textarea ref={ref} className={cx(inputClass, 'h-auto min-h-24 resize-y py-3.5 leading-[1.45]', className)} {...rest} />
 })
 
-/** Labelled field with an id wired automatically. */
 export function InputField({
   label,
   hint,

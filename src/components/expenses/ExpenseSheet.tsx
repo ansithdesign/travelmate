@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, ChevronDown, Paperclip, ReceiptText, ScanLine, X } from 'lucide-react'
+import { CaretDown, Check, CheckCircle, NotePencil, Receipt as ReceiptIcon, Scan, WarningCircle, X } from '@phosphor-icons/react'
+import { CategoryIcon } from '../icons/CategoryIcon'
 import { CATEGORIES } from '../../data/categories'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
@@ -164,8 +165,9 @@ export function ExpenseSheet() {
     amount: amount <= 0 ? 'Enter how much it cost' : undefined,
     title: !draft.title.trim() ? 'Give it a short name' : undefined,
     split: !split.valid ? 'The split does not add up yet' : undefined,
+    date: !draft.date || Number.isNaN(new Date(draft.date).getTime()) ? 'Pick when it happened' : undefined,
   }
-  const valid = !errors.trip && !errors.amount && !errors.title && !errors.split
+  const valid = !errors.trip && !errors.amount && !errors.title && !errors.split && !errors.date
 
   function save() {
     setSubmitted(true)
@@ -199,19 +201,20 @@ export function ExpenseSheet() {
       <Sheet
         open={state.open}
         onClose={closeExpense}
-        title={editing ? 'Edit expense' : 'Add expense'}
+        title={editing ? 'Edit expense' : 'New expense'}
+        description={trip && !(!editing && data.trips.length > 1) ? trip.name : undefined}
         size="lg"
         footer={
           <div className="flex items-center gap-4">
             <SplitStatus method={draft.method} amount={amount} split={split} remaining={remaining} currency={currency} />
-            <Button size="lg" className="min-w-[132px]" onClick={save} disabled={submitted && !valid}>
+            <Button size="lg" className="min-w-[140px]" onClick={save} disabled={submitted && !valid}>
               {editing ? 'Save' : 'Add expense'}
             </Button>
           </div>
         }
       >
         <form
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-7"
           onSubmit={(e) => {
             e.preventDefault()
             save()
@@ -220,7 +223,7 @@ export function ExpenseSheet() {
           {!editing && data.trips.length > 1 ? (
             <Field label="Trip" htmlFor="exp-trip">
               <div className="relative">
-                <select id="exp-trip" value={draft.tripId} onChange={(e) => changeTrip(e.target.value)} className={cx(inputClass, 'appearance-none pr-10')}>
+                <select id="exp-trip" value={draft.tripId} onChange={(e) => changeTrip(e.target.value)} className={cx(inputClass, 'appearance-none pr-11 font-semibold')}>
                   {[...openTrips, ...data.trips.filter((t) => !openTrips.includes(t))].map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.name}
@@ -228,23 +231,18 @@ export function ExpenseSheet() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown size={18} className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-ink-3" aria-hidden />
+                <CaretDown size={18} weight="bold" className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-ink-3" aria-hidden />
               </div>
             </Field>
           ) : null}
 
           {/* Amount and title lead: the two things you always know. */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col items-center gap-4">
             <label className="sr-only" htmlFor="exp-amount">
               Amount
             </label>
-            <div
-              className={cx(
-                'flex items-baseline gap-2 border-b-2 pb-2 transition-colors',
-                submitted && errors.amount ? 'border-brick' : 'border-line focus-within:border-forest',
-              )}
-            >
-              <span className="text-[28px] font-medium tracking-[-0.02em] text-ink-3">{currencySymbol(currency).trim()}</span>
+            <div className={cx('flex w-full items-start justify-center rounded-[28px] px-4 pt-4 pb-3 transition-shadow', submitted && errors.amount ? 'bg-loss-soft' : 'bg-well focus-within:bg-accent-soft')}>
+              <span className="mt-3 mr-1 text-[28px] font-light text-ink-3">{currencySymbol(currency).trim()}</span>
               <input
                 ref={amountRef}
                 id="exp-amount"
@@ -253,11 +251,10 @@ export function ExpenseSheet() {
                 autoComplete="off"
                 placeholder="0"
                 value={draft.amount}
+                size={Math.max(1, draft.amount.length || 1)}
                 onChange={(e) => {
                   const v = e.target.value
-                  if (/^[\d,]*\.?\d{0,2}$/.test(v)) {
-                    set('amount', v)
-                  }
+                  if (/^[\d,]*\.?\d{0,2}$/.test(v)) set('amount', v)
                 }}
                 onBlur={() => {
                   // Only fill exact amounts if none have been typed yet, never overwrite the person's numbers.
@@ -265,28 +262,28 @@ export function ExpenseSheet() {
                   if (draft.method === 'exact' && !typed) setDraft((d) => ({ ...d, inputs: seedInputs('exact', d.participants) }))
                 }}
                 aria-invalid={submitted && !!errors.amount}
-                className="num w-full min-w-0 bg-transparent text-[44px] leading-[52px] font-semibold tracking-[-0.035em] outline-none placeholder:text-line"
-                style={{ boxShadow: 'none' }}
+                className="num max-w-full min-w-[1ch] bg-transparent text-center text-[60px] leading-[68px] font-extralight tracking-[-0.05em] text-ink caret-accent outline-none placeholder:text-ink/20"
               />
             </div>
-            {submitted && errors.amount ? <p className="text-meta text-brick">{errors.amount}</p> : null}
+            {submitted && errors.amount ? <p className="-mt-2 text-meta text-loss">{errors.amount}</p> : null}
             <TextInput
               aria-label="What was it for"
               placeholder="What was it for? Dinner, cab, hotel"
               value={draft.title}
               invalid={submitted && !!errors.title}
               maxLength={60}
+              className="text-center font-semibold"
               onChange={(e) => {
                 const title = e.target.value
                 setDraft((d) => ({ ...d, title, category: d.categoryTouched ? d.category : (guessCategory(title) ?? d.category) }))
               }}
             />
-            {submitted && errors.title ? <p className="-mt-1 text-meta text-brick">{errors.title}</p> : null}
+            {submitted && errors.title ? <p className="-mt-2 text-meta text-loss">{errors.title}</p> : null}
           </div>
 
           <fieldset>
-            <legend className="mb-2 text-meta font-medium text-ink-2">Category</legend>
-            <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 md:-mx-6 md:px-6">
+            <legend className="mb-2.5 pl-1 text-meta font-medium text-ink-2">Category</legend>
+            <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 pb-1 md:mx-0 md:grid md:grid-cols-7 md:px-0">
               {CATEGORIES.map((c) => {
                 const on = draft.category === c.id
                 return (
@@ -296,11 +293,13 @@ export function ExpenseSheet() {
                     aria-pressed={on}
                     onClick={() => setDraft((d) => ({ ...d, category: c.id, categoryTouched: true }))}
                     className={cx(
-                      'inline-flex h-10 shrink-0 items-center gap-2 rounded-full px-3.5 text-meta font-medium transition-colors',
-                      on ? 'bg-forest text-white' : 'bg-surface text-ink-2 hairline hover:text-ink',
+                      'press flex w-[76px] shrink-0 flex-col items-center gap-1.5 rounded-[20px] pt-2.5 pb-2 text-caption font-semibold md:w-auto',
+                      on ? 'bg-panel-strong text-ink shadow-[inset_0_0_0_2px_var(--color-accent),0_10px_22px_-12px_rgb(37_99_235/0.55)]' : 'text-ink-3 hover:bg-well',
                     )}
                   >
-                    <c.icon size={16} strokeWidth={1.9} aria-hidden />
+                    <span className={cx('transition-transform duration-500 ease-[var(--ease-glide)]', on && 'scale-110 -translate-y-0.5')}>
+                      <CategoryIcon id={c.id} size={40} />
+                    </span>
                     {c.short}
                   </button>
                 )
@@ -309,8 +308,8 @@ export function ExpenseSheet() {
           </fieldset>
 
           <fieldset>
-            <legend className="mb-2 text-meta font-medium text-ink-2">Paid by</legend>
-            <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 md:-mx-6 md:px-6">
+            <legend className="mb-2.5 pl-1 text-meta font-medium text-ink-2">Paid by</legend>
+            <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 md:mx-0 md:flex-wrap md:px-0">
               {members.map((m) => {
                 const on = draft.paidBy === m.id
                 return (
@@ -320,11 +319,11 @@ export function ExpenseSheet() {
                     aria-pressed={on}
                     onClick={() => set('paidBy', m.id)}
                     className={cx(
-                      'inline-flex h-11 shrink-0 items-center gap-2 rounded-full py-1 pr-4 pl-1 text-meta font-medium transition-colors',
-                      on ? 'bg-ink text-white' : 'bg-surface text-ink-2 hairline hover:text-ink',
+                      'press inline-flex h-12 shrink-0 items-center gap-2 rounded-full py-1 pr-4 pl-1 text-meta font-semibold',
+                      on ? 'bg-ink text-ink-inverse shadow-[0_10px_20px_-12px_rgb(var(--t-shadow)/0.7)]' : 'bg-panel-strong text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line)] hover:text-ink',
                     )}
                   >
-                    <Avatar person={m} size={32} />
+                    <Avatar person={m} size={38} />
                     {m.isYou ? 'You' : firstName(m.name)}
                   </button>
                 )
@@ -333,19 +332,19 @@ export function ExpenseSheet() {
           </fieldset>
 
           <fieldset>
-            <div className="mb-3 flex items-baseline justify-between gap-3">
-              <legend className="text-meta font-medium text-ink-2">Split</legend>
+            <div className="mb-2.5 flex items-baseline justify-between gap-3 pl-1">
+              <legend className="text-meta font-medium text-ink-2">Split between</legend>
               <span className="text-meta text-ink-3">
-                {draft.participants.length} of {members.length} people
+                {draft.participants.length} of {members.length}
               </span>
             </div>
             <Segmented label="Split method" value={draft.method} onChange={changeMethod} options={METHODS} />
-            <ul className="mt-2 divide-y divide-line-soft">
+            <ul className="panel mt-3 divide-y divide-line overflow-hidden rounded-[24px]">
               {members.map((m) => {
                 const on = draft.participants.includes(m.id)
                 const share = split.shares[m.id] ?? 0
                 return (
-                  <li key={m.id} className="flex min-h-[60px] items-center gap-3 py-2">
+                  <li key={m.id} className={cx('flex min-h-[62px] items-center gap-3 px-3.5 py-2 transition-colors', !on && 'bg-well/60')}>
                     <button
                       type="button"
                       role="checkbox"
@@ -356,14 +355,14 @@ export function ExpenseSheet() {
                     >
                       <span
                         className={cx(
-                          'flex size-[22px] shrink-0 items-center justify-center rounded-[7px] transition-colors',
-                          on ? 'bg-forest text-white' : 'bg-surface shadow-[inset_0_0_0_1.5px_var(--color-line)]',
+                          'flex size-6 shrink-0 items-center justify-center rounded-full transition-all duration-300 ease-[var(--ease-glide)]',
+                          on ? 'scale-100 bg-[linear-gradient(180deg,#4f8dff,#2563eb)] text-white shadow-[0_4px_10px_-4px_rgb(37_99_235/0.8)]' : 'scale-90 shadow-[inset_0_0_0_2px_var(--color-line-strong)]',
                         )}
                       >
-                        {on ? <Check size={14} strokeWidth={3} aria-hidden /> : null}
+                        {on ? <Check size={13} weight="bold" aria-hidden /> : null}
                       </span>
-                      <Avatar person={m} size={32} className={draft.method !== 'equal' ? 'hidden sm:inline-flex' : undefined} />
-                      <span className={cx('truncate font-medium', !on && 'text-ink-3')}>{m.isYou ? 'You' : m.name}</span>
+                      <Avatar person={m} size={32} className={cx(draft.method !== 'equal' && 'hidden sm:inline-flex', !on && 'opacity-50 grayscale')} />
+                      <span className={cx('truncate font-semibold', !on && 'text-ink-3')}>{m.isYou ? 'You' : m.name}</span>
                     </button>
                     {on && draft.method !== 'equal' ? (
                       <ShareInput
@@ -375,30 +374,28 @@ export function ExpenseSheet() {
                       />
                     ) : null}
                     {on && draft.method === 'exact' ? null : (
-                      <span className={cx('num w-[76px] shrink-0 text-right', on ? 'font-medium' : 'text-ink-3')}>
-                        {on ? formatMoney(share, { currency }) : 'Not in'}
-                      </span>
+                      <span className={cx('num w-[78px] shrink-0 text-right', on ? 'font-semibold' : 'text-meta text-ink-3')}>{on ? formatMoney(share, { currency }) : 'Not in'}</span>
                     )}
                   </li>
                 )
               })}
             </ul>
-            {submitted && errors.split ? <p className="mt-1 text-meta text-brick">{split.message && split.message.length > 6 ? split.message : errors.split}</p> : null}
+            {submitted && errors.split ? <p className="mt-2 pl-1 text-meta text-loss">{split.message && split.message.length > 6 ? split.message : errors.split}</p> : null}
           </fieldset>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="When" htmlFor="exp-date">
-              <TextInput id="exp-date" type="datetime-local" value={draft.date} onChange={(e) => set('date', e.target.value)} />
+            <Field label="When" htmlFor="exp-date" error={submitted ? errors.date : undefined}>
+              <TextInput id="exp-date" type="datetime-local" value={draft.date} invalid={submitted && !!errors.date} onChange={(e) => set('date', e.target.value)} />
             </Field>
             <Field label="Receipt" optional htmlFor="exp-receipt">
               {draft.receipt ? (
-                <div className="flex h-12 items-center gap-2 rounded-md bg-forest-50 pr-1 pl-3.5">
-                  <ReceiptText size={18} className="shrink-0 text-forest" aria-hidden />
-                  <button type="button" id="exp-receipt" onClick={() => setScanOpen(true)} className="min-w-0 flex-1 truncate text-left text-body font-medium text-forest-900">
+                <div className="flex h-[52px] items-center gap-2 rounded-[16px] bg-gain-soft pr-1 pl-4">
+                  <ReceiptIcon size={20} weight="duotone" className="shrink-0 text-gain" aria-hidden />
+                  <button type="button" id="exp-receipt" onClick={() => setScanOpen(true)} className="min-w-0 flex-1 truncate text-left text-body font-semibold text-ink">
                     {draft.receipt.merchant || 'Receipt attached'}
                   </button>
-                  <button type="button" aria-label="Remove receipt" onClick={() => set('receipt', undefined)} className="flex size-10 items-center justify-center rounded-full text-forest-900 hover:bg-forest-100">
-                    <X size={17} aria-hidden />
+                  <button type="button" aria-label="Remove receipt" onClick={() => set('receipt', undefined)} className="press flex size-10 items-center justify-center rounded-full text-ink-2 hover:bg-well">
+                    <X size={16} weight="bold" aria-hidden />
                   </button>
                 </div>
               ) : (
@@ -406,9 +403,9 @@ export function ExpenseSheet() {
                   type="button"
                   id="exp-receipt"
                   onClick={() => setScanOpen(true)}
-                  className="flex h-12 items-center gap-2.5 rounded-md bg-surface px-3.5 text-left text-ink-2 hairline hover:bg-ground hover:text-ink"
+                  className="press flex h-[52px] items-center gap-2.5 rounded-[16px] px-4 text-left font-semibold text-accent shadow-[inset_0_0_0_1.5px_color-mix(in_oklab,var(--color-accent)_40%,transparent)] hover:bg-accent-soft"
                 >
-                  <ScanLine size={18} aria-hidden />
+                  <Scan size={20} weight="bold" aria-hidden />
                   Scan or attach
                 </button>
               )}
@@ -420,8 +417,8 @@ export function ExpenseSheet() {
               <TextArea id="exp-notes" rows={2} placeholder="Anything the group should know" value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
             </Field>
           ) : (
-            <button type="button" onClick={() => setShowNotes(true)} className="-mt-2 inline-flex h-10 items-center gap-2 self-start rounded-md px-1 text-meta font-medium text-forest hover:underline">
-              <Paperclip size={15} aria-hidden />
+            <button type="button" onClick={() => setShowNotes(true)} className="press -mt-2 inline-flex h-10 items-center gap-2 self-start rounded-full px-3 text-meta font-semibold text-accent hover:bg-accent-soft">
+              <NotePencil size={17} weight="duotone" aria-hidden />
               Add a note
             </button>
           )}
@@ -464,7 +461,7 @@ function ShareInput({ method, value, onChange, currency, name }: { method: Split
           const ok = method === 'shares' ? /^\d{0,3}(\.\d{0,1})?$/.test(v) : /^[\d,]*\.?\d{0,2}$/.test(v)
           if (ok) onChange(v)
         }}
-        className={cx(inputClass, 'num h-10 text-right text-meta', prefix ? 'pl-6' : 'pl-2.5', suffix ? 'pr-7' : 'pr-2.5')}
+        className={cx(inputClass, 'num h-11 rounded-[14px] text-right text-meta font-semibold', prefix ? 'pl-7' : 'pl-3', suffix ? 'pr-7' : 'pr-3')}
       />
       {suffix ? <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-meta text-ink-3">{suffix}</span> : null}
     </div>
@@ -510,8 +507,8 @@ function SplitStatus({
     tone = 'warn'
   }
   return (
-    <p aria-live="polite" className={cx('num min-w-0 flex-1 text-meta font-medium', tone === 'ok' ? 'text-forest' : tone === 'warn' ? 'text-amber-ink' : 'text-ink-3')}>
-      {tone === 'ok' ? <Check size={15} strokeWidth={2.4} className="mr-1 -mt-0.5 inline" aria-hidden /> : null}
+    <p aria-live="polite" className={cx('num min-w-0 flex-1 text-meta font-semibold', tone === 'ok' ? 'text-gain' : tone === 'warn' ? 'text-sun' : 'text-ink-3')}>
+      {tone === 'ok' ? <CheckCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline" aria-hidden /> : tone === 'warn' ? <WarningCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline" aria-hidden /> : null}
       {text}
     </p>
   )

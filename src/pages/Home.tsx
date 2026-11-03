@@ -1,16 +1,19 @@
 import { Link } from 'react-router-dom'
-import { Plus, ReceiptText, ScanLine } from 'lucide-react'
-import { FeaturedTrip, TripRow } from '../components/trips/TripCards'
+import { ArrowRight, CheckCircle, Plus, Scan } from '@phosphor-icons/react'
+import { FeaturedTrip, TripRow, TripWindowCard } from '../components/trips/TripCards'
 import { Button } from '../components/ui/Button'
-import { Milestone } from '../components/ui/Milestone'
+import { Window } from '../components/ui/Cover'
+import { Avatar } from '../components/ui/Avatar'
+import { BrandMark } from '../components/shared/BrandMark'
+import { ContentSheet, SheetBody, SkyHero } from '../components/shared/Page'
 import { useAllTripViews, type TripView } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
+import { useToast } from '../components/ui/Toast'
 import { greeting, parseDate, tripLength } from '../utils/dates'
 import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
-import { useToast } from '../components/ui/Toast'
-import { BrandMark } from '../components/shared/BrandMark'
+import { cx } from '../utils/cx'
 
 export function Home() {
   const views = useAllTripViews()
@@ -18,46 +21,76 @@ export function Home() {
   const { openTrip, openExpense } = useUI()
   const toast = useToast()
 
+  if (views.length === 0) return <FirstRun />
+
   const active = views
     .filter((v) => v.status.phase === 'upcoming' || v.status.phase === 'ongoing')
     .sort((a, b) => (a.status.phase === 'ongoing' ? -1 : b.status.phase === 'ongoing' ? 1 : a.trip.startDate.localeCompare(b.trip.startDate)))
   const ended = views.filter((v) => v.status.phase === 'ended')
   const past = views.filter((v) => v.status.phase === 'completed').sort((a, b) => b.trip.endDate.localeCompare(a.trip.endDate))
   const lead = active[0]
-  const restActive = active.slice(1)
-
-  if (views.length === 0) return <FirstRun />
 
   return (
-    <div className="mx-auto w-full max-w-[1080px] px-4 pt-5 pb-12 sm:px-6 lg:px-8 lg:pt-10">
-      <header className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5 lg:hidden">
-          <BrandMark size={24} onDark={false} />
-          <span className="text-heading">TripMate</span>
+    <>
+      <SkyHero className="pt-[max(14px,env(safe-area-inset-top))] pb-8 lg:pt-8">
+        <header className="flex items-center justify-between gap-3 lg:hidden">
+          <span className="flex items-center gap-2.5">
+            <BrandMark size={30} />
+            <span className="text-sky text-heading">TripMate</span>
+          </span>
+          <Button size="sm" variant="sky" icon={Plus} onClick={() => openTrip()}>
+            New trip
+          </Button>
+        </header>
+
+        <h1 className="text-sky mt-8 text-hero lg:mt-2">
+          {greeting()},<br className="sm:hidden" /> {firstName(me.name)}
+        </h1>
+        <YearLine views={views} />
+
+        <div className="mt-8 lg:max-w-[640px]">
+          {lead ? (
+            <>
+              <FeaturedTrip view={lead} />
+              <div className="mt-3 grid grid-cols-2 gap-2.5">
+                <Button variant="white" size="lg" icon={Plus} onClick={() => openExpense({ tripId: lead.trip.id })}>
+                  Add expense
+                </Button>
+                <Button variant="sky" size="lg" icon={Scan} iconWeight="bold" onClick={() => openExpense({ tripId: lead.trip.id, scan: true })}>
+                  Scan receipt
+                </Button>
+              </div>
+            </>
+          ) : (
+            <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] items-center gap-6">
+              <Window seed={2} shade={0.4} className="aspect-[0.76] w-full" />
+              <div>
+                <p className="text-sky text-title">Nothing booked yet</p>
+                <p className="text-sky-2 mt-1 text-body">Start a trip and the money, plans and people land in one place.</p>
+                <Button className="mt-4" variant="white" icon={Plus} onClick={() => openTrip()}>
+                  Plan a trip
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
-        <Button size="sm" variant="secondary" icon={Plus} onClick={() => openTrip()} className="lg:hidden">
-          New trip
-        </Button>
-      </header>
+      </SkyHero>
 
-      <h1 className="mt-6 text-display lg:mt-0">
-        {greeting()}, {firstName(me.name)}
-      </h1>
-      <YearLine views={views} />
-
-      <div className="mt-7 grid gap-x-10 gap-y-10 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0">
+      <ContentSheet>
+        <SheetBody>
           {ended.map((v) => (
-            <div key={v.trip.id} className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-md bg-surface px-4 py-3 hairline">
+            <div key={v.trip.id} className="panel mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[22px] p-4">
               <p className="min-w-0 flex-1 text-meta text-ink-2">
-                <Link to={`/trips/${v.trip.id}`} className="font-medium text-ink hover:underline">
+                <Link to={`/trips/${v.trip.id}`} className="font-semibold text-ink hover:underline">
                   {v.trip.name}
                 </Link>{' '}
-                ended {v.status.days === 1 ? 'yesterday' : `${v.status.days} days ago`}. Mark it complete to keep it in your journal.
+                ended {v.status.days === 1 ? 'yesterday' : `${v.status.days} days ago`}. Mark it complete to keep it as a journal.
               </p>
               <Button
                 size="sm"
-                variant="quiet"
+                variant="secondary"
+                icon={CheckCircle}
+                iconWeight="duotone"
                 onClick={() => {
                   saveTrip({ ...v.trip, completed: true, completedAt: new Date().toISOString() })
                   toast.success(`${v.trip.name} marked complete`)
@@ -68,78 +101,43 @@ export function Home() {
             </div>
           ))}
 
-          {lead ? (
-            <section aria-labelledby="next-trip">
-              <h2 id="next-trip" className="sr-only">
-                {lead.status.phase === 'ongoing' ? 'Current trip' : 'Next trip'}
-              </h2>
-              <FeaturedTrip view={lead} />
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:flex">
-                <Button icon={Plus} onClick={() => openExpense({ tripId: lead.trip.id })} className="sm:flex-none">
-                  Add expense
-                </Button>
-                <Button variant="secondary" icon={ScanLine} onClick={() => openExpense({ tripId: lead.trip.id, scan: true })}>
-                  Scan receipt
-                </Button>
-                <Link
-                  to="/expenses"
-                  className="col-span-2 hidden h-11 items-center gap-2 rounded-md px-3 text-body font-medium text-ink-2 hover:bg-sunken/70 hover:text-ink sm:ml-auto sm:inline-flex"
-                >
-                  <ReceiptText size={18} aria-hidden /> All expenses
-                </Link>
+          <div className="grid gap-x-10 gap-y-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <OutstandingSummary views={views} />
+
+            {active.length > 1 ? (
+              <section aria-labelledby="coming-up">
+                <h2 id="coming-up" className="text-heading">
+                  Also coming up
+                </h2>
+                <div className="mt-2 -mx-2 flex flex-col">
+                  {active.slice(1).map((v, i) => (
+                    <TripRow key={v.trip.id} view={v} seed={i + 2} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section aria-labelledby="past-trips" className="lg:col-span-2">
+              <div className="flex items-baseline justify-between">
+                <h2 id="past-trips" className="text-heading">
+                  Past trips
+                </h2>
+                <span className="num text-meta text-ink-3">{past.length}</span>
               </div>
+              {past.length ? (
+                <div className="no-scrollbar -mx-5 mt-4 flex snap-x gap-5 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
+                  {past.map((v, i) => (
+                    <TripWindowCard key={v.trip.id} view={v} seed={i + 1} />
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2 max-w-[48ch] text-body text-ink-2">Finished trips become journal pages here, with what they cost and how they settled.</p>
+              )}
             </section>
-          ) : (
-            <section className="rounded-lg bg-surface px-5 py-8 text-center hairline">
-              <Milestone tone="amber" cap="Next" value="?" size="md" label="No trip planned" />
-              <h2 className="mt-4 text-heading">Nothing planned yet</h2>
-              <p className="mx-auto mt-1 max-w-[36ch] text-body text-ink-2">Start a trip now and the expenses, bookings and people all land in one place.</p>
-              <Button className="mt-5" icon={Plus} onClick={() => openTrip()}>
-                Plan a trip
-              </Button>
-            </section>
-          )}
-
-          {restActive.length ? (
-            <section className="mt-10" aria-labelledby="coming-up">
-              <h2 id="coming-up" className="text-heading">
-                Also coming up
-              </h2>
-              <ul className="mt-1 divide-y divide-line">
-                {restActive.map((v) => (
-                  <li key={v.trip.id}>
-                    <TripRow view={v} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-        </div>
-
-        <aside className="min-w-0">
-          <OutstandingSummary views={views} />
-          <section aria-labelledby="past-trips" className="mt-8 first:mt-0">
-            <div className="flex items-baseline justify-between">
-              <h2 id="past-trips" className="text-heading">
-                Past trips
-              </h2>
-              <span className="text-meta text-ink-3">{past.length}</span>
-            </div>
-            {past.length ? (
-              <ul className="mt-1 divide-y divide-line">
-                {past.map((v) => (
-                  <li key={v.trip.id}>
-                    <TripRow view={v} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-2 text-body text-ink-2">Finished trips become journal pages here, with what they cost and how they settled.</p>
-            )}
-          </section>
-        </aside>
-      </div>
-    </div>
+          </div>
+        </SheetBody>
+      </ContentSheet>
+    </>
   )
 }
 
@@ -150,15 +148,14 @@ function YearLine({ views }: { views: TripView[] }) {
   const thisYear = views.filter((v) => parseDate(v.trip.startDate).getFullYear() === year && v.trip.currency === 'INR')
   const myShare = thisYear.reduce((a, v) => a + (v.ledger.share[me.id] ?? 0), 0)
   const days = thisYear.filter((v) => v.status.phase !== 'upcoming').reduce((a, v) => a + tripLength(v.trip.startDate, v.trip.endDate), 0)
-  if (thisYear.length === 0) return <p className="mt-2 text-body text-ink-2">Every trip, every expense, every memory, in one place.</p>
+  if (thisYear.length === 0) return <p className="text-sky-2 mt-2 text-body">Every trip, every expense, every memory, in one place.</p>
   return (
-    <p className="mt-2 max-w-[52ch] text-body text-ink-2">
-      In {year} your share comes to <span className="num font-medium text-ink">{formatMoney(myShare, { round: true })}</span> across{' '}
-      <span className="num font-medium text-ink">{thisYear.length}</span> {thisYear.length === 1 ? 'trip' : 'trips'}
+    <p className="text-sky-2 mt-2 max-w-[44ch] text-body">
+      {year} so far: <span className="num font-semibold text-white">{formatMoney(myShare, { round: true })}</span> your share across{' '}
+      <span className="num font-semibold text-white">{thisYear.length}</span> {thisYear.length === 1 ? 'trip' : 'trips'}
       {days ? (
         <>
-          {' '}
-          and <span className="num font-medium text-ink">{days}</span> days away.
+          , <span className="num font-semibold text-white">{days}</span> days away.
         </>
       ) : (
         '.'
@@ -178,19 +175,21 @@ function OutstandingSummary({ views }: { views: TripView[] }) {
     .filter((r) => r.other)
   if (rows.length === 0) return null
   return (
-    <section aria-labelledby="to-settle" className="mb-8">
+    <section aria-labelledby="to-settle">
       <h2 id="to-settle" className="text-heading">
         To settle
       </h2>
-      <ul className="mt-1 divide-y divide-line">
+      <ul className="panel mt-3 divide-y divide-line overflow-hidden rounded-[24px]">
         {rows.map((r, i) => (
           <li key={i}>
-            <Link to={`/trips/${r.trip.id}/settle`} className="flex items-center justify-between gap-3 py-3 hover:text-forest">
-              <span className="min-w-0">
-                <span className="block truncate font-medium">{r.amount > 0 ? `${firstName(r.other!.name)} owes you` : `You owe ${firstName(r.other!.name)}`}</span>
+            <Link to={`/trips/${r.trip.id}/settle`} className="group flex items-center gap-3 px-4 py-3.5 hover:bg-well">
+              <Avatar person={r.other!} size={40} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-semibold">{r.amount > 0 ? `${firstName(r.other!.name)} owes you` : `You owe ${firstName(r.other!.name)}`}</span>
                 <span className="block truncate text-meta text-ink-3">{r.trip.name}</span>
               </span>
-              <span className={`num shrink-0 font-medium ${r.amount > 0 ? 'text-forest' : 'text-brick'}`}>{formatMoney(Math.abs(r.amount), { currency: r.trip.currency })}</span>
+              <span className={cx('num shrink-0 text-heading', r.amount > 0 ? 'text-gain' : 'text-loss')}>{formatMoney(Math.abs(r.amount), { currency: r.trip.currency })}</span>
+              <ArrowRight size={16} weight="bold" className="shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" aria-hidden />
             </Link>
           </li>
         ))}
@@ -203,20 +202,22 @@ function FirstRun() {
   const { me, resetDemo } = useStore()
   const { openTrip } = useUI()
   return (
-    <div className="mx-auto flex min-h-[80dvh] w-full max-w-[520px] flex-col justify-center px-6 py-12">
-      <Milestone tone="amber" cap="Km" value="0" size="lg" label="Zero kilometres travelled" />
-      <h1 className="mt-8 text-display">Welcome, {firstName(me.name)}</h1>
-      <p className="mt-3 text-body text-ink-2">
-        Make a trip, invite the people going, and add expenses as they happen. TripMate works out who owes whom and keeps the trip as a journal when you are back.
-      </p>
-      <div className="mt-8 flex flex-col gap-2 sm:flex-row">
-        <Button size="lg" icon={Plus} onClick={() => openTrip()}>
-          Create your first trip
-        </Button>
-        <Button size="lg" variant="ghost" onClick={resetDemo}>
-          Explore sample trips
-        </Button>
+    <SkyHero className="flex min-h-[86dvh] flex-col justify-center py-12">
+      <div className="mx-auto w-full max-w-[460px]">
+        <Window seed={1} shade={0.3} eager className="mx-auto aspect-[0.76] w-[56%]" />
+        <h1 className="text-sky mt-10 text-hero">Welcome aboard, {firstName(me.name)}</h1>
+        <p className="text-sky-2 mt-3 text-body">
+          Make a trip, invite the people going, and add expenses as they happen. TripMate works out who owes whom, and keeps every trip as a journal when you are home.
+        </p>
+        <div className="mt-8 flex flex-col gap-2.5">
+          <Button size="lg" variant="white" icon={Plus} onClick={() => openTrip()}>
+            Create your first trip
+          </Button>
+          <Button size="lg" variant="sky" onClick={resetDemo}>
+            Explore sample trips
+          </Button>
+        </div>
       </div>
-    </div>
+    </SkyHero>
   )
 }
