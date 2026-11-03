@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Plus, Scan } from '@phosphor-icons/react'
 import { FeaturedTrip, PastTripCard, TripRow, TripWindowCard } from '../components/trips/TripCards'
 import { Button } from '../components/ui/Button'
-import { Window } from '../components/ui/Cover'
+import { SkyArt } from '../components/shared/SkyArt'
 import { Avatar } from '../components/ui/Avatar'
 import { BrandMark } from '../components/shared/BrandMark'
 import { ContentSheet, SheetBody, SkyHero } from '../components/shared/Page'
@@ -67,8 +67,8 @@ export function Home() {
               </div>
             </>
           ) : (
-            <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] items-center gap-6">
-              <Window seed={2} shade={0.4} className="aspect-[0.76] w-full" />
+            <div className="glass-control flex items-center gap-5 rounded-[30px] p-6">
+              <SkyArt size={110} className="shrink-0" />
               <div>
                 <p className="text-sky text-title">Nothing booked yet</p>
                 <p className="text-sky-2 mt-1 text-body">Start a trip and the money, plans and people land in one place.</p>
@@ -227,7 +227,7 @@ function FirstRun() {
   return (
     <SkyHero className="flex min-h-[86dvh] flex-col justify-center py-12">
       <div className="mx-auto w-full max-w-[460px]">
-        <Window seed={1} shade={0.3} eager className="mx-auto aspect-[0.76] w-[56%]" />
+        <SkyArt size={200} className="mx-auto" />
         <h1 className="text-sky mt-10 text-hero">Welcome aboard, {firstName(me.name)}</h1>
         <p className="text-sky-2 mt-3 text-body">
           Make a trip, invite the people going, and add expenses as they happen. TripMate works out who owes whom, and keeps every trip as a journal when you are home.

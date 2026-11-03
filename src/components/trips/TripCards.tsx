@@ -7,7 +7,7 @@ import { cx } from '../../utils/cx'
 import { formatRange } from '../../utils/dates'
 import { formatMoney } from '../../utils/money'
 import { AvatarStack } from '../ui/Avatar'
-import { Window } from '../ui/Cover'
+import { PhotoCard } from '../ui/Cover'
 import { useCountUp } from '../ui/Money'
 import { countdown, phaseLabel } from './status'
 
@@ -20,10 +20,7 @@ export function BalanceLine({ net, className, currency, onSky }: { net: number; 
   )
 }
 
-/**
- * The next trip, seen through the cabin window, with its countdown set in
- * huge light numerals on the sky.
- */
+/** The next trip as a large photo card: countdown up top, name and people along the bottom. */
 export function FeaturedTrip({ view, seed = 0 }: { view: TripView; seed?: number }) {
   const { person, me } = useStore()
   const { trip, status, ledger } = view
@@ -34,24 +31,26 @@ export function FeaturedTrip({ view, seed = 0 }: { view: TripView; seed?: number
 
   return (
     <Link to={`/trips/${trip.id}`} className="group block" aria-label={`${trip.name}, ${phaseLabel(trip, status)}`}>
-      <div className="grid grid-cols-[minmax(0,0.92fr)_minmax(0,1fr)] items-center gap-5 sm:gap-8">
-        <Window
-          photo={trip.cover}
-          seed={seed}
-          eager
-          className="aspect-[0.76] w-full transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:-translate-y-1 group-hover:rotate-[-1deg]"
-        />
-        <div className="min-w-0">
-          <p className="text-sky-2 text-meta font-medium">{cd.pre}</p>
-          <p className="text-sky num -mt-1 text-[clamp(84px,24vw,128px)] leading-[0.95] font-extralight tracking-[-0.06em]">{Math.round(n)}</p>
-          <p className="text-sky-2 text-heading font-medium">{cd.post}</p>
-          <div className="mt-4 h-px w-12 bg-white/40" />
-          <h3 className="text-sky mt-4 text-title">{trip.name}</h3>
-          <p className="text-sky-2 mt-0.5 text-meta">{formatRange(trip.startDate, trip.endDate)}</p>
-          <AvatarStack people={members} size={30} className="mt-3" ringClass="ring-white/60" />
+      <PhotoCard photo={trip.cover} seed={seed} eager radius={30} className="aspect-[4/3.4] w-full transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:-translate-y-1 sm:aspect-[16/10]">
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgb(6_14_48/0.32)_0%,transparent_32%,transparent_52%,rgb(6_14_48/0.62)_100%)]" />
+        {cd.value ? (
+          <div className="absolute top-5 right-5 text-right">
+            <p className="text-sky-2 text-caption font-semibold">{cd.pre}</p>
+            <p className="text-sky num text-[64px] leading-[60px] font-extralight tracking-[-0.06em]">{Math.round(n)}</p>
+            <p className="text-sky-2 text-meta font-medium">{cd.post}</p>
+          </div>
+        ) : null}
+        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5">
+          <div className="min-w-0">
+            <h3 className="text-sky text-display">{trip.name}</h3>
+            <p className="text-sky-2 mt-0.5 text-meta">
+              {trip.destination} · {formatRange(trip.startDate, trip.endDate)}
+            </p>
+          </div>
+          <AvatarStack people={members} size={30} ringClass="ring-white/70" className="shrink-0" />
         </div>
-      </div>
-      <div className="glass-control mt-6 flex items-center justify-between gap-3 rounded-full py-2.5 pr-3 pl-5 text-meta text-white">
+      </PhotoCard>
+      <div className="glass-control mt-3 flex items-center justify-between gap-3 rounded-full py-2.5 pr-3 pl-5 text-meta text-white">
         <span className="num text-sky-2 truncate">
           <span className="font-semibold text-white">{formatMoney(ledger.total, { currency: trip.currency })}</span>
           {trip.budget ? ` of ${formatMoney(trip.budget, { currency: trip.currency })}` : ''} spent
@@ -65,14 +64,14 @@ export function FeaturedTrip({ view, seed = 0 }: { view: TripView; seed?: number
   )
 }
 
-/** A small cabin window for the past-trips row. */
+/** Past trip as a photo tile for the mobile scroller. */
 export function TripWindowCard({ view, seed = 0 }: { view: TripView; seed?: number }) {
   const { me } = useStore()
   const { trip, status, ledger } = view
   const myNet = ledger.net[me.id] ?? 0
   return (
-    <Link to={`/trips/${trip.id}`} className="group block w-[150px] shrink-0 snap-start lg:w-[200px]">
-      <Window photo={trip.cover} seed={seed} shade={0.1} className="aspect-[0.8] w-full transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1" />
+    <Link to={`/trips/${trip.id}`} className="group block w-[156px] shrink-0 snap-start">
+      <PhotoCard photo={trip.cover} seed={seed} radius={22} className="aspect-[4/5] w-full transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1" />
       <p className="mt-3 truncate text-body font-semibold">{trip.name}</p>
       <p className="truncate text-meta text-ink-3">{phaseLabel(trip, status)}</p>
       <p className={cx('num mt-0.5 truncate text-meta font-medium', myNet === 0 ? 'text-ink-3' : myNet > 0 ? 'text-gain' : 'text-loss')}>
@@ -89,7 +88,7 @@ export function TripRow({ view, seed = 0 }: { view: TripView; seed?: number }) {
   const myNet = ledger.net[me.id] ?? 0
   return (
     <Link to={`/trips/${trip.id}`} className="press group flex items-center gap-4 rounded-[22px] p-2 pr-3 hover:bg-well">
-      <Window photo={trip.cover} seed={seed} shade={0} className="aspect-[0.8] w-[54px] shrink-0" />
+      <PhotoCard photo={trip.cover} seed={seed} radius={16} className="size-14 shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="truncate text-body font-semibold">{trip.name}</p>
         <p className="truncate text-meta text-ink-3">
@@ -110,9 +109,9 @@ export function PastTripCard({ view, seed = 0 }: { view: TripView; seed?: number
   const { trip, ledger } = view
   const myNet = ledger.net[me.id] ?? 0
   return (
-    <Link to={`/trips/${trip.id}`} className="panel group flex gap-5 rounded-[28px] p-4 transition-shadow hover:shadow-[inset_0_0_0_1px_var(--color-line-strong),0_18px_40px_-22px_rgb(var(--t-shadow)/0.5)]">
-      <Window photo={trip.cover} seed={seed} shade={0.1} className="aspect-[0.8] w-[132px] shrink-0 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1" />
-      <div className="flex min-w-0 flex-1 flex-col py-1">
+    <Link to={`/trips/${trip.id}`} className="panel group flex gap-5 rounded-[28px] p-3 pr-5 transition-shadow hover:shadow-[inset_0_0_0_1px_var(--color-line-strong),0_18px_40px_-22px_rgb(var(--t-shadow)/0.5)]">
+      <PhotoCard photo={trip.cover} seed={seed} radius={20} className="aspect-[4/5] w-[128px] shrink-0" />
+      <div className="flex min-w-0 flex-1 flex-col py-2">
         <p className="text-title">{trip.name}</p>
         <p className="text-meta text-ink-3">
           {formatRange(trip.startDate, trip.endDate)} · {trip.members.length} {trip.members.length === 1 ? 'traveller' : 'travellers'}

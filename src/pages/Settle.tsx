@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { AirplaneTilt, ArrowUUpLeft, Check, CheckCircle, SealCheck } from '@phosphor-icons/react'
+import { ArrowRight, ArrowUUpLeft, Check, CheckCircle, HandCoins, SealCheck } from '@phosphor-icons/react'
 import { TripSkyHeader } from '../components/trips/TripHeader'
 import { ContentSheet, SheetBody } from '../components/shared/Page'
 import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { EmptyState } from '../components/ui/Controls'
-import { CategoryIcon } from '../components/icons/CategoryIcon'
+import { SkyArt } from '../components/shared/SkyArt'
 import { Figure } from '../components/ui/Money'
 import { ConfirmDialog } from '../components/ui/Sheet'
 import { useToast } from '../components/ui/Toast'
@@ -15,7 +15,7 @@ import { useStore } from '../store/store'
 import type { Person } from '../types'
 import { cx } from '../utils/cx'
 import { fmt } from '../utils/dates'
-import { firstName, initials } from '../utils/id'
+import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
 import type { Transfer } from '../utils/settle'
 import { NotFound } from './NotFound'
@@ -49,7 +49,7 @@ function SettleBody({ view }: { view: TripView }) {
   const name = (id: string) => (id === me.id ? 'You' : firstName(person(id)?.name ?? 'Someone'))
 
   if (expenses.length === 0) {
-    return <EmptyState art={<CategoryIcon id="other" size={72} />} title="Nothing to settle" body="Once expenses are added, this page works out the fewest payments that square everyone up." />
+    return <EmptyState art={<SkyArt size={130} />} title="Nothing to settle" body="Once expenses are added, this page works out the fewest payments that square everyone up." />
   }
 
   // Keep a ticket on screen while its stamp lands, even though the ledger already moved on.
@@ -75,7 +75,7 @@ function SettleBody({ view }: { view: TripView }) {
             </div>
           </div>
         ) : (
-          <ol className="mt-5 flex flex-col gap-3.5">
+          <ol className="mt-5 flex flex-col gap-3">
             {tickets.map((t, i) => (
               <li key={key(t)}>
                 <Ticket
@@ -194,7 +194,7 @@ function SettleBody({ view }: { view: TripView }) {
         open={!!pending}
         onClose={() => setPending(null)}
         tone="primary"
-        icon={<AirplaneTilt size={44} weight="duotone" className="text-accent" />}
+        icon={<HandCoins size={44} weight="duotone" className="text-accent" />}
         title="Record this payment?"
         body={
           pending ? (
@@ -220,14 +220,11 @@ function SettleBody({ view }: { view: TripView }) {
   )
 }
 
-/** A payment as a boarding pass: initials as airport codes, a perforated stub with the amount. */
+/** One suggested payment: who pays whom, how much, and the action to record it. */
 function Ticket({
-  index,
-  total,
   from,
   to,
   amount,
-  mine,
   youPay,
   youGet,
   stamped,
@@ -244,60 +241,36 @@ function Ticket({
   stamped: boolean
   onPaid: () => void
 }) {
-  const stub = 120
-  const notch = `radial-gradient(circle at calc(100% - ${stub}px) 0, transparent 11px, #000 11.5px) top / 100% 51% no-repeat, radial-gradient(circle at calc(100% - ${stub}px) 100%, transparent 11px, #000 11.5px) bottom / 100% 51% no-repeat`
+  const mine = youPay || youGet
   return (
-    <div className={cx('relative transition-[opacity,transform] duration-500', stamped && 'pointer-events-none')} style={stamped ? { animation: 'none' } : undefined}>
-      <div
-        className={cx(
-          'relative flex overflow-hidden rounded-[24px] bg-panel-strong shadow-[0_14px_34px_-20px_rgb(var(--t-shadow)/0.5)]',
-          mine && 'bg-[linear-gradient(120deg,var(--color-panel-strong)_55%,rgb(96_165_250/0.16))]',
-        )}
-        style={{ mask: notch, WebkitMask: notch }}
-      >
-        <div className="min-w-0 flex-1 p-4 sm:p-5">
-          <div className="flex h-full items-center gap-2">
-            <Code person={from} you={youPay} />
-            <span className="relative flex min-w-[40px] flex-1 items-center" aria-hidden>
-              <span className="h-px flex-1 border-t-2 border-dotted border-line-strong" />
-              <AirplaneTilt size={20} weight="fill" className="mx-1 shrink-0 rotate-45 text-accent" />
-              <span className="h-px flex-1 border-t-2 border-dotted border-line-strong" />
-            </span>
-            <Code person={to} you={youGet} align="right" />
-          </div>
-        </div>
-        <div className="flex shrink-0 flex-col justify-between border-l-2 border-dashed border-line-strong p-4" style={{ width: stub }}>
-          <div>
-            <p className="num text-heading leading-6">{amount}</p>
-            <p className="font-mono text-[11px] text-ink-3">
-              {index} of {total}
-            </p>
-          </div>
-          <Button size="sm" variant={youPay || youGet ? 'primary' : 'secondary'} icon={Check} className="mt-3 w-full px-2" onClick={onPaid}>
-            Paid
-          </Button>
-        </div>
-        <span className="sr-only">
-          {from.name} pays {to.name} {amount}
-        </span>
+    <div
+      className={cx(
+        'panel relative flex items-center gap-4 overflow-hidden rounded-[24px] p-4 transition-[opacity,transform] duration-500',
+        mine && 'shadow-[inset_0_0_0_1.5px_color-mix(in_oklab,var(--color-accent)_40%,transparent),0_14px_30px_-20px_rgb(37_99_235/0.6)]',
+        stamped && 'pointer-events-none',
+      )}
+    >
+      <Avatar person={from} size={44} />
+      <div className="min-w-0 flex-1">
+        <p className="flex min-w-0 items-center gap-1.5 text-meta text-ink-2">
+          <span className="truncate font-semibold text-ink">{youPay ? 'You' : firstName(from.name)}</span>
+          <ArrowRight size={13} weight="bold" className="shrink-0 text-ink-3" aria-label="pays" />
+          <span className="truncate font-semibold text-ink">{youGet ? 'You' : firstName(to.name)}</span>
+        </p>
+        <p className="num text-title">{amount}</p>
       </div>
+      <Button size="sm" variant={mine ? 'primary' : 'secondary'} icon={Check} onClick={onPaid} className="shrink-0">
+        Paid
+      </Button>
+      <span className="sr-only">
+        {from.name} pays {to.name} {amount}
+      </span>
       {stamped ? (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute top-1/2 left-[38%] -translate-x-1/2 -translate-y-1/2 rounded-[10px] border-[3px] border-gain px-3 py-1 font-mono text-[22px] font-bold tracking-[0.2em] text-gain [animation:stamp_520ms_var(--ease-glide)_both]"
-        >
-          PAID
+        <span aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 bg-gain-soft text-heading text-gain backdrop-blur-sm [animation:fade-in_260ms_ease-out_both]">
+          <CheckCircle size={26} weight="fill" className="[animation:pop_420ms_var(--ease-out-expo)_both]" />
+          Recorded
         </span>
       ) : null}
     </div>
-  )
-}
-
-function Code({ person, you, align = 'left' }: { person: Person; you: boolean; align?: 'left' | 'right' }) {
-  return (
-    <span className={cx('flex min-w-0 shrink-0 flex-col', align === 'right' && 'items-end text-right')}>
-      <span className="font-mono text-[30px] leading-9 font-semibold tracking-[-0.02em] text-ink">{initials(person.name)}</span>
-      <span className="max-w-[86px] truncate text-caption text-ink-3">{you ? 'You' : firstName(person.name)}</span>
-    </span>
   )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { CaretDown, Check, CheckCircle, NotePencil, Receipt as ReceiptIcon, Scan, WarningCircle, X } from '@phosphor-icons/react'
-import { CategoryIcon } from '../icons/CategoryIcon'
+import { CategoryTile } from '../icons/CategoryIcon'
 import { CATEGORIES } from '../../data/categories'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
@@ -298,14 +298,9 @@ export function ExpenseSheet() {
                     type="button"
                     aria-pressed={on}
                     onClick={() => setDraft((d) => ({ ...d, category: c.id, categoryTouched: true }))}
-                    className={cx(
-                      'press flex w-[76px] shrink-0 flex-col items-center gap-1.5 rounded-[20px] pt-2.5 pb-2 text-caption font-semibold md:w-auto',
-                      on ? 'bg-panel-strong text-ink shadow-[inset_0_0_0_2px_var(--color-accent),0_10px_22px_-12px_rgb(37_99_235/0.55)]' : 'text-ink-3 hover:bg-well',
-                    )}
+                    className={cx('press flex w-[68px] shrink-0 flex-col items-center gap-2 rounded-[18px] py-1.5 text-caption font-semibold md:w-auto', on ? 'text-ink' : 'text-ink-3 hover:text-ink-2')}
                   >
-                    <span className={cx('transition-transform duration-500 ease-[var(--ease-glide)]', on && 'scale-110 -translate-y-0.5')}>
-                      <CategoryIcon id={c.id} size={40} />
-                    </span>
+                    <CategoryTile id={c.id} size={48} selected={on} />
                     {c.short}
                   </button>
                 )

@@ -2,16 +2,17 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AirplaneTilt, ArrowLeft, ArrowRight, Bed, CaretRight, CheckCircle, Plus, Scan, UserPlus } from '@phosphor-icons/react'
 import { CATEGORIES, categoryById } from '../data/categories'
-import { FlightPath } from '../components/trips/BudgetRoad'
+import { BudgetBar } from '../components/trips/BudgetRoad'
 import { TripTabs } from '../components/trips/TripHeader'
 import { phaseLabel } from '../components/trips/status'
 import { useTripActions } from '../components/trips/useTripActions'
-import { CategoryIcon, CategoryTile } from '../components/icons/CategoryIcon'
+import { CategoryTile } from '../components/icons/CategoryIcon'
+import { SkyArt } from '../components/shared/SkyArt'
 import { ExpenseDetailSheet } from '../components/expenses/ExpenseDetailSheet'
 import { ContentSheet, SheetBody, SkyHero } from '../components/shared/Page'
 import { Avatar, AvatarStack } from '../components/ui/Avatar'
 import { Button, IconButton } from '../components/ui/Button'
-import { Window } from '../components/ui/Cover'
+import { PhotoCard } from '../components/ui/Cover'
 import { Menu } from '../components/ui/Menu'
 import { Figure } from '../components/ui/Money'
 import { useTripView, type TripView } from '../hooks/useTrip'
@@ -48,16 +49,16 @@ function Overview({ view }: { view: TripView }) {
           <IconButton icon={ArrowLeft} label="Back to trips" tone="sky" onClick={() => navigate('/')} />
           <Menu items={items} label="Trip actions" tone="sky" />
         </div>
-        <div className="mt-3 flex items-end gap-4 sm:gap-6">
-          <Window photo={trip.cover} eager shade={0.12} className="aspect-[0.78] w-[96px] shrink-0 sm:w-[132px]" />
+        <div className="mt-3 flex items-center gap-4 sm:gap-6">
+          <PhotoCard photo={trip.cover} eager radius={22} className="size-[88px] shrink-0 sm:size-[112px]" />
           <div className="min-w-0 pb-1">
             <h1 className="text-sky text-display sm:text-hero">{trip.name}</h1>
             <p className="text-sky-2 mt-1 text-meta sm:text-body">
               {trip.destination} · <span className="whitespace-nowrap">{formatRange(trip.startDate, trip.endDate)}</span>
             </p>
             <Link to={`/trips/${trip.id}/people`} className="mt-2.5 inline-flex items-center gap-2 rounded-full py-0.5 pr-2 hover:bg-white/10">
-              <AvatarStack people={members} size={28} max={5} />
-              <span className="text-sky-2 text-caption font-semibold">
+              <AvatarStack people={members} size={24} max={4} />
+              <span className="text-sky-2 text-caption font-semibold whitespace-nowrap">
                 {phaseLabel(trip, status)}
                 {trip.invites.length ? ` · ${trip.invites.length} invited` : ''}
               </span>
@@ -90,9 +91,9 @@ function Overview({ view }: { view: TripView }) {
                     </p>
                   </div>
                 </div>
-                {trip.budget ? <FlightPath spent={ledger.total} budget={trip.budget} currency={cur} className="mt-3" /> : null}
+                {trip.budget ? <BudgetBar spent={ledger.total} budget={trip.budget} currency={cur} className="mt-4" /> : null}
 
-                <div className="mt-3 border-t border-line pt-1.5">
+                <div className="mt-4 border-t border-line pt-2">
                   <BalanceBars view={view} members={members} />
                 </div>
 
@@ -206,7 +207,7 @@ function RecentActivity({ view }: { view: TripView }) {
       </div>
       {feed.length === 0 ? (
         <div className="panel mt-3 flex flex-col items-center rounded-[24px] px-5 py-8 text-center">
-          <CategoryIcon id="other" size={48} />
+          <SkyArt size={110} />
           <p className="mt-3 text-body text-ink-2">Nothing yet. Add the first expense when someone pays for something.</p>
           <Button className="mt-4" icon={Plus} onClick={() => openExpense({ tripId: trip.id })}>
             Add expense
@@ -288,7 +289,7 @@ function WhereItWent({ view }: { view: TripView }) {
         <ul className="mt-4 flex flex-col gap-2.5">
           {byCat.map(({ c, v }) => (
             <li key={c.id} className="flex items-center gap-3 text-meta">
-              <CategoryIcon id={c.id} size={26} />
+              <CategoryTile id={c.id} size={30} />
               <span className="min-w-0 flex-1 truncate text-ink-2">{c.label}</span>
               <span className="size-2 rounded-full" style={{ background: c.tint }} aria-hidden />
               <span className="num w-[78px] text-right font-semibold">{formatMoney(v, { currency: trip.currency })}</span>

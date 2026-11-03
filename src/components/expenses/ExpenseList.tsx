@@ -12,7 +12,8 @@ import { Field, TextInput, inputClass } from '../ui/Field'
 import { Sheet } from '../ui/Sheet'
 import { ExpenseDetailSheet } from './ExpenseDetailSheet'
 import { ExpenseRow } from './ExpenseRow'
-import { CategoryIcon } from '../icons/CategoryIcon'
+import { CategoryTile } from '../icons/CategoryIcon'
+import { SkyArt } from '../shared/SkyArt'
 import { Avatar } from '../ui/Avatar'
 import { firstName } from '../../utils/id'
 
@@ -109,7 +110,7 @@ export function ExpenseList({
         title="No expenses yet"
         body="Add the first one when someone pays. Splits and balances update on their own."
         action={emptyAction}
-        art={<CategoryIcon id="other" size={64} />}
+        art={<SkyArt size={120} />}
       />
     )
   }
@@ -141,7 +142,7 @@ export function ExpenseList({
         {CATEGORIES.filter((c) => catCounts[c.id]).map((c) => (
           <Chip
             key={c.id}
-            leading={<CategoryIcon id={c.id} size={28} />}
+            leading={<CategoryTile id={c.id} size={30} />}
             active={f.categories.includes(c.id)}
             count={catCounts[c.id]}
             onClick={() =>

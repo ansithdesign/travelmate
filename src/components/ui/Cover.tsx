@@ -20,7 +20,7 @@ const CLOUD: Record<SkyPhase, [string, string, number]> = {
 
 /**
  * A photo with a sky fallback. If the image is missing or fails, you see what a
- * window seat shows anyway: open sky and a passing cloud. Never a broken icon.
+ * soft sky with a passing cloud instead. Never a broken icon.
  */
 export function Cover({
   photo,
@@ -93,51 +93,30 @@ export function Cover({
   )
 }
 
-/**
- * The signature frame: an aircraft cabin window. Moulded bezel, inner reveal
- * shadow, a glint on the acrylic and a half-drawn shade that slides down on mount.
- */
-export function Window({
+/** A trip photo as a clean rounded card with a hairline edge and soft depth. */
+export function PhotoCard({
   photo,
   className,
   seed = 0,
   eager,
-  shade = 0.16,
+  radius = 24,
   children,
 }: {
   photo?: Photo
   className?: string
   seed?: number
   eager?: boolean
-  /** How far the shade is drawn, 0 to 1 */
-  shade?: number
+  radius?: number
   children?: React.ReactNode
 }) {
   return (
     <div
-      className={cx(
-        'relative rounded-[42%/32%]',
-        'bg-[linear-gradient(160deg,#ffffff_0%,#edf1f9_45%,#cfd8ea_100%)]',
-        'shadow-[inset_0_2px_0_rgb(255_255_255/0.95),inset_0_-3px_6px_rgb(12_23_54/0.12),0_22px_44px_-20px_rgb(8_20_60/0.6),0_2px_6px_rgb(8_20_60/0.12)]',
-        className,
-      )}
+      className={cx('relative overflow-hidden shadow-[0_18px_40px_-22px_rgb(8_20_60/0.55),0_2px_6px_-2px_rgb(8_20_60/0.18)]', className)}
+      style={{ borderRadius: radius }}
     >
-      {/* Inset is relative to the window itself, so the bezel scales with any size */}
-      <div className="absolute inset-x-[8%] inset-y-[6.4%] overflow-hidden rounded-[40%/30%] shadow-[inset_0_0_0_2px_rgb(12_23_54/0.08)]">
-        <Cover photo={photo} seed={seed} eager={eager} className="absolute inset-0" />
-        {shade > 0 ? (
-          <div
-            aria-hidden
-            className="absolute inset-x-0 top-0 bg-[linear-gradient(180deg,#f6f8fc_0%,#e6ebf4_85%,#cdd5e5_100%)] shadow-[0_3px_8px_rgb(12_23_54/0.2)] [animation:shade_1100ms_var(--ease-out-expo)_both]"
-            style={{ height: `${shade * 100}%` }}
-          >
-            <span className="absolute bottom-[22%] left-1/2 h-[3px] w-[22%] -translate-x-1/2 rounded-full bg-[#b8c2d6]" />
-          </div>
-        ) : null}
-        <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[40%/30%] shadow-[inset_0_8px_18px_rgb(12_23_54/0.3),inset_0_-2px_10px_rgb(255_255_255/0.2)]" />
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,transparent_30%,rgb(255_255_255/0.24)_41%,transparent_52%)]" />
-        {children}
-      </div>
+      <Cover photo={photo} seed={seed} eager={eager} className="absolute inset-0" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.22)]" style={{ borderRadius: radius }} />
+      {children}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 ---
 name: TripMate
-description: A shared travel companion seen through a cabin window, under a living sky.
+description: A shared travel companion under a living, painted sky.
 colors:
   accent: "#2563eb"
   accent-golden: "#3b5bdb"
@@ -189,7 +189,7 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Window Seat Under a Living Sky"**
+**Creative North Star: "A Living, Painted Sky"**
 
 The whole app sits under a full-bleed sky whose gradient, sun or moon, clouds and stars follow local time through four phases: dawn, day, golden and night. The phase is set on the root element (`html[data-sky]`) and every ink, glass and accent token re-resolves from it. The sky is the ground; working content rises over it on frosted glass sheets, and the things worth looking at (trips) are framed as aircraft cabin windows.
 
@@ -198,20 +198,20 @@ Density is calm and phone-first: one primary figure per view, set large and ligh
 **Key Characteristics:**
 - Living sky backdrop in four phases, crossfading on change.
 - Frosted content sheet (34px top radius) that rises on every navigation.
-- Cabin Window frame with a drawn shade and a sky-and-cloud fallback in place of any missing photo.
+- Rounded photo cards for trips, with a phase-matched sky-and-cloud fallback in place of any missing photo.
 - Ultralight headline numerals that count up; Geist Mono reserved for codes and printed artefacts.
-- Authored, dimensional icons for categories and navigation; Phosphor (bold, duotone, fill) for UI actions.
+- Phosphor throughout: regular and fill for navigation, duotone glyphs centred in soft category-tinted circles for categories, bold for small controls. No 3D objects.
 
 ## Colors
 
 A sky-derived palette: navy ink on the light phases, moonlit ink at night, one luminous blue for action, and green/coral/amber reserved for money meaning.
 
 ### Primary
-- **Luminous Sky Blue** (accent): primary buttons, active tab, focus ring, caret, selection tint, the flight-path trail. It deepens to a periwinkle (accent-golden) at golden hour and lifts to a pale moonlit blue (accent-night) at night. Primary pills render it through one shared `.luminous` material: a lit gradient (`#4f8dff` to `#2563eb`, brighter at night) with a bright top edge. Never re-type the gradient inline.
+- **Luminous Sky Blue** (accent): primary buttons, active tab, focus ring, caret, selection tint, the budget bar. It deepens to a periwinkle (accent-golden) at golden hour and lifts to a pale moonlit blue (accent-night) at night. Primary pills render it through one shared `.luminous` material: a lit gradient (`#4f8dff` to `#2563eb`, brighter at night) with a bright top edge. Never re-type the gradient inline.
 - **Deep Sky Blue** (accent-ink): accent used as text on light glass where contrast needs it.
 
 ### Secondary
-- **Contrail Green** (gain): "You get back", money left in budget, the PAID stamp.
+- **Contrail Green** (gain): "You get back", money left in budget, the recorded-payment check.
 - **Sunset Coral** (loss): "You owe", over budget, field errors, destructive actions.
 - **Brass Sun** (sun): warm highlight tone; soft variant for tinted wells.
 
@@ -225,7 +225,7 @@ A sky-derived palette: navy ink on the light phases, moonlit ink at night, one l
 ### Named Rules
 **The Phase Token Rule.** UI colour is read from phase tokens on `html[data-sky]`, never hard-coded per screen. A colour that does not change between day and night is either cloud white, the navy used on white pills, or a mistake.
 
-**The Sky Supplies the Colour Rule.** Gradients belong to the sky, to sky fallbacks inside windows, and to lit pills. No decorative gradient blobs elsewhere.
+**The Sky Supplies the Colour Rule.** Gradients belong to the sky, to sky fallbacks inside photo cards, the budget bar, and to lit pills. No decorative gradient blobs elsewhere.
 
 **The Worded Money Rule.** Gain and loss colours support a sentence ("You owe", "Owed", "All square"); they never carry meaning alone.
 
@@ -233,18 +233,18 @@ A sky-derived palette: navy ink on the light phases, moonlit ink at night, one l
 
 **Display Font:** Geist Variable (with ui-sans-serif, system-ui)
 **Body Font:** Geist Variable, stylistic sets ss01 and cv11 on
-**Label/Mono Font:** Geist Mono Variable, only for codes and printed artefacts (boarding-pass initials, ticket counters, receipts, invite links, the PAID stamp)
+**Label/Mono Font:** Geist Mono Variable, only for codes and printed artefacts (receipts, booking references, invite links; never on interface labels).
 
-**Character:** One contemporary sans carrying semibold, tightly tracked headings against very light, oversized numerals, the way a flight display or a weather app sets its figures.
+**Character:** One contemporary sans carrying semibold, tightly tracked headings against very light, oversized numerals, the way a weather app sets its figures.
 
 ### Hierarchy
 - **Hero** (600, 2.375rem, 2.625rem): greeting on the sky.
 - **Display** (600, 1.875rem, 2.25rem): page titles in the sky header.
 - **Title** (600, 1.3125rem, 1.75rem): sheet and dialog titles, trip names.
-- **Heading** (600, 1.0625rem, 1.5rem): section headers inside the sheet, ticket amounts.
+- **Heading** (600, 1.0625rem, 1.5rem): section headers inside the sheet, payment amounts.
 - **Body** (400, 0.9375rem, 1.375rem): default text; button labels at 600.
 - **Meta** (400 to 600, 0.8125rem): secondary lines, field labels, chips, tab labels.
-- **Caption** (0.75rem): dates under windows, route-map stops, axis labels.
+- **Caption** (0.75rem): dates under photo cards, place chips, axis labels.
 - **Figure** (300, 34 / 46 / 64px, tracking -0.045em, tabular): money totals; currency symbol at half size and raised, paise dimmed.
 - **Countdown** (200, clamp 84 to 128px, tracking -0.06em, tabular): the single huge numeral on the sky; also the journal year and the amount entry (60px).
 
@@ -253,7 +253,7 @@ A sky-derived palette: navy ink on the light phases, moonlit ink at night, one l
 
 **The Tabular Money Rule.** Every amount uses tabular figures (`tnum`).
 
-**The Mono Is Print Rule.** Geist Mono appears only where a real artefact would be printed: codes, tickets, receipts, links.
+**The Mono Is Print Rule.** Geist Mono appears only where a real artefact would be printed: booking codes, receipts, links.
 
 ## Layout
 
@@ -269,7 +269,7 @@ Depth is glass over sky. Surfaces stack in a fixed order: sky, then on-sky glass
 - **Sky glass** (`inset 0 1px 0 white/0.45, inset 0 0 0 1px white/0.22, 0 8px 24px -12px`, blur 18px saturate 1.8): floating glass on the sky.
 - **Glass control** (deeper fill `rgb(8 22 76 / 0.44)`, blur 18px saturate 1.6): pills and strips on the sky that carry white labels.
 - **Glass bar** (panel-strong mixed with sheet, blur 24px saturate 1.8, `0 18px 40px -18px shadow/0.5`): tab bar and menus floating over content.
-- **Lit pill** (`inset 0 1px 0 white/0.35, 0 10px 24px -10px accent/0.7`): primary and danger buttons, the add button, route badges.
+- **Lit pill** (`inset 0 1px 0 white/0.35, 0 10px 24px -10px accent/0.7`): primary and danger buttons, the add button.
 
 ### Named Rules
 **The Lit Edge Rule.** Every glass surface carries a one-pixel bright inner top edge; it is what makes glass read as glass on a moving sky.
@@ -278,7 +278,7 @@ Depth is glass over sky. Surfaces stack in a fixed order: sky, then on-sky glass
 
 ## Shapes
 
-Pills for every control (buttons, chips, segmented tracks, tab bar, toasts, trip tabs). Soft, generous corners for containers stepping up with size: fields 16px, menus and rows 22px, panels 24px, feature cards and route map 28px, dialogs and the side rail 30px, the content sheet 34px (modal sheets 32px on phones). The one non-rectangular silhouette is the cabin window: an elliptical rounded rectangle (42% / 32%) with an inner pane at 40% / 30%. Boarding-pass tickets are cut with two semicircular notches at the perforation and a dashed stub divider.
+Pills for every control (buttons, chips, segmented tracks, tab bar, toasts, trip tabs). Soft, generous corners for containers stepping up with size: fields 16px, menus and rows 22px, panels 24px, feature cards 28 to 30px, dialogs and the side rail 30px, the content sheet 34px (modal sheets 32px on phones).
 
 ## Components
 
@@ -300,7 +300,7 @@ Luminous, tactile pills that compress on press.
 ### Cards / Containers
 - **Content sheet:** frosted phase sheet, 34px top radius (all corners from 1024px), body padding 24px top, 20 / 28 / 40px sides.
 - **Panel:** translucent panel, 24px radius, hairline ring, divided lists inside.
-- **Trip cards:** a Window plus text; hover lifts the window 4px (and tilts the featured one 1deg) on the expo curve.
+- **Trip cards:** a rounded PhotoCard with a soft scrim; the featured one carries name, dates, avatars and a light countdown numeral over the photo; hover lifts 4px on the expo curve.
 
 ### Inputs / Fields
 - **Style:** 52px soft-filled panel-strong field, 16px radius, inset line-strong ring; label above in meta medium ink-2, optional marker in ink-3.
@@ -314,21 +314,20 @@ Luminous, tactile pills that compress on press.
 - **Menus:** glass-bar popover, 22px radius, pops in at 260ms.
 - **Toast:** dark navy pill at the bottom above the tab bar, filled status icon, optional action pill.
 
-### Cabin Window (signature)
-A moulded white bezel with inner reveal shadow, an acrylic glint and a half-drawn shade (default 16%) that slides down on mount (1100ms, expo). Inside is the trip photo; if the photo is missing or fails, a seeded sky gradient with two bobbing clouds shows instead, so a window is never broken. Used at every size, from the 32px rail thumbnail (no shade) to the featured trip.
+### PhotoCard
+A trip photo in a rounded card (radius 16 to 30 by size) with a hairline light edge and soft depth. When the photo is missing or fails, the card shows a sky that matches the current phase, with clouds and stars varied per trip.
 
-### Flight Path budget (signature)
-Budget drawn as a dashed arc from origin to a destination pin. A plane flies along it to the share spent (1600ms exponential), trailing a solid blue gradient and carrying a tag with the spent amount. Over budget, the plane lands past the pin and the trail turns coral. A worded line above states percent used and amount left or over.
+### Budget bar
+A 10px rounded track in the well colour with a sky-tinted fill (light blue to accent to violet) that eases to the share spent on open; coral when over budget. Percentage and amount left sit above it.
 
-### Boarding-pass Ticket (signature)
-Each settlement payment is a boarding pass: payer and payee initials as mono airport codes joined by a dotted route and plane, a perforated stub with the amount and "n of N", and a Paid button. Marking paid slams a green mono PAID stamp onto the ticket (scale 2.4 to 1, rotate -11deg, 520ms).
+### Payment card
+Each suggested settlement is a panel card: the payer's avatar, "Payer -> Payee" in words with a small arrow, the amount in title type and a "Paid" button (filled when it involves you). Recording a payment shows a green check overlay before the card leaves.
 
-### Route Map (signature)
-A finished trip's places drawn as a winding flight route that snakes left to right and back, with take-off and landing badges (lit blue circles) at the ends, panel-strong stop dots and a blue-to-peach contrail.
+### Places
+A finished trip's places are numbered chips that wrap; in edit mode each chip carries a remove control.
 
-### Icons
-- **Category icons:** hand-drawn dimensional objects (house, bowl, vehicle and so on), lit from the top left with a soft contact shadow, at 40 to 44px.
-- **Nav glyphs:** authored for TripMate: a cabin window with a cloud (Trips), a torn receipt (Expenses), a passport with a globe (Profile). Outlined in currentColor when idle; filled with the blue gradient and white detail when active.
+- **Category icons:** Phosphor duotone glyphs (bed, fork and knife, car, ticket, bag, plane, sparkle) centred in a circle tinted 16% with the category colour; selected, the circle fills with the colour and the glyph turns white.
+- **Nav icons:** Phosphor House, Receipt and UserCircle; regular when idle, fill when active.
 - **UI icons:** Phosphor in bold for actions, duotone for illustrative spots, fill for status.
 
 ### Motion grammar
@@ -337,8 +336,8 @@ A finished trip's places drawn as a winding flight route that snakes left to rig
 - **Sheet rise:** the content sheet rises 18px and fades in over 640ms (expo) on every navigation; this is the only page transition.
 - **Modal sheet:** slides up (phones) or in from the right (768px+) in 520ms on the glide curve; drags down to dismiss.
 - **Count-up:** reserved for the two headline moments, the trip's group spend on the overview and the home countdown (1100ms / 1400ms, exponential ease). Figures in sheets, tables and summaries are static, so no one ever reads an amount mid-count.
-- **Plane flight, shade drop, PAID stamp, route draw-in** as described above.
-- All motion collapses under `prefers-reduced-motion`; count-ups and the plane jump straight to their values.
+- **Budget fill, payment recorded check** as described above.
+- All motion collapses under `prefers-reduced-motion`; count-ups and the budget fill jump straight to their values.
 
 Easing: **expo** `cubic-bezier(0.16, 1, 0.3, 1)` for arrivals; **glide** `cubic-bezier(0.22, 1, 0.36, 1)` for sliding indicators, sheets and presses.
 
@@ -348,18 +347,19 @@ Easing: **expo** `cubic-bezier(0.16, 1, 0.3, 1)` for arrivals; **glide** `cubic-
 - **Do** set type placed directly on the sky with the sky text styles (white with an atmospheric shadow; 92% white for secondary), so it holds when a cloud drifts behind it.
 - **Do** put pill controls and strips on the sky in the glass-control material, so white labels keep 4.5:1 in every phase; use the white pill for the one primary action on the sky.
 - **Do** keep the luminary clear of controls and titles: on phones the sun or moon sits above the top edge so only its glow spills into the sky; from 1024px it is shown whole in the open sky right of centre (x 70%).
-- **Do** let windows show the sky you are under: the cabin-window fallback follows the phase (sunset tones at golden hour, a starry night sky at night), varied per trip.
+- **Do** let photo fallbacks show the sky you are under: the fallback follows the phase (sunset tones at golden hour, a starry night sky at night), varied per trip.
 - **Do** match words to the sky: the home greeting follows the phase, not the raw clock.
 - **Do** read every UI colour from the phase tokens and check new surfaces in all four phases, night included.
-- **Do** frame trip imagery in the cabin Window and rely on its sky fallback rather than a placeholder or broken image.
+- **Do** show trip imagery in rounded PhotoCards and rely on their sky fallback rather than a placeholder or broken image.
+- **Do** keep metaphors out of working elements: the sky is the atmosphere; payments, budgets and places use plain, familiar patterns.
 - **Do** word every balance ("You owe", "You get back", "All square") and set amounts in tabular figures.
 - **Do** honour reduced motion for every new animation.
 
 ### Don't:
 - **Don't** use em dashes in copy.
-- **Don't** use emoji as icons, and don't substitute a thin line-icon set for categories or navigation; those use the authored dimensional set.
+- **Don't** use emoji or 3D rendered objects as icons; categories use tinted duotone glyphs in circles, navigation uses Phosphor regular and fill.
 - **Don't** place navy ink or unshadowed white text directly on the sky.
 - **Don't** add decorative gradient blobs; colour comes from the sky.
 - **Don't** lay content on a flat opaque white page; working content sits on the frosted sheet.
-- **Don't** add uppercase eyebrow labels above headings; the only tracked uppercase in the world belongs to printed artefacts (the PAID stamp, receipt headers).
+- **Don't** add uppercase eyebrow labels above headings; the only tracked uppercase in the world belongs to printed artefacts (receipt headers).
 - **Don't** use Geist Mono for interface labels or headings.

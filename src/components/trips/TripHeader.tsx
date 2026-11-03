@@ -6,7 +6,7 @@ import { cx } from '../../utils/cx'
 import { IconButton } from '../ui/Button'
 import { SkyHero } from '../shared/Page'
 
-/** Trip section tabs, set as glass pills on the sky. */
+/** Trip section tabs: quiet text on the sky, the current one in white with a short bar beneath. */
 export function TripTabs({ view, className }: { view: TripView; className?: string }) {
   const { trip, status } = view
   const tabs = [
@@ -21,16 +21,13 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
   // Keep the current section visible when the strip scrolls on narrow screens.
   useEffect(() => {
     const el = ref.current?.querySelector<HTMLElement>('[aria-current="page"]')
-    if (el && ref.current) ref.current.scrollTo({ left: Math.max(0, el.offsetLeft - 20) })
+    if (el && ref.current) ref.current.scrollTo({ left: Math.max(0, el.offsetLeft - ref.current.offsetLeft - (ref.current.clientWidth - el.clientWidth) / 2) })
   }, [trip.id])
   return (
     <nav
       ref={ref}
       aria-label="Trip sections"
-      className={cx(
-        'no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:w-fit sm:max-w-full sm:gap-1 sm:rounded-full sm:p-1 sm:px-1 sm:[background:linear-gradient(180deg,rgb(255_255_255/0.12),rgb(255_255_255/0.03)),rgb(8_22_76/0.5)] sm:shadow-[inset_0_1px_0_rgb(255_255_255/0.32),inset_0_0_0_1px_rgb(255_255_255/0.16)] sm:backdrop-blur-[18px]',
-        className,
-      )}
+      className={cx('no-scrollbar -mx-5 flex gap-6 overflow-x-auto px-5 max-sm:[mask-image:linear-gradient(90deg,transparent_0,#000_22px,#000_calc(100%-28px),transparent)] sm:mx-0 sm:gap-7 sm:px-0', className)}
     >
       {tabs.map((t) => (
         <NavLink
@@ -39,8 +36,9 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
           end={t.end}
           className={({ isActive }) =>
             cx(
-              'press flex h-9 shrink-0 items-center rounded-full px-4 text-meta font-semibold',
-              isActive ? 'bg-white text-[#0c1736] shadow-[0_6px_16px_-8px_rgb(8_20_60/0.5)]' : 'glass-control text-white sm:bg-none sm:shadow-none sm:backdrop-blur-none sm:[background:transparent] hover:bg-white/15',
+              'relative flex h-11 shrink-0 items-center text-body font-semibold transition-colors duration-200',
+              'after:absolute after:inset-x-0 after:bottom-0 after:mx-auto after:h-[3px] after:rounded-full after:bg-white after:transition-[width,opacity] after:duration-300',
+              isActive ? 'text-sky after:w-5 after:opacity-100' : 'text-white/70 [text-shadow:0_1px_8px_rgb(8_22_70/0.35)] after:w-0 after:opacity-0 hover:text-white',
             )
           }
         >
@@ -64,7 +62,7 @@ export function TripSkyHeader({ view, title, actions }: { view: TripView; title:
         </div>
         {actions}
       </div>
-      <TripTabs view={view} className="mt-5" />
+      <TripTabs view={view} className="mt-3" />
     </SkyHero>
   )
 }

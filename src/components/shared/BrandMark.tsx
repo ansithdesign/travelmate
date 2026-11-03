@@ -1,26 +1,25 @@
 import { useId } from 'react'
 
-/** TripMate mark: a cabin window holding a small sky with the sun setting into a cloud. */
+/** TripMate mark: a small square of evening sky with the sun behind a cloud. */
 export function BrandMark({ size = 30 }: { size?: number }) {
   const u = useId().replace(/:/g, '')
   return (
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
       <defs>
         <linearGradient id={`${u}s`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2f78e6" />
-          <stop offset="0.65" stopColor="#c493d2" />
-          <stop offset="1" stopColor="#ffc187" />
+          <stop offset="0" stopColor="#3b6fe0" />
+          <stop offset="0.6" stopColor="#b48ad8" />
+          <stop offset="1" stopColor="#ffbe8a" />
         </linearGradient>
-        <linearGradient id={`${u}b`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset="1" stopColor="#d6deee" />
-        </linearGradient>
+        <radialGradient id={`${u}u`} cx="0.4" cy="0.38" r="0.6">
+          <stop offset="0" stopColor="#fffbe8" />
+          <stop offset="1" stopColor="#ffc861" />
+        </radialGradient>
       </defs>
-      <rect x="4" y="1.5" width="24" height="29" rx="11" fill={`url(#${u}b)`} />
-      <rect x="7" y="4.5" width="18" height="23" rx="8.5" fill={`url(#${u}s)`} />
-      <circle cx="19.5" cy="18" r="3.4" fill="#fff4d6" />
-      <path d="M8.5 23.5c0-2 1.6-3.4 3.4-3.2.6-1.8 2.3-3 4.2-2.6 1.6.3 2.7 1.6 2.9 3.1 1.6-.2 3 .9 3.2 2.5v.2c0 1.6-1.3 2.7-2.9 2.7H11c-1.4 0-2.5-1.2-2.5-2.7z" fill="#fff" />
-      <rect x="7" y="4.5" width="18" height="4.5" rx="2.25" fill="#eef2fa" />
+      <rect x="1" y="1" width="30" height="30" rx="9" fill={`url(#${u}s)`} />
+      <rect x="1" y="1" width="30" height="30" rx="9" fill="none" stroke="#fff" strokeOpacity="0.35" />
+      <circle cx="19.5" cy="12.5" r="5" fill={`url(#${u}u)`} />
+      <path d="M7 22.4c0-2.3 1.8-4 4-3.8.7-2.1 2.7-3.5 5-3.1 1.9.3 3.3 1.9 3.5 3.7 1.9-.2 3.6 1.1 3.8 3v.2c0 1.9-1.6 3.3-3.5 3.3H10c-1.7 0-3-1.5-3-3.3z" fill="#fff" />
     </svg>
   )
 }

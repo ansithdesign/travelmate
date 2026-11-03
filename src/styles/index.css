@@ -336,3 +336,17 @@
   0% { transform: scale(0.88); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+@keyframes breathe {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-46%, -53%) scale(1.08); }
+}
+@keyframes rays {
+  0%, 100% { transform: translateX(-50%) rotate(-2deg); }
+  50% { transform: translateX(-50%) rotate(2deg); }
+}
+@keyframes shoot {
+  0%, 92% { opacity: 0; transform: rotate(155deg) translateX(0); }
+  93% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(155deg) translateX(-260px); }
+}

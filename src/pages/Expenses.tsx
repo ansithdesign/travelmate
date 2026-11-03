@@ -3,7 +3,7 @@ import { Plus } from '@phosphor-icons/react'
 import { ExpenseList } from '../components/expenses/ExpenseList'
 import { ContentSheet, SheetBody, SkyHero } from '../components/shared/Page'
 import { Button } from '../components/ui/Button'
-import { Window } from '../components/ui/Cover'
+import { PhotoCard } from '../components/ui/Cover'
 import { useAllTripViews } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
@@ -62,7 +62,7 @@ export function Expenses() {
               onClick={() => setTripId(v.trip.id)}
               className={cx('press flex h-10 shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-meta font-semibold', tripId === v.trip.id ? 'bg-white text-[#0c1736]' : 'glass-control text-white')}
             >
-              <Window photo={v.trip.cover} seed={i + 1} shade={0} className="aspect-[0.8] w-6" />
+              <PhotoCard photo={v.trip.cover} seed={i + 1} radius={999} className="size-7" />
               {v.trip.name}
               <span className="num opacity-60">{v.expenses.length}</span>
             </button>

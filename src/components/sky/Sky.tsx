@@ -17,40 +17,72 @@ const CLOUD_TINT: Record<SkyPhase, [string, string, number]> = {
   night: ['#5a6497', '#262f63', 0.38],
 }
 
-const CLOUDS = [
-  { top: 6, w: 260, dur: 190, delay: -40, o: 1, blur: 0 },
-  { top: 16, w: 170, dur: 150, delay: -110, o: 0.85, blur: 0.5 },
-  { top: 27, w: 320, dur: 240, delay: -170, o: 0.9, blur: 0 },
-  { top: 2, w: 120, dur: 130, delay: -20, o: 0.6, blur: 1.5 },
-  { top: 38, w: 220, dur: 210, delay: -80, o: 0.75, blur: 1 },
-  { top: 48, w: 380, dur: 280, delay: -230, o: 0.7, blur: 2 },
+// Two depths of cloud: far (small, soft, slow) and near (large, crisp, a little faster).
+const FAR = [
+  { top: 4, w: 150, dur: 260, delay: -60 },
+  { top: 19, w: 120, dur: 300, delay: -200 },
+  { top: 33, w: 170, dur: 280, delay: -120 },
+  { top: 52, w: 140, dur: 320, delay: -260 },
+]
+// Near clouds keep below the header band so they never sit behind titles.
+const NEAR = [
+  { top: 30, w: 300, dur: 170, delay: -40 },
+  { top: 46, w: 360, dur: 210, delay: -150 },
+  { top: 62, w: 280, dur: 190, delay: -90 },
 ]
 
+// Soft colour blooms per phase: light scattering in the atmosphere, painted large and very soft.
+const BLOOMS: Record<SkyPhase, { x: string; y: string; s: string; c: string }[]> = {
+  dawn: [
+    { x: '8%', y: '62%', s: '70vmax', c: 'rgb(255 176 150 / 0.55)' },
+    { x: '82%', y: '34%', s: '55vmax', c: 'rgb(200 160 255 / 0.4)' },
+  ],
+  day: [
+    { x: '86%', y: '4%', s: '60vmax', c: 'rgb(255 248 220 / 0.32)' },
+    { x: '10%', y: '70%', s: '65vmax', c: 'rgb(150 215 255 / 0.4)' },
+  ],
+  golden: [
+    { x: '70%', y: '70%', s: '75vmax', c: 'rgb(255 160 110 / 0.5)' },
+    { x: '12%', y: '30%', s: '55vmax', c: 'rgb(170 120 230 / 0.42)' },
+  ],
+  night: [
+    { x: '20%', y: '20%', s: '60vmax', c: 'rgb(90 80 200 / 0.3)' },
+    { x: '85%', y: '75%', s: '60vmax', c: 'rgb(40 120 190 / 0.22)' },
+  ],
+}
+
 // Deterministic star field so it does not jump between renders.
-const STARS = Array.from({ length: 90 }, (_, i) => {
+const STARS = Array.from({ length: 110 }, (_, i) => {
   const r = (n: number) => {
     const x = Math.sin(i * 9301 + n * 49297) * 233280
     return x - Math.floor(x)
   }
-  return { x: r(1) * 100, y: r(2) * 62, s: r(3) > 0.88 ? 2.2 : r(3) > 0.6 ? 1.5 : 1, d: 2 + r(4) * 4, delay: -r(5) * 6 }
+  return { x: r(1) * 100, y: r(2) * 64, s: r(3) > 0.9 ? 2.2 : r(3) > 0.62 ? 1.4 : 0.9, d: 2 + r(4) * 4, delay: -r(5) * 6 }
 })
 
+// Film grain, so the gradients read as painted light rather than flat fills.
+const GRAIN =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")"
+
 /**
- * The living sky. A fixed layer behind the whole app whose light follows the
- * time of day. Gradients crossfade between phases; clouds drift and lift a
- * little as you scroll; stars come out at night.
+ * The living sky. A fixed, painted layer behind the whole app whose light
+ * follows the time of day: graded gradients, soft colour blooms, sun rays,
+ * two depths of drifting cloud with parallax, stars and the odd shooting
+ * star at night, and a fine grain over everything.
  */
 export const Sky = memo(function Sky() {
   const { phase } = useSky()
-  const cloudsRef = useRef<HTMLDivElement>(null)
+  const farRef = useRef<HTMLDivElement>(null)
+  const nearRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     let raf = 0
     const onScroll = () => {
       cancelAnimationFrame(raf)
       raf = requestAnimationFrame(() => {
-        const y = Math.min(window.scrollY, 1200)
-        if (cloudsRef.current) cloudsRef.current.style.transform = `translate3d(0, ${-y * 0.18}px, 0)`
+        const y = Math.min(window.scrollY, 1400)
+        if (farRef.current) farRef.current.style.transform = `translate3d(0, ${-y * 0.08}px, 0)`
+        if (nearRef.current) nearRef.current.style.transform = `translate3d(0, ${-y * 0.22}px, 0)`
       })
     }
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -61,19 +93,49 @@ export const Sky = memo(function Sky() {
   }, [])
 
   const [top, belly, cloudOpacity] = CLOUD_TINT[phase]
+  const lit = phase !== 'night'
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
       {(Object.keys(GRADIENTS) as SkyPhase[]).map((p) => (
-        <div
-          key={p}
-          className="absolute inset-0 transition-opacity duration-[1800ms] ease-in-out"
-          style={{ background: GRADIENTS[p], opacity: p === phase ? 1 : 0 }}
-        />
+        <div key={p} className="absolute inset-0 transition-opacity duration-[1800ms] ease-in-out" style={{ background: GRADIENTS[p], opacity: p === phase ? 1 : 0 }} />
       ))}
 
+      {/* Colour blooms */}
+      {(Object.keys(BLOOMS) as SkyPhase[]).map((p) => (
+        <div key={p} className="absolute inset-0 transition-opacity duration-[1800ms]" style={{ opacity: p === phase ? 1 : 0 }}>
+          {BLOOMS[p].map((b, i) => (
+            <span
+              key={i}
+              className="absolute rounded-full"
+              style={{
+                left: b.x,
+                top: b.y,
+                width: b.s,
+                height: b.s,
+                transform: 'translate(-50%, -50%)',
+                background: `radial-gradient(circle, ${b.c} 0%, transparent 62%)`,
+                animation: `breathe ${26 + i * 9}s ease-in-out ${-i * 7}s infinite`,
+              }}
+            />
+          ))}
+        </div>
+      ))}
 
-      {/* Stars */}
+      {/* Sun rays */}
+      <div
+        className="absolute -top-[30%] left-1/2 h-[120vh] w-[140vw] -translate-x-1/2 transition-opacity duration-[1800ms]"
+        style={{
+          opacity: lit ? (phase === 'day' ? 0.5 : 0.65) : 0,
+          background:
+            'repeating-conic-gradient(from 160deg at 50% 0%, rgb(255 255 255 / 0) 0deg, rgb(255 250 235 / 0.16) 5deg, rgb(255 255 255 / 0) 11deg, rgb(255 255 255 / 0) 19deg)',
+          maskImage: 'radial-gradient(ellipse 60% 70% at 50% 0%, #000 0%, transparent 75%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 60% 70% at 50% 0%, #000 0%, transparent 75%)',
+          animation: 'rays 60s ease-in-out infinite',
+        }}
+      />
+
+      {/* Stars and the odd shooting star */}
       <div className={cx('absolute inset-0 transition-opacity duration-[2000ms]', phase === 'night' ? 'opacity-100' : 'opacity-0')}>
         {STARS.map((s, i) => (
           <span
@@ -89,42 +151,41 @@ export const Sky = memo(function Sky() {
             }}
           />
         ))}
+        <span className="absolute top-[12%] left-[62%] h-px w-[120px] origin-left rotate-[155deg] bg-[linear-gradient(90deg,#fff,transparent)] opacity-0 [animation:shoot_14s_ease-out_4s_infinite]" />
       </div>
 
-      {/* Clouds */}
-      <div ref={cloudsRef} className="absolute inset-0 will-change-transform" style={{ opacity: cloudOpacity, transition: 'opacity 1.8s' }}>
-        {CLOUDS.map((c, i) => (
-          <div
-            key={i}
-            className="absolute left-0"
-            style={{
-              top: `${c.top}%`,
-              animation: `drift ${c.dur}s linear ${c.delay}s infinite`,
-              opacity: c.o,
-              filter: c.blur ? `blur(${c.blur}px)` : undefined,
-            }}
-          >
+      {/* Far clouds */}
+      <div ref={farRef} className="absolute inset-0 will-change-transform" style={{ opacity: cloudOpacity * 0.55, filter: 'blur(1.5px)', transition: 'opacity 1.8s' }}>
+        {FAR.map((c, i) => (
+          <div key={i} className="absolute left-0" style={{ top: `${c.top}%`, animation: `drift ${c.dur}s linear ${c.delay}s infinite` }}>
+            <CloudShape width={c.w} top={top} belly={belly} variant={(i + 1) % 3} />
+          </div>
+        ))}
+      </div>
+
+      {/* Zenith: the sky deepens overhead, which also keeps type on the sky legible */}
+      <div className="absolute inset-x-0 top-0 h-[42%]" style={{ background: 'linear-gradient(180deg, rgb(6 18 64 / 0.24) 0%, rgb(6 18 64 / 0.08) 55%, transparent 100%)' }} />
+
+      {/* Sun or moon, above the zenith wash so it stays luminous */}
+      <Luminary phase={phase} />
+
+      {/* Near clouds */}
+      <div ref={nearRef} className="absolute inset-0 will-change-transform" style={{ opacity: cloudOpacity, transition: 'opacity 1.8s' }}>
+        {NEAR.map((c, i) => (
+          <div key={i} className="absolute left-0" style={{ top: `${c.top}%`, animation: `drift ${c.dur}s linear ${c.delay}s infinite` }}>
             <CloudShape width={c.w} top={top} belly={belly} variant={i % 3} />
           </div>
         ))}
       </div>
 
-      {/* Zenith: the sky deepens overhead, which also keeps type on the sky legible over passing clouds */}
-      <div className="absolute inset-x-0 top-0 h-[42%]" style={{ background: 'linear-gradient(180deg, rgb(6 18 64 / 0.26) 0%, rgb(6 18 64 / 0.1) 55%, transparent 100%)' }} />
-
-      {/* Sun or moon, above the zenith wash so it stays luminous */}
-      <Luminary phase={phase} />
-
       {/* Low haze where the horizon would be */}
       <div
         className="absolute inset-x-0 bottom-0 h-[45%]"
-        style={{
-          background:
-            phase === 'night'
-              ? 'linear-gradient(180deg, transparent, rgb(60 50 120 / 0.35))'
-              : 'linear-gradient(180deg, transparent, rgb(255 255 255 / 0.22))',
-        }}
+        style={{ background: phase === 'night' ? 'linear-gradient(180deg, transparent, rgb(60 50 120 / 0.35))' : 'linear-gradient(180deg, transparent, rgb(255 255 255 / 0.2))' }}
       />
+
+      {/* Grain */}
+      <div className="absolute inset-0 opacity-[0.16] mix-blend-soft-light" style={{ backgroundImage: GRAIN }} />
     </div>
   )
 })

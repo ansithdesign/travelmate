@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { AirplaneLanding, AirplaneTakeoff, ArrowLeft, ArrowRight, Check, CheckCircle, Images, PencilSimple, Plus, X } from '@phosphor-icons/react'
+import { ArrowLeft, ArrowRight, Check, CheckCircle, Images, PencilSimple, Plus, X } from '@phosphor-icons/react'
 import { CATEGORIES } from '../data/categories'
 import { TripTabs } from '../components/trips/TripHeader'
 import { ContentSheet, SkyHero } from '../components/shared/Page'
@@ -20,9 +20,8 @@ import { firstName, uid } from '../utils/id'
 import { readImage } from '../utils/image'
 import { formatMoney } from '../utils/money'
 import { NotFound } from './NotFound'
-import { RouteMap } from '../components/trips/RouteMap'
 import { Figure } from '../components/ui/Money'
-import { CategoryIcon } from '../components/icons/CategoryIcon'
+import { CategoryTile } from '../components/icons/CategoryIcon'
 
 export function Journal() {
   const { tripId } = useParams()
@@ -179,42 +178,32 @@ function JournalBody({ view }: { view: TripView }) {
               <AvatarStack people={members} size={32} className="mt-3" />
             </section>
 
-            {/* Places as a road */}
+            {/* Places */}
             <section aria-labelledby="places" className="mt-12">
               <h2 id="places" className="text-heading">
                 Places along the way
               </h2>
               {trip.journal.places.length ? (
-                edit ? (
-                <ol className="relative mt-4 ml-[13px] border-l-2 border-dashed border-accent/35 pl-7">
+                <ol className="mt-4 flex flex-wrap gap-2">
                   {trip.journal.places.map((p, i) => (
-                    <li key={p + i} className="group relative flex min-h-10 items-center justify-between gap-3 py-1.5">
-                      {i === 0 || i === trip.journal.places.length - 1 ? (
-                        <span aria-hidden className="absolute top-1/2 -left-[39px] flex size-7 -translate-y-1/2 items-center justify-center rounded-full luminous">
-                          {i === 0 ? <AirplaneTakeoff size={15} weight="fill" /> : <AirplaneLanding size={15} weight="fill" />}
-                        </span>
-                      ) : (
-                        <span aria-hidden className="absolute top-1/2 -left-[31px] size-3 -translate-y-1/2 rounded-full bg-panel-strong shadow-[0_0_0_3px_var(--color-accent)]" />
-                      )}
-                      <span className="font-semibold">{p}</span>
+                    <li key={p + i} className="flex h-10 items-center gap-2 rounded-full bg-panel-strong py-1 pr-2 pl-1.5 shadow-[inset_0_0_0_1px_var(--color-line)]">
+                      <span aria-hidden className="num flex size-7 items-center justify-center rounded-full bg-accent-soft text-caption font-semibold text-accent">
+                        {i + 1}
+                      </span>
+                      <span className={edit ? 'text-meta font-semibold' : 'pr-2 text-meta font-semibold'}>{p}</span>
                       {edit ? (
-                      <button
-                        type="button"
-                        aria-label={`Remove ${p}`}
-                        onClick={() => setJournal({ places: trip.journal.places.filter((_, j) => j !== i) })}
-                        className="flex size-9 items-center justify-center rounded-full text-ink-3 hover:bg-well hover:text-ink"
-                      >
-                        <X size={15} aria-hidden />
-                      </button>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${p}`}
+                          onClick={() => setJournal({ places: trip.journal.places.filter((_, j) => j !== i) })}
+                          className="flex size-7 items-center justify-center rounded-full text-ink-3 hover:bg-well hover:text-ink"
+                        >
+                          <X size={13} weight="bold" aria-hidden />
+                        </button>
                       ) : null}
                     </li>
                   ))}
                 </ol>
-                ) : (
-                  <div className="mt-4">
-                    <RouteMap places={trip.journal.places} />
-                  </div>
-                )
               ) : (
                 <p className="mt-2 text-body text-ink-3">No places yet. Add them in Edit journal, in the order you went.</p>
               )}
@@ -252,8 +241,8 @@ function JournalBody({ view }: { view: TripView }) {
               </p>
               <ul className="mt-5 flex flex-col gap-3">
                 {byCat.map(({ c, v }) => (
-                  <li key={c.id} className="grid grid-cols-[28px_84px_minmax(0,1fr)_auto] items-center gap-2.5 text-meta">
-                    <CategoryIcon id={c.id} size={28} />
+                  <li key={c.id} className="grid grid-cols-[30px_84px_minmax(0,1fr)_auto] items-center gap-2.5 text-meta">
+                    <CategoryTile id={c.id} size={30} />
                     <span className="truncate text-ink-2">{c.short}</span>
                     <span className="h-2 rounded-full bg-well">
                       <span className="block h-full rounded-full" style={{ width: `${(v / ledger.total) * 100}%`, background: c.tint }} />
