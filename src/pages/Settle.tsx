@@ -64,13 +64,13 @@ function SettleBody({ view }: { view: TripView }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="min-w-0">
-        <h2 className="on-sky px-0.5 pt-2 text-display">{settled && !stamping ? 'All square' : `${tickets.length} ${tickets.length === 1 ? 'payment' : 'payments'} left`}</h2>
-        <p className="on-sky mt-1 px-0.5 text-body">
+        <h2 className="on-sky px-0.5 pt-4 text-display">{settled && !stamping ? 'All square' : `${tickets.length} ${tickets.length === 1 ? 'payment' : 'payments'} left`}</h2>
+        <p className="on-sky mt-2 px-0.5 text-body">
           {settled && !stamping ? 'Every balance on this trip is zero.' : gross > transfers.length && payments.length === 0 ? `Netted down from ${gross} debts.` : 'The fewest payments that settle everyone.'}
         </p>
 
         {/* The picture first: how far along settling is, and who is ahead or behind */}
-        <section aria-label="Settlement overview" className="panel mt-6 rounded-[28px] p-5">
+        <section aria-label="Settlement overview" className="panel mt-8 rounded-[28px] p-6">
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="text-meta font-medium text-ink-3">Settled so far</p>
@@ -81,10 +81,10 @@ function SettleBody({ view }: { view: TripView }) {
             </div>
             <span className={cx('level num', settled ? 'ok' : 'aware')}>{pct}%</span>
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-accent-soft" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label="Share of the trip settled">
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-accent-soft" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label="Share of the trip settled">
             <div className="h-full rounded-full bg-[var(--ok)] transition-[width] duration-700 ease-[var(--ease-out-expo)]" style={{ width: `${pct}%` }} />
           </div>
-          <ul className="mt-5 flex flex-col gap-2.5">
+          <ul className="mt-7 flex flex-col gap-4">
             {byNet.map((m) => {
               const net = ledger.net[m.id] ?? 0
               const w = (Math.abs(net) / maxNet) * 50
@@ -106,7 +106,7 @@ function SettleBody({ view }: { view: TripView }) {
         </section>
 
         {settled && !stamping ? (
-          <div className="panel mt-6 flex items-center gap-4 rounded-[28px] p-5">
+          <div className="panel mt-8 flex items-center gap-4 rounded-[28px] p-6">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
               <SealCheck size={28} weight="duotone" aria-hidden />
             </span>
@@ -116,11 +116,11 @@ function SettleBody({ view }: { view: TripView }) {
             </div>
           </div>
         ) : (
-          <section aria-labelledby="to-pay" className="mt-8">
-            <h3 id="to-pay" className="flex min-h-11 items-center px-0.5 text-title">
+          <section aria-labelledby="to-pay" className="mt-12">
+            <h3 id="to-pay" className="flex min-h-11 items-center px-0.5 pb-1 text-title">
               To pay
             </h3>
-            <ol className="panel-strong rows mt-1 overflow-hidden rounded-[28px]">
+            <ol className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
               {tickets.map((t) => (
                 <li key={key(t)}>
                   <PayRow
@@ -138,7 +138,7 @@ function SettleBody({ view }: { view: TripView }) {
         )}
 
         {payments.length ? (
-          <section aria-labelledby="paid" className="mt-12">
+          <section aria-labelledby="paid" className="mt-14">
             <h3 id="paid" className="flex min-h-11 items-center gap-2 px-0.5 text-title">
               Paid
               <span className="num text-meta font-medium text-ink-3">{payments.length}</span>
@@ -271,11 +271,11 @@ function SettleBody({ view }: { view: TripView }) {
  */
 function PayRow({ from, sentence, amount, stamped, onPaid }: { from: Person; to?: Person; sentence: string; amount: string; stamped: boolean; onPaid: () => void }) {
   return (
-    <div className={cx('relative flex min-h-[76px] items-center gap-3.5 overflow-hidden px-5 py-3 transition-opacity duration-500', stamped && 'pointer-events-none')}>
+    <div className={cx('relative flex min-h-[88px] items-center gap-4 overflow-hidden px-5 py-4 transition-opacity duration-500', stamped && 'pointer-events-none')}>
       <Avatar person={from} size={38} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[14px] font-semibold">{sentence}</p>
-        <p className="num text-[19px] leading-6 font-[650] tracking-[-0.02em]">{amount}</p>
+        <p className="num mt-0.5 text-[20px] leading-6 font-[650] tracking-[-0.02em]">{amount}</p>
       </div>
       <Button size="sm" icon={Check} onClick={onPaid} className="shrink-0 px-3.5">
         Mark paid

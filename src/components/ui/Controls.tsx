@@ -26,11 +26,11 @@ export function Segmented<T extends string>({
   }, [i, options.length])
 
   return (
-    <div ref={root} role="radiogroup" aria-label={label} className={cx('relative grid auto-cols-fr grid-flow-col gap-0.5 rounded-[12px] bg-well p-[3px]', className)}>
+    <div ref={root} role="radiogroup" aria-label={label} className={cx('relative grid auto-cols-fr grid-flow-col gap-0.5 rounded-full bg-well p-1', className)}>
       {thumb ? (
         <span
           aria-hidden
-          className="absolute top-[3px] bottom-[3px] rounded-[9px] bg-solid shadow-[0_2px_8px_-2px_rgba(13,27,42,0.12)] transition-[left,width] duration-300 ease-[var(--ease-out-expo)]"
+          className="absolute top-1 bottom-1 rounded-full bg-solid shadow-[0_2px_8px_-2px_rgba(13,27,42,0.12)] transition-[left,width] duration-300 ease-[var(--ease-out-expo)]"
           style={{ left: thumb.x, width: thumb.w }}
         />
       ) : null}
@@ -48,7 +48,7 @@ export function Segmented<T extends string>({
               if (e.key === 'ArrowRight') onChange(options[(i + 1) % options.length].value)
               if (e.key === 'ArrowLeft') onChange(options[(i - 1 + options.length) % options.length].value)
             }}
-            className={cx('relative z-[1] min-h-[38px] rounded-[9px] px-1.5 text-meta font-semibold transition-colors duration-200', active ? 'text-ink' : 'text-ink-2 hover:text-ink')}
+            className={cx('relative z-[1] min-h-[40px] rounded-full px-2 text-[14px] font-semibold transition-colors duration-200', active ? 'text-ink' : 'text-ink-3 hover:text-ink')}
           >
             {o.label}
           </button>
