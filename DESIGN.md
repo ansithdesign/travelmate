@@ -8,14 +8,14 @@ colors:
   muted: "#4f6278"
   faint: "#8d9cae"
   midnight: "#0f2238"
-  accent: "#1769d6"
-  accent-ink: "#0f56b5"
+  accent: "#3a5fb0"
+  accent-ink: "#2b4a92"
   accent-soft: "rgba(23, 105, 214, 0.12)"
   accent-bright: "#8fc6fb"
-  haze-light: "#f3f6fb"
+  haze-light: "#f4f7fc"
   haze-dark: "#0a1430"
-  sky-light: ["#74b7f0", "#bcdcf6", "#fbe7d9"]
-  sky-dark: ["#070f26", "#0e1d42", "#15295a"]
+  sky-light: ["#86a2d8", "#b9c9ea", "#e6ecf8"]
+  sky-dark: ["#0a1230", "#1a2b61", "#34508f"]
   sun-light: "rgba(255, 238, 205, 0.95)"
   glass: "rgba(255, 255, 255, 0.56)"
   glass-strong: "rgba(255, 255, 255, 0.8)"
@@ -77,7 +77,9 @@ TripMate uses the owner's **Under the Sky** system from Finbook, with an Airbnb-
 - **Modules are borderless frosted glass.** 20px blur, a barely-there 1px inner light and a wide, faint shadow. No borders, no hard edge lines. Edges come from light, not lines.
 - **Airbnb calm.** Few weights, one clear step from title to body to a muted secondary line. Photos lead, words sit underneath. Sections are separated by space, not by rules or more boxes.
 
-There are exactly two themes. **Light** is a clear blue sky that melts into a warm peach horizon, with a soft glowing sun and drifting clouds. **Dark** is a deep midnight sky with a few stars. Auto follows the device; Profile can pin either. Internally `html[data-sky]` is `day` (light) or `night` (dark).
+The sky is painted, in the spirit of the owner's portfolio (ansithmohammed.com): dusky periwinkle, a glowing sun or moon, stars at night, layered mountain ridges and mist that dissolve into the haze. Titles end with a blue full stop (`Dot`). Trip photos sit in tilted, white frames (`Framed`); until a photo loads, a painted scene (sky, sun or moon, three ridgelines, seeded per trip) stands in. The logo mark is a moon over two ridgelines.
+
+There are exactly two themes. **Light** is a periwinkle sky fading to a pale haze, with a soft glowing sun, clouds and misty ridges. **Dark** is a deep midnight sky with stars, an occasional shooting star and a moon. Auto follows the device; Profile can pin either. Internally `html[data-sky]` is `day` (light) or `night` (dark).
 
 ## Colors
 
@@ -157,7 +159,7 @@ Strong glass, 42px, medium 14px label. Selected is midnight.
 Haze, radius 34 (sheet) or 30 (dialog), grabber 38 x 5, 21px bold title, a plain close icon. Backdrop `rgba(8,20,40,0.32)` with a 3px blur.
 
 ### Tab bar
-A floating glass dock, 68px tall, pill shaped, centred above the bottom edge. The current tab expands into an accent-soft pill with its icon (fill) and label; other tabs are 48px regular icons. Add expense is a 52px midnight circle built into the middle of the dock, so it never covers content. Tapping the current tab scrolls to the top. Pages reserve 112px at the bottom.
+A floating glass dock of three tabs, 64px tall, pill shaped, centred above the bottom edge. The current tab expands into an accent-soft pill with its icon (fill) and label; other tabs are 48px regular icons. Add expense is a separate 64px midnight floating button to the right of the dock on the same row, with a soft top light and a plus that turns on press. Tapping the current tab scrolls to the top. Pages reserve 112px at the bottom.
 
 ### Key moments
 First run uses the full twilight sky (`.tone-ink`) with white type, a white primary button and a translucent secondary.

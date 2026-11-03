@@ -8,7 +8,7 @@ import { useTripActions } from '../components/trips/useTripActions'
 import { CategoryTile } from '../components/icons/CategoryIcon'
 import { SkyArt } from '../components/shared/SkyArt'
 import { ExpenseDetailSheet } from '../components/expenses/ExpenseDetailSheet'
-import { ContentSheet, NavHeader, SheetBody, SkyHero } from '../components/shared/Page'
+import { ContentSheet, Dot, NavHeader, SheetBody, SkyHero } from '../components/shared/Page'
 import { Avatar, AvatarStack } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { PhotoCard } from '../components/ui/Cover'
@@ -46,7 +46,10 @@ function Overview({ view }: { view: TripView }) {
         <div className="flex items-center gap-4">
           <PhotoCard photo={trip.cover} eager radius={18} className="size-[64px] shrink-0 sm:size-[76px]" />
           <div className="min-w-0">
-            <h1 className="text-hero">{trip.name}</h1>
+            <h1 className="text-hero">
+              {trip.name}
+              <Dot />
+            </h1>
             <p className="mt-1 text-meta text-ink-3">
               {trip.destination} · <span className="whitespace-nowrap">{formatRange(trip.startDate, trip.endDate)}</span>
             </p>
@@ -76,7 +79,7 @@ function Overview({ view }: { view: TripView }) {
 
       <ContentSheet>
         <SheetBody className="pt-8">
-          <div className="grid gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="min-w-0">
               {expenses.length ? (
                 <section aria-labelledby="balances">

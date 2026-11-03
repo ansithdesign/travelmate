@@ -8,6 +8,18 @@ import { formatMoney } from '../../utils/money'
 import { PhotoCard } from '../ui/Cover'
 import { phaseLabel } from './status'
 
+/** A photo in a white frame with a slight tilt, like a print set down on the table. */
+export function Framed({ children, tilt = 0, className }: { children: React.ReactNode; tilt?: number; className?: string }) {
+  return (
+    <div
+      className={cx('rounded-[24px] bg-[var(--frame)] p-1.5 shadow-[0_2px_6px_rgba(13,27,42,0.06),0_18px_34px_-16px_rgba(13,27,42,0.28)] backdrop-blur-[10px] transition-transform duration-300 ease-[var(--ease-out-expo)]', className)}
+      style={{ transform: `rotate(${tilt}deg)` }}
+    >
+      {children}
+    </div>
+  )
+}
+
 export function BalanceLine({ net, className, currency }: { net: number; className?: string; currency?: CurrencyCode }) {
   if (net === 0) return <span className={cx('text-ink-3', className)}>All square</span>
   return (
@@ -25,12 +37,14 @@ export function FeaturedTrip({ view, seed = 0 }: { view: TripView; seed?: number
 
   return (
     <Link to={`/trips/${trip.id}`} className="group block" aria-label={`${trip.name}, ${phaseLabel(trip, status)}`}>
-      <PhotoCard photo={trip.cover} seed={seed} eager radius={20} className="aspect-[4/3] w-full transition-transform duration-200 ease-[var(--ease-out-expo)] group-active:scale-[0.985] sm:aspect-[16/10]">
-        <span className="absolute top-3.5 left-3.5 rounded-full bg-white/95 px-3 py-1.5 text-[13px] font-semibold text-[#0d1b2a] shadow-[0_2px_10px_rgba(13,27,42,0.16)]">
-          {phaseLabel(trip, status)}
-        </span>
-      </PhotoCard>
-      <div className="mt-3 flex items-start justify-between gap-3 px-0.5">
+      <Framed tilt={-1.2} className="group-active:scale-[0.985]">
+        <PhotoCard photo={trip.cover} seed={seed} eager radius={18} className="aspect-[4/3] w-full shadow-none sm:aspect-[16/10]">
+          <span className="absolute top-3 left-3 rounded-full bg-white/95 px-3 py-1.5 text-[13px] font-semibold text-[#0d1b2a] shadow-[0_2px_10px_rgba(13,27,42,0.16)]">
+            {phaseLabel(trip, status)}
+          </span>
+        </PhotoCard>
+      </Framed>
+      <div className="mt-5 flex items-start justify-between gap-3 px-0.5">
         <div className="min-w-0">
           <h3 className="truncate text-heading">{trip.name}</h3>
           <p className="truncate text-meta text-ink-3">
@@ -53,9 +67,11 @@ export function TripWindowCard({ view, seed = 0 }: { view: TripView; seed?: numb
   const { trip, status, ledger } = view
   const myNet = ledger.net[me.id] ?? 0
   return (
-    <Link to={`/trips/${trip.id}`} className="group block w-[164px] shrink-0 snap-start">
-      <PhotoCard photo={trip.cover} seed={seed} radius={16} className="aspect-square w-full transition-transform duration-200 group-active:scale-[0.985]" />
-      <p className="mt-2.5 truncate text-[15px] font-semibold">{trip.name}</p>
+    <Link to={`/trips/${trip.id}`} className="group block w-[172px] shrink-0 snap-start">
+      <Framed tilt={seed % 2 ? 1.6 : -1.6} className="group-active:scale-[0.985]">
+        <PhotoCard photo={trip.cover} seed={seed} radius={18} className="aspect-[4/5] w-full shadow-none" />
+      </Framed>
+      <p className="mt-4 truncate text-[15px] font-semibold">{trip.name}</p>
       <p className="truncate text-meta text-ink-3">{phaseLabel(trip, status)}</p>
       <p className={cx('num truncate text-meta font-medium', myNet === 0 ? 'text-ink-3' : myNet > 0 ? 'text-gain' : 'text-loss')}>
         {myNet === 0 ? `${formatMoney(ledger.total, { currency: trip.currency })} · settled` : myNet > 0 ? `Owed ${formatMoney(myNet, { currency: trip.currency })}` : `You owe ${formatMoney(-myNet, { currency: trip.currency })}`}

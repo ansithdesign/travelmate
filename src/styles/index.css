@@ -95,13 +95,17 @@
   --faint: #8d9cae;
   --on-ink: #ffffff;
   --midnight: #0f2238;
-  --sky-1: #74b7f0;
-  --sky-2: #bcdcf6;
-  --sky-3: #fbe7d9;
-  --haze: #f3f6fb;
-  --sun: rgba(255, 238, 205, 0.95);
-  --sun-x: 80%;
-  --cloud-a: 0.66;
+  --sky-1: #86a2d8;
+  --sky-2: #b9c9ea;
+  --sky-3: #e6ecf8;
+  --haze: #f4f7fc;
+  --sun: rgba(255, 244, 220, 0.95);
+  --sun-x: 78%;
+  --cloud-a: 0.7;
+  --ridge-far: rgba(120, 142, 200, 0.34);
+  --ridge-near: rgba(92, 116, 182, 0.3);
+  --mist: rgba(255, 255, 255, 0.85);
+  --frame: #f6f8fd;
   --glass: rgba(255, 255, 255, 0.6);
   --glass-strong: rgba(255, 255, 255, 0.82);
   --glass-edge: rgba(255, 255, 255, 0.5);
@@ -114,11 +118,11 @@
   /* Shadows are wide and faint: light, not edges */
   --shadow-soft: 0 1px 2px rgba(23, 63, 112, 0.03), 0 10px 30px -14px rgba(23, 63, 112, 0.14);
   --shadow-float: 0 2px 6px rgba(13, 27, 42, 0.06), 0 16px 36px -14px rgba(13, 27, 42, 0.22);
-  --accent: #1769d6;
-  --accent-ink: #0f56b5;
+  --accent: #3a5fb0;
+  --accent-ink: #2b4a92;
   --on-accent: #ffffff;
-  --accent-soft: rgba(23, 105, 214, 0.12);
-  --accent-bright: #8fc6fb;
+  --accent-soft: rgba(58, 95, 176, 0.12);
+  --accent-bright: #a9bdf0;
   --ok: #23915c;
   --ok-tint: rgba(35, 145, 92, 0.13);
   --ok-ink: #15693f;
@@ -143,13 +147,17 @@
   --faint: #6b7d95;
   --on-ink: #0d1b2a;
   --midnight: #0f2238;
-  --sky-1: #070f26;
-  --sky-2: #0e1d42;
-  --sky-3: #15295a;
+  --sky-1: #0a1230;
+  --sky-2: #1a2b61;
+  --sky-3: #34508f;
   --haze: #0a1430;
-  --sun: rgba(170, 190, 255, 0.18);
-  --sun-x: 78%;
+  --sun: rgba(170, 190, 255, 0.2);
+  --sun-x: 56%;
   --cloud-a: 0;
+  --ridge-far: rgba(78, 108, 185, 0.5);
+  --ridge-near: rgba(30, 52, 122, 0.7);
+  --mist: rgba(110, 138, 214, 0.22);
+  --frame: rgba(255, 255, 255, 0.13);
   --glass: rgba(255, 255, 255, 0.07);
   --glass-strong: rgba(255, 255, 255, 0.1);
   --glass-edge: rgba(255, 255, 255, 0.05);
@@ -161,11 +169,11 @@
   --divider: rgba(255, 255, 255, 0.07);
   --shadow-soft: 0 10px 30px -16px rgba(0, 0, 0, 0.35);
   --shadow-float: 0 16px 36px -14px rgba(0, 0, 0, 0.5);
-  --accent: #6cb4ff;
-  --accent-ink: #9ccbff;
+  --accent: #8aa8f2;
+  --accent-ink: #b4c7fa;
   --on-accent: #06142b;
-  --accent-soft: rgba(108, 180, 255, 0.16);
-  --accent-bright: #9fd0ff;
+  --accent-soft: rgba(138, 168, 242, 0.17);
+  --accent-bright: #b4c7fa;
   --ok: #4cc58a;
   --ok-tint: rgba(76, 197, 138, 0.16);
   --ok-ink: #8fe2b8;
@@ -256,7 +264,7 @@
       radial-gradient(220px 180px at var(--sun-x) 40px, var(--sun), transparent 70%),
       linear-gradient(180deg, var(--sky-2) 0px, var(--sky-3) 170px, var(--haze) 360px);
   }
-  /* A soft sun that breathes, sitting where the sun glow is */
+  /* The sun glows softly by day and becomes a moon at night */
   .sky-layer::before {
     content: '';
     position: absolute;
@@ -268,6 +276,66 @@
     background: radial-gradient(closest-side, var(--sun), transparent);
     filter: blur(14px);
     animation: sun-breathe 9s ease-in-out infinite;
+  }
+  :root[data-sky='night'] .sky-layer::before {
+    top: 44px;
+    left: calc(var(--sun-x) - 22px);
+    width: 44px;
+    height: 44px;
+    filter: none;
+    background: radial-gradient(circle at 36% 34%, #fffaf0, #f1e4c6 72%);
+    box-shadow: 0 0 36px 12px rgba(255, 240, 200, 0.26), 0 0 140px 60px rgba(150, 175, 255, 0.16);
+    animation: none;
+  }
+  :root[data-sky='night'] .sky-layer.soft::before {
+    top: 44px;
+    transform: scale(0.8);
+  }
+  .sky-layer .ridges {
+    position: absolute;
+    inset: auto 0 0 0;
+    width: 100%;
+    height: 280px;
+    filter: blur(1.2px);
+    -webkit-mask-image: linear-gradient(180deg, #000 25%, transparent 92%);
+    mask-image: linear-gradient(180deg, #000 25%, transparent 92%);
+  }
+  .sky-layer .ridges.soft {
+    height: 170px;
+  }
+  .sky-layer .ridge-far { fill: var(--ridge-far); }
+  .sky-layer .ridge-near { fill: var(--ridge-near); }
+  .sky-layer .mist {
+    position: absolute;
+    inset: auto -10% 0 -10%;
+    height: 200px;
+    background:
+      radial-gradient(60% 70% at 20% 100%, var(--mist), transparent 70%),
+      radial-gradient(55% 60% at 75% 100%, var(--mist), transparent 70%);
+    filter: blur(16px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 45%, transparent 100%);
+    animation: mist-drift 40s ease-in-out infinite alternate;
+  }
+  .sky-layer.soft .mist {
+    height: 120px;
+  }
+  .sky-layer .stars.s2 {
+    opacity: 0.55;
+    transform: translate(18px, 26px) scale(0.9);
+    animation: twinkle 5s ease-in-out infinite;
+  }
+  .sky-layer .shoot {
+    position: absolute;
+    top: 110px;
+    left: 22%;
+    width: 110px;
+    height: 1.5px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, #fff);
+    opacity: 0;
+    transform: rotate(18deg);
+    animation: shoot 16s ease-in 4s infinite;
   }
   .sky-layer .cloud {
     position: absolute;
@@ -479,6 +547,15 @@
 @keyframes toast-in {
   from { transform: translateY(40px); opacity: 0; }
   to { transform: none; opacity: 1; }
+}
+@keyframes mist-drift {
+  from { transform: translateX(-3%); }
+  to { transform: translateX(3%); }
+}
+@keyframes shoot {
+  0%, 90% { opacity: 0; transform: translate(0, 0) rotate(18deg); }
+  93% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(150px, 50px) rotate(18deg); }
 }
 @keyframes sun-breathe {
   0%, 100% { transform: scale(1); opacity: 0.85; }

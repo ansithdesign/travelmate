@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowCounterClockwise, DownloadSimple, Trash, type Icon } from '@phosphor-icons/react'
-import { ContentSheet, SheetBody, SkyHero } from '../components/shared/Page'
+import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
 import { Segmented } from '../components/ui/Controls'
 import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
@@ -50,7 +50,10 @@ export function Profile() {
   return (
     <>
       <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-10 lg:pt-12">
-        <h1 className="text-hero">Profile</h1>
+        <h1 className="text-hero">
+          Profile
+          <Dot />
+        </h1>
         <div className="mt-8 flex items-center gap-4">
           <Avatar person={me} size={60} />
           <div className="min-w-0">

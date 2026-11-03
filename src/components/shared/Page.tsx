@@ -25,6 +25,15 @@ export function SheetBody({ children, className }: { children: ReactNode; classN
   return <div className={cx('px-6 pt-4 pb-12 lg:px-10', className)}>{children}</div>
 }
 
+/** The signature blue full stop that ends a page title. */
+export function Dot() {
+  return (
+    <span aria-hidden className="text-accent">
+      .
+    </span>
+  )
+}
+
 /** True once the window has scrolled a few pixels, for headers that gain material. */
 export function useScrolled(threshold = 4) {
   const [scrolled, setScrolled] = useState(false)

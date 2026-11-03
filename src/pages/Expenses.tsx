@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Plus } from '@phosphor-icons/react'
 import { ExpenseList } from '../components/expenses/ExpenseList'
-import { ContentSheet, SheetBody, SkyHero } from '../components/shared/Page'
+import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
 import { Button } from '../components/ui/Button'
 import { PhotoCard } from '../components/ui/Cover'
 import { useAllTripViews } from '../hooks/useTrip'
@@ -27,7 +27,10 @@ export function Expenses() {
   return (
     <>
       <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-8 lg:pt-12">
-        <h1 className="text-hero">Expenses</h1>
+        <h1 className="text-hero">
+          Expenses
+          <Dot />
+        </h1>
 
         {/* Stats are open: a hairline and a figure, no box */}
         <div className="mt-8 grid max-w-[520px] grid-cols-2 gap-6">

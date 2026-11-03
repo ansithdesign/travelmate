@@ -39,9 +39,9 @@ export function AppShell() {
 }
 
 /**
- * A floating glass dock. The current tab expands into a pill with its label,
- * the others stay as quiet icons, and Add expense sits in the middle of the
- * dock so it never covers content. Tapping the current tab scrolls to the top.
+ * A floating glass dock of three tabs: the current one expands into a pill with
+ * its label, the others stay as quiet icons. Add expense is its own floating
+ * button beside the dock. Tapping the current tab scrolls to the top.
  */
 function TabBar({ pathname }: { pathname: string }) {
   const { openExpense } = useUI()
@@ -61,32 +61,32 @@ function TabBar({ pathname }: { pathname: string }) {
           if (on) window.scrollTo({ top: 0, behavior: 'smooth' })
         }}
         className={cx(
-          'press flex h-12 items-center justify-center rounded-full text-[14px] font-semibold transition-[background-color,color,padding] duration-300 ease-[var(--ease-out-expo)]',
-          on ? 'bg-accent-soft pr-4 pl-3.5 text-accent-ink' : 'w-12 text-ink-3 hover:text-ink',
+          'press flex h-12 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent/40 text-[14px] font-semibold transition-[background-color,color,padding] duration-300 ease-[var(--ease-out-expo)]',
+          on ? 'bg-accent-soft pr-4 pl-3 text-accent-ink max-[359px]:px-0 max-[359px]:w-11' : 'w-11 text-ink-3 hover:text-ink',
         )}
       >
         <I size={24} weight={on ? 'fill' : 'regular'} aria-hidden className="shrink-0" />
-        <span className={cx('overflow-hidden whitespace-nowrap transition-[max-width,margin,opacity] duration-300 ease-[var(--ease-out-expo)]', on ? 'ml-2 max-w-[84px] opacity-100' : 'ml-0 max-w-0 opacity-0')}>{label}</span>
+        <span className={cx('overflow-hidden whitespace-nowrap transition-[max-width,margin,opacity] duration-300 ease-[var(--ease-out-expo)]', on ? 'ml-2 max-w-[84px] opacity-100 max-[359px]:hidden' : 'ml-0 max-w-0 opacity-0')}>{label}</span>
       </NavLink>
     )
   }
 
   return (
-    <div className="safe-bottom pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-3 lg:hidden">
-      <nav aria-label="Primary" className="glass-bar pointer-events-auto flex h-[68px] items-center gap-1 rounded-full p-2">
-        {tab(NAV[0], 0)}
-        {tab(NAV[1], 1)}
-        <button
-          type="button"
-          aria-label="Add expense"
-          disabled={data.trips.length === 0}
-          onClick={() => openExpense({ tripId: tripMatch?.params.tripId })}
-          className="luminous press mx-1 flex size-[52px] shrink-0 items-center justify-center rounded-full disabled:opacity-50"
-        >
-          <Plus size={24} weight="bold" aria-hidden />
-        </button>
-        {tab(NAV[2], 2)}
+    <div className="safe-bottom pointer-events-none fixed inset-x-0 bottom-0 z-40 flex items-end justify-between gap-3 px-4 pb-3 lg:hidden">
+      <nav aria-label="Primary" className="glass-bar pointer-events-auto flex h-16 min-w-0 items-center gap-0.5 rounded-full p-2">
+        {NAV.map((n, i) => tab(n, i))}
       </nav>
+      <button
+        type="button"
+        aria-label="Add expense"
+        disabled={data.trips.length === 0}
+        onClick={() => openExpense({ tripId: tripMatch?.params.tripId })}
+        className="group press pointer-events-auto relative flex size-14 shrink-0 items-center justify-center rounded-full text-white min-[390px]:size-16 shadow-[0_14px_30px_-10px_rgba(15,34,56,0.55),0_2px_6px_rgba(15,34,56,0.18)] disabled:opacity-50"
+        style={{ background: 'radial-gradient(120% 120% at 30% 15%, #2d5f9a 0%, var(--midnight) 55%, #0a1626 100%)' }}
+      >
+        <span aria-hidden className="absolute inset-[3px] rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.16),transparent_55%)]" />
+        <Plus size={26} weight="bold" aria-hidden className="relative transition-transform duration-300 ease-[var(--ease-out-expo)] group-active:rotate-90" />
+      </button>
     </div>
   )
 }

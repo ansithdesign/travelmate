@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button'
 import { SkyArt } from '../components/shared/SkyArt'
 import { Avatar } from '../components/ui/Avatar'
 import { BrandMark } from '../components/shared/BrandMark'
-import { ContentSheet, SheetBody, SkyHero } from '../components/shared/Page'
+import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
 import { useAllTripViews, type TripView } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
@@ -36,9 +36,13 @@ export function Home() {
     <>
       <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-12 lg:pt-12">
         <header className="flex items-end justify-between gap-3">
-          <h1 className="text-hero">
-            {greeting},<br className="sm:hidden" /> {firstName(me.name)}
-          </h1>
+          <div>
+            <p className="text-body text-ink-3">{greeting},</p>
+            <h1 className="mt-0.5 text-[46px] leading-[1.02] font-semibold tracking-[-0.045em]">
+              {firstName(me.name)}
+              <Dot />
+            </h1>
+          </div>
           <Button size="sm" variant="secondary" icon={Plus} onClick={() => openTrip()} className="mb-0.5 lg:hidden">
             New trip
           </Button>
@@ -98,7 +102,7 @@ export function Home() {
             </div>
           ))}
 
-          <div className="grid gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
             <div className="section-rule lg:hidden">
               <OutstandingSummary views={views} />
             </div>
@@ -125,7 +129,7 @@ export function Home() {
               </div>
               {past.length ? (
                 <>
-                  <div className="no-scrollbar -mx-6 mt-3 flex snap-x gap-4 overflow-x-auto px-6 pt-1 pb-3 sm:-mx-6 sm:px-6 lg:hidden">
+                  <div className="no-scrollbar -mx-6 mt-2 flex snap-x scroll-px-6 gap-5 overflow-x-auto px-6 py-4 sm:-mx-6 sm:px-6 lg:hidden">
                     {past.map((v, i) => (
                       <TripWindowCard key={v.trip.id} view={v} seed={i + 1} />
                     ))}
