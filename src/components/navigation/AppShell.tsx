@@ -12,6 +12,7 @@ import { BrandMark } from '../shared/BrandMark'
 import { Avatar } from '../ui/Avatar'
 import { Window } from '../ui/Cover'
 import { Sky } from '../sky/Sky'
+import { ErrorBoundary } from '../shared/ErrorBoundary'
 
 const NAV: { to: string; label: string; icon: (p: { active?: boolean; size?: number }) => JSX.Element; match: (p: string) => boolean }[] = [
   { to: '/', label: 'Trips', icon: TripsIcon, match: (p) => p === '/' || p.startsWith('/trips') },
@@ -27,7 +28,9 @@ export function AppShell() {
       <div className="min-h-dvh lg:pl-[296px]">
         <SideRail pathname={pathname} />
         <main className="min-w-0 lg:pt-2">
-          <Outlet />
+          <ErrorBoundary resetKey={pathname}>
+            <Outlet />
+          </ErrorBoundary>
         </main>
         <TabBar pathname={pathname} />
       </div>

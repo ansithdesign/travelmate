@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle, Plus, Scan } from '@phosphor-icons/react'
-import { FeaturedTrip, TripRow, TripWindowCard } from '../components/trips/TripCards'
+import { FeaturedTrip, PastTripCard, TripRow, TripWindowCard } from '../components/trips/TripCards'
 import { Button } from '../components/ui/Button'
 import { Window } from '../components/ui/Cover'
 import { Avatar } from '../components/ui/Avatar'
@@ -137,11 +137,18 @@ export function Home() {
                 <span className="num text-meta text-ink-3">{past.length}</span>
               </div>
               {past.length ? (
-                <div className="no-scrollbar -mx-5 mt-4 flex snap-x gap-5 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
-                  {past.map((v, i) => (
-                    <TripWindowCard key={v.trip.id} view={v} seed={i + 1} />
-                  ))}
-                </div>
+                <>
+                  <div className="no-scrollbar -mx-5 mt-4 flex snap-x gap-5 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:hidden">
+                    {past.map((v, i) => (
+                      <TripWindowCard key={v.trip.id} view={v} seed={i + 1} />
+                    ))}
+                  </div>
+                  <div className="mt-4 hidden gap-4 lg:grid lg:grid-cols-2">
+                    {past.map((v, i) => (
+                      <PastTripCard key={v.trip.id} view={v} seed={i + 1} />
+                    ))}
+                  </div>
+                </>
               ) : (
                 <p className="mt-2 max-w-[48ch] text-body text-ink-2">Finished trips become journal pages here, with what they cost and how they settled.</p>
               )}

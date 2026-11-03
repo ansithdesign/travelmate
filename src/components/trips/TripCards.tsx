@@ -51,7 +51,7 @@ export function FeaturedTrip({ view, seed = 0 }: { view: TripView; seed?: number
           <AvatarStack people={members} size={28} className="mt-3" ringClass="ring-white/70" />
         </div>
       </div>
-      <div className="glass mt-6 flex items-center justify-between gap-3 rounded-full py-2.5 pr-3 pl-5 text-meta text-white">
+      <div className="glass-control mt-6 flex items-center justify-between gap-3 rounded-full py-2.5 pr-3 pl-5 text-meta text-white">
         <span className="num text-sky-2 truncate">
           <span className="font-semibold text-white">{formatMoney(ledger.total, { currency: trip.currency })}</span>
           {trip.budget ? ` of ${formatMoney(trip.budget, { currency: trip.currency })}` : ''} spent
@@ -99,6 +99,29 @@ export function TripRow({ view, seed = 0 }: { view: TripView; seed?: number }) {
       <div className="shrink-0 text-right">
         <p className="num text-body font-semibold">{formatMoney(ledger.total, { currency: trip.currency })}</p>
         <BalanceLine net={myNet} currency={trip.currency} className="text-caption font-medium" />
+      </div>
+    </Link>
+  )
+}
+
+/** Desktop: a past trip as a wide journal card. */
+export function PastTripCard({ view, seed = 0 }: { view: TripView; seed?: number }) {
+  const { me } = useStore()
+  const { trip, ledger } = view
+  const myNet = ledger.net[me.id] ?? 0
+  return (
+    <Link to={`/trips/${trip.id}`} className="panel group flex gap-5 rounded-[28px] p-4 transition-shadow hover:shadow-[inset_0_0_0_1px_var(--color-line-strong),0_18px_40px_-22px_rgb(var(--t-shadow)/0.5)]">
+      <Window photo={trip.cover} seed={seed} shade={0.1} className="aspect-[0.8] w-[132px] shrink-0 transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1" />
+      <div className="flex min-w-0 flex-1 flex-col py-1">
+        <p className="text-title">{trip.name}</p>
+        <p className="text-meta text-ink-3">
+          {formatRange(trip.startDate, trip.endDate)} · {trip.members.length} {trip.members.length === 1 ? 'traveller' : 'travellers'}
+        </p>
+        {trip.journal.note ? <p className="mt-2 line-clamp-3 text-meta text-ink-2">{trip.journal.note}</p> : null}
+        <div className="mt-auto flex items-baseline justify-between gap-3 pt-3">
+          <span className="num text-heading">{formatMoney(ledger.total, { currency: trip.currency })}</span>
+          <BalanceLine net={myNet} currency={trip.currency} className="text-meta" />
+        </div>
       </div>
     </Link>
   )

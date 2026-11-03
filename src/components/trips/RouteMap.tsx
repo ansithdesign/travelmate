@@ -21,7 +21,7 @@ export function RouteMap({ places }: { places: string[] }) {
 
   const cols = w < 420 ? 3 : w < 640 ? 4 : 5
   const rowH = 96
-  const padX = 34
+  const padX = 40
   const top = 26
   const pts = places.map((_, i) => {
     const r = Math.floor(i / cols)
@@ -82,15 +82,20 @@ export function RouteMap({ places }: { places: string[] }) {
         </>
       ) : null}
       <ol className="absolute inset-0">
-        {places.map((p, i) => (
+        {places.map((p, i) => {
+          const lw = Math.min(110, (w - padX * 2) / (cols - 1) - 6)
+          // Keep every label inside the card, even at the turns.
+          const left = Math.min(Math.max(pts[i].x, lw / 2 + 10), w - lw / 2 - 10)
+          return (
           <li
             key={p + i}
             className="absolute -translate-x-1/2 text-center text-caption leading-[15px] font-semibold text-ink"
-            style={{ left: pts[i].x, top: pts[i].y + 18, width: Math.min(110, (w - padX * 2) / (cols - 1) - 6) }}
+            style={{ left, top: pts[i].y + 18, width: lw }}
           >
             <span className="line-clamp-2">{p}</span>
           </li>
-        ))}
+          )
+        })}
       </ol>
     </div>
   )

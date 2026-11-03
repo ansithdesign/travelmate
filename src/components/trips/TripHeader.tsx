@@ -28,7 +28,7 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
       ref={ref}
       aria-label="Trip sections"
       className={cx(
-        'no-scrollbar glass flex w-fit max-w-full gap-1 overflow-x-auto rounded-full p-1 max-sm:[mask-image:linear-gradient(90deg,transparent_0,#000_14px,#000_calc(100%-22px),transparent)]',
+        'no-scrollbar glass-control flex w-fit max-w-full gap-1 overflow-x-auto rounded-full p-1 max-sm:[mask-image:linear-gradient(90deg,transparent_0,#000_14px,#000_calc(100%-22px),transparent)]',
         className,
       )}
     >

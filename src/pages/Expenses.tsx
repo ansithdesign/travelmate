@@ -50,7 +50,7 @@ export function Expenses() {
             type="button"
             aria-pressed={tripId === 'all'}
             onClick={() => setTripId('all')}
-            className={cx('press flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-meta font-semibold', tripId === 'all' ? 'bg-white text-[#0c1736]' : 'glass text-white')}
+            className={cx('press flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-meta font-semibold', tripId === 'all' ? 'bg-white text-[#0c1736]' : 'glass-control text-white')}
           >
             All trips <span className="num opacity-60">{data.expenses.length}</span>
           </button>
@@ -60,7 +60,7 @@ export function Expenses() {
               type="button"
               aria-pressed={tripId === v.trip.id}
               onClick={() => setTripId(v.trip.id)}
-              className={cx('press flex h-10 shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-meta font-semibold', tripId === v.trip.id ? 'bg-white text-[#0c1736]' : 'glass text-white')}
+              className={cx('press flex h-10 shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-meta font-semibold', tripId === v.trip.id ? 'bg-white text-[#0c1736]' : 'glass-control text-white')}
             >
               <Window photo={v.trip.cover} seed={i + 1} shade={0} className="aspect-[0.8] w-6" />
               {v.trip.name}

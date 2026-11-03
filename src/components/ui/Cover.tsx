@@ -33,19 +33,26 @@ export function Cover({
   const [failed, setFailed] = useState(false)
   const [loaded, setLoaded] = useState(false)
   const show = !!photo?.src && !failed
+  // Derive the fallback sky from the photo id so each window shows its own clouds.
+  let h = seed * 7919
+  for (const c of photo?.id ?? '') h = (h * 31 + c.charCodeAt(0)) >>> 0
+  const r = (n: number) => ((h >>> (n * 3)) % 1000) / 1000
+  const skyIdx = (h + seed) % SKIES.length
+  const a = { top: 8 + r(1) * 30, left: -18 + r(2) * 30, w: 120 + r(3) * 70, v: h % 3 }
+  const b = { bottom: 4 + r(4) * 26, right: -26 + r(5) * 28, w: 150 + r(6) * 80, v: (h >>> 2) % 3 }
 
   return (
     <div className={cx('relative overflow-hidden', className)}>
       <div
         aria-hidden
         className={cx('absolute inset-0 transition-opacity duration-700', show && loaded ? 'opacity-0' : 'opacity-100')}
-        style={{ background: SKIES[seed % SKIES.length] }}
+        style={{ background: SKIES[skyIdx] }}
       >
-        <div className="absolute top-[16%] left-[-12%] w-[70%]" style={{ animation: `bob 7s ease-in-out ${-seed}s infinite` }}>
-          <CloudShape width={160} variant={seed % 3} />
+        <div className="absolute" style={{ top: `${a.top}%`, left: `${a.left}%`, animation: `bob ${6 + r(7) * 4}s ease-in-out ${-r(8) * 6}s infinite` }}>
+          <CloudShape width={a.w} variant={a.v} />
         </div>
-        <div className="absolute right-[-22%] bottom-[12%] w-[80%] opacity-85" style={{ animation: `bob 9s ease-in-out ${-seed * 2}s infinite` }}>
-          <CloudShape width={200} variant={(seed + 1) % 3} />
+        <div className="absolute opacity-85" style={{ bottom: `${b.bottom}%`, right: `${b.right}%`, animation: `bob ${8 + r(9) * 4}s ease-in-out ${-r(10) * 6}s infinite` }}>
+          <CloudShape width={b.w} variant={b.v} />
         </div>
       </div>
       {show ? (

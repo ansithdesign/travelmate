@@ -213,6 +213,16 @@
       inset 0 0 0 1px rgb(255 255 255 / 0.22),
       0 8px 24px -12px rgb(8 20 60 / 0.35);
   }
+  /* Pill controls on the sky: deeper glass so white labels hold 4.5:1 in every phase */
+  .glass-control {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.04)), rgb(8 22 76 / 0.44);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.32),
+      inset 0 0 0 1px rgb(255 255 255 / 0.16),
+      0 8px 24px -12px rgb(8 20 60 / 0.4);
+  }
   /* Glass for bars that float over content */
   .glass-bar {
     background: color-mix(in oklab, var(--t-panel-strong) 70%, var(--t-sheet));

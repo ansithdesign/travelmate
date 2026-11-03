@@ -1,4 +1,4 @@
-import { memo, useEffect, useId, useRef } from 'react'
+import { memo, useEffect, useId, useRef, useState } from 'react'
 import { useSky, type SkyPhase } from '../../store/sky'
 import { cx } from '../../utils/cx'
 
@@ -129,13 +129,39 @@ export const Sky = memo(function Sky() {
   )
 })
 
+function useWide() {
+  const q = '(min-width: 1024px)'
+  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.matchMedia?.(q).matches)
+  useEffect(() => {
+    const m = window.matchMedia?.(q)
+    if (!m) return
+    const on = () => setWide(m.matches)
+    m.addEventListener('change', on)
+    return () => m.removeEventListener('change', on)
+  }, [])
+  return wide
+}
+
+/**
+ * Sun or moon. Phones have controls and titles across the whole top edge, so the
+ * disc sits just above the frame and only its rim and glow show. Desktop has open
+ * sky at the top right, so the disc is shown whole there.
+ */
 function Luminary({ phase }: { phase: SkyPhase }) {
-  const pos: Record<SkyPhase, { x: string; y: string; size: number; core: string; glow: string }> = {
-    dawn: { x: '52%', y: '0.5%', size: 64, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
-    day: { x: '52%', y: '-0.5%', size: 80, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
-    golden: { x: '52%', y: '1%', size: 74, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
-    night: { x: '54%', y: '2.5%', size: 42, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
-  }
+  const wide = useWide()
+  const pos: Record<SkyPhase, { x: string; y: string; size: number; core: string; glow: string }> = wide
+    ? {
+        dawn: { x: '84%', y: '9%', size: 64, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
+        day: { x: '84%', y: '7%', size: 78, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
+        golden: { x: '84%', y: '10%', size: 72, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
+        night: { x: '85%', y: '8%', size: 44, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
+      }
+    : {
+        dawn: { x: '58%', y: '-4.6%', size: 76, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
+        day: { x: '58%', y: '-4.8%', size: 84, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
+        golden: { x: '58%', y: '-4.4%', size: 80, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
+        night: { x: '58%', y: '-2.4%', size: 46, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
+      }
   const p = pos[phase]
   return (
     <div
@@ -201,7 +227,7 @@ const PUFFS: number[][][] = [
  */
 export function CloudShape({ width, top = '#fff', belly = '#cfe0f5', variant = 0 }: { width: number; top?: string; belly?: string; variant?: number }) {
   const id = `c${useId().replace(/:/g, '')}`
-  const puffs = PUFFS[variant % PUFFS.length]
+  const puffs = PUFFS[((Math.trunc(variant) % PUFFS.length) + PUFFS.length) % PUFFS.length]
   return (
     <svg width={width} height={width * 0.5} viewBox="0 0 240 120" style={{ overflow: 'visible' }} aria-hidden>
       <defs>
