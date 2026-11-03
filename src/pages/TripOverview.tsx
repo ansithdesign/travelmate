@@ -43,6 +43,7 @@ function Overview({ view }: { view: TripView }) {
     <>
       <NavHeader title={<span className="sr-only">{trip.name}</span>} back="/" actions={<Menu items={items} label="Trip actions" tone="plain" />} />
       <SkyHero className="pt-2 pb-2">
+        <div className="on-sky">
         <div className="flex items-center gap-4">
           <PhotoCard photo={trip.cover} eager radius={18} className="size-[64px] shrink-0 sm:size-[76px]" />
           <div className="min-w-0">
@@ -57,7 +58,7 @@ function Overview({ view }: { view: TripView }) {
         </div>
 
         {/* The hero figure sits straight on the sky */}
-        <div className="mt-10">
+        <div className="mt-8">
           <p className="text-meta font-medium text-ink-3">{expenses.length ? 'Group has spent' : 'Nothing spent yet'}</p>
           <Figure value={ledger.total} currency={cur} animate size="xl" className="mt-1.5" />
           <div className="mt-4 flex flex-wrap items-center gap-2.5">
@@ -72,9 +73,10 @@ function Overview({ view }: { view: TripView }) {
               </span>
             </Link>
           </div>
-          {trip.budget ? <BudgetBar spent={ledger.total} budget={trip.budget} currency={cur} className="mt-8 max-w-[560px]" /> : null}
         </div>
-        <TripTabs view={view} className="mt-10" />
+        </div>
+        {trip.budget ? <BudgetBar spent={ledger.total} budget={trip.budget} currency={cur} className="mt-10 max-w-[560px]" /> : null}
+        <TripTabs view={view} className="mt-8" />
       </SkyHero>
 
       <ContentSheet>

@@ -7,9 +7,9 @@ export function BrandMark({ size = 30 }: { size?: number }) {
     <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden>
       <defs>
         <linearGradient id={`${u}s`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2c4488" />
-          <stop offset="0.65" stopColor="#7d93d0" />
-          <stop offset="1" stopColor="#f1d9d4" />
+          <stop offset="0" stopColor="#2a4690" />
+          <stop offset="0.65" stopColor="#6f8fd6" />
+          <stop offset="1" stopColor="#e4ebfa" />
         </linearGradient>
         <clipPath id={`${u}c`}>
           <rect x="0" y="0" width="32" height="32" rx="9" />

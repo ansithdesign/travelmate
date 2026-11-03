@@ -7,15 +7,15 @@ colors:
   ink-2: "#2a3c52"
   muted: "#4f6278"
   faint: "#8d9cae"
-  midnight: "#0f2238"
-  accent: "#3a5fb0"
-  accent-ink: "#2b4a92"
+  midnight: "#14224a"
+  accent: "#3563d6"
+  accent-ink: "#2349b0"
   accent-soft: "rgba(23, 105, 214, 0.12)"
   accent-bright: "#8fc6fb"
   haze-light: "#f4f7fc"
   haze-dark: "#0a1430"
-  sky-light: ["#86a2d8", "#b9c9ea", "#e6ecf8"]
-  sky-dark: ["#0a1230", "#1a2b61", "#34508f"]
+  sky-light: ["#36559f", "#6a8cd0", "#b5c9ee"]
+  sky-dark: ["#0a1432", "#1f3a82", "#4468b8"]
   sun-light: "rgba(255, 238, 205, 0.95)"
   glass: "rgba(255, 255, 255, 0.56)"
   glass-strong: "rgba(255, 255, 255, 0.8)"
@@ -77,9 +77,9 @@ TripMate uses the owner's **Under the Sky** system from Finbook, with an Airbnb-
 - **Modules are borderless frosted glass.** 20px blur, a barely-there 1px inner light and a wide, faint shadow. No borders, no hard edge lines. Edges come from light, not lines.
 - **Airbnb calm.** Few weights, one clear step from title to body to a muted secondary line. Photos lead, words sit underneath. Sections are separated by space, not by rules or more boxes.
 
-The sky is painted, in the spirit of the owner's portfolio (ansithmohammed.com): dusky periwinkle, a glowing sun or moon, stars at night, layered mountain ridges and mist that dissolve into the haze. Titles end with a blue full stop (`Dot`). Trip photos sit in tilted, white frames (`Framed`); until a photo loads, a painted scene (sky, sun or moon, three ridgelines, seeded per trip) stands in. The logo mark is a moon over two ridgelines.
+The sky is painted, in the spirit of the owner's portfolio (ansithmohammed.com): dusky periwinkle, a moon and stars at night, layered mountain ridges and mist that dissolve into the haze. Titles end with a blue full stop (`Dot`). Trip photos sit in tilted, white frames (`Framed`); until a photo loads, a painted scene (sky, sun or moon, three ridgelines, seeded per trip) stands in. The logo mark is a moon over two ridgelines.
 
-There are exactly two themes. **Light** is a periwinkle sky fading to a pale haze, with a soft glowing sun, clouds and misty ridges. **Dark** is a deep midnight sky with stars, an occasional shooting star and a moon. Auto follows the device; Profile can pin either. Internally `html[data-sky]` is `day` (light) or `night` (dark).
+There are exactly two themes. **Light** follows the portfolio sky: a deep, rich blue (`#36559f` to `#6a8cd0` to `#b5c9ee`), faint stars, no sun, and white mist banks at the foot with soft, blurred, pale ridges melting into them. Text that sits on the deep blue (titles, hero figures, header controls) is white via the `.on-sky` class, which remaps the ink tokens; everything below the band is ink on haze. Ridges are never crisp; they are blurred and masked at top and bottom so they blend. **Dark** is a deep midnight sky with stars, an occasional shooting star and a moon. Auto follows the device; Profile can pin either. Internally `html[data-sky]` is `day` (light) or `night` (dark).
 
 ## Colors
 

@@ -27,6 +27,7 @@ export function Expenses() {
   return (
     <>
       <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-8 lg:pt-12">
+        <div className="on-sky">
         <h1 className="text-hero">
           Expenses
           <Dot />
@@ -44,6 +45,7 @@ export function Expenses() {
           </div>
         </div>
 
+        </div>
         <div className="no-scrollbar -mx-6 mt-6 flex gap-2 overflow-x-auto px-6 py-1 sm:mx-0 sm:px-0" role="group" aria-label="Trip">
           <button
             type="button"

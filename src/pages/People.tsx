@@ -88,8 +88,8 @@ function PeopleBody({ view }: { view: TripView }) {
 
   return (
     <>
-      <h2 className="px-0.5 pt-2 text-display">People</h2>
-      <p className="mt-1.5 px-0.5 text-body text-ink-3">Everyone on the trip can add expenses and is in every split by default.</p>
+      <h2 className="on-sky px-0.5 pt-2 text-display">People</h2>
+      <p className="on-sky mt-1.5 px-0.5 text-body">Everyone on the trip can add expenses and is in every split by default.</p>
 
       <section aria-labelledby="invite-link" className="panel mt-5 rounded-[28px] p-6">
         <h2 id="invite-link" className="flex items-center gap-2.5 text-heading">

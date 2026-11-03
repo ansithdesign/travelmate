@@ -35,6 +35,7 @@ export function Home() {
   return (
     <>
       <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-12 lg:pt-12">
+        <div className="on-sky">
         <header className="flex items-end justify-between gap-3">
           <div>
             <p className="text-body text-ink-3">{greeting},</p>
@@ -48,6 +49,7 @@ export function Home() {
           </Button>
         </header>
         <YearLine views={views} />
+        </div>
 
         <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:items-start lg:gap-10">
         <div>

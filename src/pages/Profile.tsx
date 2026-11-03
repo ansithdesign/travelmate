@@ -49,7 +49,7 @@ export function Profile() {
 
   return (
     <>
-      <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-10 lg:pt-12">
+      <SkyHero className="on-sky pt-[max(28px,env(safe-area-inset-top))] pb-10 lg:pt-12">
         <h1 className="text-hero">
           Profile
           <Dot />

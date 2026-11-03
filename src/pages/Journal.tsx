@@ -80,7 +80,7 @@ function JournalBody({ view }: { view: TripView }) {
         }
       />
       <SkyHero className="pb-6">
-        <header>
+        <header className="on-sky">
           <p className="text-meta font-medium text-ink-3">
             {start.toLocaleString('en-IN', { month: 'long' })} {start.getFullYear()}
           </p>

@@ -6,8 +6,9 @@ import { cx } from '../../utils/cx'
 function Ridges({ soft }: { soft: boolean }) {
   return (
     <svg aria-hidden className={cx('ridges', soft && 'soft')} viewBox="0 0 800 260" preserveAspectRatio="xMidYMax slice">
-      <path className="ridge-far" d="M0 150 C60 120 90 100 140 110 C190 120 220 80 280 60 C330 44 360 70 410 96 C460 120 500 84 560 66 C620 50 660 90 720 108 C760 118 780 112 800 104 V260 H0Z" />
-      <path className="ridge-near" d="M0 190 C70 170 120 150 180 160 C250 172 290 130 350 120 C420 110 450 150 520 152 C590 154 640 118 700 124 C750 130 780 150 800 156 V260 H0Z" />
+      <path className="ridge-back" d="M0 130 C90 100 150 96 230 112 C310 128 360 82 450 84 C540 86 600 118 690 104 C740 96 780 100 800 104 V260 H0Z" />
+      <path className="ridge-far" d="M0 160 C80 138 140 126 220 142 C300 158 370 112 460 116 C550 120 620 150 700 138 C750 130 780 134 800 138 V260 H0Z" />
+      <path className="ridge-near" d="M0 198 C90 182 160 170 250 184 C340 198 420 160 510 166 C600 172 680 196 800 180 V260 H0Z" />
     </svg>
   )
 }

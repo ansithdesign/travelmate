@@ -59,8 +59,8 @@ function DetailsBody({ view }: { view: TripView }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-x-12 gap-y-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="min-w-0">
-        <h2 className="px-0.5 pt-2 text-display">Plans</h2>
-        <p className="mt-1.5 px-0.5 text-body text-ink-3">Bookings, addresses and links, so nobody scrolls back through the group chat.</p>
+        <h2 className="on-sky px-0.5 pt-2 text-display">Plans</h2>
+        <p className="on-sky mt-1.5 px-0.5 text-body">Bookings, addresses and links, so nobody scrolls back through the group chat.</p>
 
         {KINDS.filter(({ kind }) => trip.info.some((i) => i.kind === kind)).map(({ kind, label }) => {
           const items = trip.info.filter((i) => i.kind === kind)

@@ -55,7 +55,7 @@ export function NavHeader({ title, back, actions, children }: { title: ReactNode
   const scrolled = useScrolled()
   return (
     <header className={cx('sticky top-0 z-30 transition-[background-color,box-shadow] duration-200', scrolled && 'header-material')}>
-      <div className="mx-auto grid min-h-[calc(52px+env(safe-area-inset-top))] w-full max-w-[1080px] grid-cols-[44px_1fr_auto] items-center px-4 pt-[env(safe-area-inset-top)] lg:px-8">
+      <div className={cx('mx-auto grid min-h-[calc(52px+env(safe-area-inset-top))] w-full max-w-[1080px] grid-cols-[44px_1fr_auto] items-center px-4 pt-[env(safe-area-inset-top)] lg:px-8', !scrolled && 'on-sky')}>
         <div>
           {back ? (
             <button

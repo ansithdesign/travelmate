@@ -58,8 +58,8 @@ function SettleBody({ view }: { view: TripView }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="min-w-0">
-        <h2 className="px-0.5 pt-2 text-display">{settled && !stamping ? 'All square' : `${transfers.length} ${transfers.length === 1 ? 'payment' : 'payments'} to settle`}</h2>
-        <p className="mt-1.5 max-w-[56ch] px-0.5 text-body text-ink-3">
+        <h2 className="on-sky px-0.5 pt-2 text-display">{settled && !stamping ? 'All square' : `${transfers.length} ${transfers.length === 1 ? 'payment' : 'payments'} to settle`}</h2>
+        <p className="on-sky mt-1.5 max-w-[56ch] px-0.5 text-body">
           {settled && !stamping
             ? 'Every balance on this trip is at zero.'
             : 'The fewest payments that square everyone up. Tap Paid once the money has changed hands.'}

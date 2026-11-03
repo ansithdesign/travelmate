@@ -94,17 +94,18 @@
   --muted: #4f6278;
   --faint: #8d9cae;
   --on-ink: #ffffff;
-  --midnight: #0f2238;
-  --sky-1: #86a2d8;
-  --sky-2: #b9c9ea;
-  --sky-3: #e6ecf8;
+  --midnight: #14224a;
+  --sky-1: #36559f;
+  --sky-2: #6a8cd0;
+  --sky-3: #b5c9ee;
   --haze: #f4f7fc;
-  --sun: rgba(255, 244, 220, 0.95);
+  --sun: rgba(255, 255, 255, 0.2);
   --sun-x: 78%;
-  --cloud-a: 0.7;
-  --ridge-far: rgba(120, 142, 200, 0.34);
-  --ridge-near: rgba(92, 116, 182, 0.3);
-  --mist: rgba(255, 255, 255, 0.85);
+  --cloud-a: 0.5;
+  --ridge-back: rgba(176, 197, 240, 0.5);
+  --ridge-far: rgba(150, 176, 232, 0.42);
+  --ridge-near: rgba(120, 148, 214, 0.34);
+  --mist: rgba(255, 255, 255, 0.95);
   --frame: #f6f8fd;
   --glass: rgba(255, 255, 255, 0.6);
   --glass-strong: rgba(255, 255, 255, 0.82);
@@ -118,10 +119,10 @@
   /* Shadows are wide and faint: light, not edges */
   --shadow-soft: 0 1px 2px rgba(23, 63, 112, 0.03), 0 10px 30px -14px rgba(23, 63, 112, 0.14);
   --shadow-float: 0 2px 6px rgba(13, 27, 42, 0.06), 0 16px 36px -14px rgba(13, 27, 42, 0.22);
-  --accent: #3a5fb0;
-  --accent-ink: #2b4a92;
+  --accent: #3563d6;
+  --accent-ink: #2349b0;
   --on-accent: #ffffff;
-  --accent-soft: rgba(58, 95, 176, 0.12);
+  --accent-soft: rgba(53, 99, 214, 0.12);
   --accent-bright: #a9bdf0;
   --ok: #23915c;
   --ok-tint: rgba(35, 145, 92, 0.13);
@@ -146,16 +147,17 @@
   --muted: #a1b2c7;
   --faint: #6b7d95;
   --on-ink: #0d1b2a;
-  --midnight: #0f2238;
-  --sky-1: #0a1230;
-  --sky-2: #1a2b61;
-  --sky-3: #34508f;
+  --midnight: #14224a;
+  --sky-1: #0a1432;
+  --sky-2: #1f3a82;
+  --sky-3: #4468b8;
   --haze: #0a1430;
   --sun: rgba(170, 190, 255, 0.2);
   --sun-x: 56%;
   --cloud-a: 0;
-  --ridge-far: rgba(78, 108, 185, 0.5);
-  --ridge-near: rgba(30, 52, 122, 0.7);
+  --ridge-back: rgba(70, 98, 170, 0.3);
+  --ridge-far: rgba(60, 88, 160, 0.38);
+  --ridge-near: rgba(34, 58, 128, 0.5);
   --mist: rgba(110, 138, 214, 0.22);
   --frame: rgba(255, 255, 255, 0.13);
   --glass: rgba(255, 255, 255, 0.07);
@@ -169,8 +171,8 @@
   --divider: rgba(255, 255, 255, 0.07);
   --shadow-soft: 0 10px 30px -16px rgba(0, 0, 0, 0.35);
   --shadow-float: 0 16px 36px -14px rgba(0, 0, 0, 0.5);
-  --accent: #8aa8f2;
-  --accent-ink: #b4c7fa;
+  --accent: #7ea2ff;
+  --accent-ink: #aec4ff;
   --on-accent: #06142b;
   --accent-soft: rgba(138, 168, 242, 0.17);
   --accent-bright: #b4c7fa;
@@ -256,13 +258,13 @@
     overflow: hidden;
     background:
       radial-gradient(260px 220px at var(--sun-x) 70px, var(--sun), transparent 70%),
-      linear-gradient(180deg, var(--sky-1) 0px, var(--sky-2) 250px, var(--sky-3) 440px, var(--haze) 620px);
+      linear-gradient(180deg, var(--sky-1) 0px, var(--sky-2) 300px, var(--sky-3) 480px, var(--haze) 620px);
   }
   .sky-layer.soft {
-    height: 360px;
+    height: 400px;
     background:
       radial-gradient(220px 180px at var(--sun-x) 40px, var(--sun), transparent 70%),
-      linear-gradient(180deg, var(--sky-2) 0px, var(--sky-3) 170px, var(--haze) 360px);
+      linear-gradient(180deg, var(--sky-1) 0px, var(--sky-2) 190px, var(--sky-3) 310px, var(--haze) 400px);
   }
   /* The sun glows softly by day and becomes a moon at night */
   .sky-layer::before {
@@ -295,24 +297,26 @@
     position: absolute;
     inset: auto 0 0 0;
     width: 100%;
-    height: 280px;
-    filter: blur(1.2px);
-    -webkit-mask-image: linear-gradient(180deg, #000 25%, transparent 92%);
-    mask-image: linear-gradient(180deg, #000 25%, transparent 92%);
+    height: 300px;
+    filter: blur(3.5px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 38%, #000 55%, transparent 96%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 38%, #000 55%, transparent 96%);
   }
   .sky-layer .ridges.soft {
     height: 170px;
   }
+  .sky-layer .ridge-back { fill: var(--ridge-back); }
   .sky-layer .ridge-far { fill: var(--ridge-far); }
   .sky-layer .ridge-near { fill: var(--ridge-near); }
   .sky-layer .mist {
     position: absolute;
     inset: auto -10% 0 -10%;
-    height: 200px;
+    height: 240px;
     background:
-      radial-gradient(60% 70% at 20% 100%, var(--mist), transparent 70%),
-      radial-gradient(55% 60% at 75% 100%, var(--mist), transparent 70%);
-    filter: blur(16px);
+      radial-gradient(60% 75% at 18% 100%, var(--mist), transparent 72%),
+      radial-gradient(55% 70% at 78% 100%, var(--mist), transparent 72%),
+      radial-gradient(45% 55% at 50% 105%, var(--mist), transparent 75%);
+    filter: blur(14px);
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%, transparent 100%);
     mask-image: linear-gradient(180deg, transparent 0%, #000 45%, transparent 100%);
     animation: mist-drift 40s ease-in-out infinite alternate;
@@ -336,6 +340,22 @@
     opacity: 0;
     transform: rotate(18deg);
     animation: shoot 16s ease-in 4s infinite;
+  }
+  :root[data-sky='day'] .sky-layer::before {
+    opacity: 0.6;
+    animation: none;
+  }
+  /* A few faint stars even by day, like the portfolio sky */
+  :root[data-sky='day'] .sky-layer::after {
+    content: '';
+    position: absolute;
+    inset: 0 0 55% 0;
+    opacity: 0.85;
+    background-image:
+      radial-gradient(1.2px 1.2px at 12% 20%, #fff, transparent), radial-gradient(1px 1px at 31% 12%, #fff, transparent),
+      radial-gradient(1.4px 1.4px at 52% 28%, #fff, transparent), radial-gradient(1px 1px at 70% 14%, #fff, transparent),
+      radial-gradient(1.2px 1.2px at 86% 30%, #fff, transparent), radial-gradient(1px 1px at 22% 40%, #fff, transparent),
+      radial-gradient(1px 1px at 92% 8%, #fff, transparent), radial-gradient(1.2px 1.2px at 5% 6%, #fff, transparent);
   }
   .sky-layer .cloud {
     position: absolute;
@@ -450,6 +470,32 @@
     backdrop-filter: blur(20px) saturate(1.6);
     box-shadow: 0 1px 0 var(--divider);
   }
+  /* Text sitting on the deep blue of the sky reads in white */
+  .on-sky {
+    color: #fff;
+    --color-ink: #fff;
+    --color-ink-2: rgba(255, 255, 255, 0.9);
+    --color-ink-3: rgba(255, 255, 255, 0.76);
+    --color-faint: rgba(255, 255, 255, 0.6);
+    --color-well: rgba(255, 255, 255, 0.16);
+    --color-line: rgba(255, 255, 255, 0.2);
+    --color-gain: #a6f0c8;
+    --color-loss: #ffc4bd;
+    --color-accent: #ffffff;
+  }
+  .on-sky .glass-control {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  }
+  .on-sky .hairline { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28); }
+  .on-sky .level:is(.ok, .act, .aware, .info, .quiet) {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+  .on-sky .level.ok::before { background: #8fe8b8; }
+  .on-sky .level.act::before { background: #ffb0a8; }
+  .on-sky ::placeholder { color: rgba(255, 255, 255, 0.6); }
   /* Type straight on the sky reads in ink, like everywhere else */
   .text-sky {
     color: var(--ink);
