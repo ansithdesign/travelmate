@@ -151,25 +151,25 @@
   --muted: #bfb0e0;
   --faint: #8f7fb8;
   --on-ink: #1a1033;
-  --midnight: #2b1b5c;
-  --sky-1: #0b0620;
-  --sky-2: #2a1458;
-  --sky-3: #5b2d8e;
-  --haze: #120a2a;
-  --sun: rgba(190, 160, 255, 0.22);
+  --midnight: #1f1445;
+  --sky-1: #050214;
+  --sky-2: #170a38;
+  --sky-3: #321a5e;
+  --haze: #0a0520;
+  --sun: rgba(190, 160, 255, 0.12);
   --sun-x: 56%;
   --cloud-a: 0;
-  --ridge-back: rgba(120, 70, 190, 0.34);
-  --ridge-far: rgba(86, 46, 150, 0.5);
-  --ridge-near: rgba(40, 20, 90, 0.72);
-  --mist: rgba(150, 100, 230, 0.2);
+  --ridge-back: rgba(90, 50, 150, 0.32);
+  --ridge-far: rgba(60, 30, 110, 0.55);
+  --ridge-near: rgba(26, 12, 64, 0.8);
+  --mist: rgba(120, 80, 200, 0.18);
   --frame: rgba(255, 255, 255, 0.16);
   --paper: #ece6fb;
-  --glass: rgba(44, 30, 88, 0.82);
-  --glass-strong: rgba(56, 40, 108, 0.94);
+  --glass: rgba(32, 21, 68, 0.86);
+  --glass-strong: rgba(42, 29, 86, 0.95);
   --glass-edge: rgba(255, 255, 255, 0.1);
   --sheen: rgba(255, 255, 255, 0.05);
-  --solid: #2a1c58;
+  --solid: #1f1445;
   --line: rgba(255, 255, 255, 0.14);
   --fill: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.24);
@@ -353,7 +353,7 @@
     top: 40px;
     width: 120%;
     height: 170px;
-    background: linear-gradient(90deg, transparent, rgba(176, 90, 255, 0.55), rgba(255, 110, 210, 0.45), transparent);
+    background: linear-gradient(90deg, transparent, rgba(150, 70, 230, 0.36), rgba(230, 90, 190, 0.3), transparent);
     animation: aurora-a 22s ease-in-out infinite alternate;
   }
   .sky-layer .a2 {
@@ -361,7 +361,7 @@
     top: 120px;
     width: 110%;
     height: 150px;
-    background: linear-gradient(90deg, transparent, rgba(96, 82, 255, 0.5), rgba(160, 120, 255, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(86, 70, 230, 0.34), rgba(140, 100, 240, 0.28), transparent);
     animation: aurora-b 28s ease-in-out infinite alternate;
   }
   .sky-layer .a3 {
@@ -369,7 +369,7 @@
     top: 220px;
     width: 120%;
     height: 130px;
-    background: linear-gradient(90deg, transparent, rgba(255, 90, 190, 0.32), rgba(130, 90, 255, 0.4), transparent);
+    background: linear-gradient(90deg, transparent, rgba(230, 80, 170, 0.2), rgba(110, 80, 230, 0.26), transparent);
     animation: aurora-a 34s ease-in-out infinite alternate-reverse;
   }
   .sky-layer.soft .a1 { top: 20px; height: 130px; }

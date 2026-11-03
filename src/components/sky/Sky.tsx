@@ -35,9 +35,6 @@ export const Sky = memo(function Sky({ soft = false }: { soft?: boolean }) {
           <span className="aurora a1" />
           <span className="aurora a2" />
           {!soft ? <span className="aurora a3" /> : null}
-          <span className="stars" />
-          <span className="stars s2" />
-          {!soft ? <span className="shoot" /> : null}
         </>
       ) : null}
       <SkyParticles night={phase === 'night'} soft={soft} />
