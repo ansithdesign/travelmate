@@ -285,9 +285,9 @@ function CoverPicker({ value, onChange, destination }: { value?: Photo; onChange
 
   return (
     <fieldset>
-      <legend className="mb-1.5 flex w-full items-baseline justify-between text-meta font-medium text-ink-2">
+      <legend className="mb-1.5 flex w-full items-baseline justify-between pl-0.5 text-meta font-semibold text-ink-2">
         Cover photo
-        <span className="font-normal text-ink-3">Optional</span>
+        <span className="font-normal text-ink-3">optional</span>
       </legend>
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
         <button
@@ -295,7 +295,7 @@ function CoverPicker({ value, onChange, destination }: { value?: Photo; onChange
           onClick={() => file.current?.click()}
           className={cx(
             'relative flex aspect-square flex-col items-center justify-center gap-1 overflow-hidden rounded-[16px] text-caption font-medium text-ink-2 ring-line hover:bg-well',
-            custom && 'ring-2 ring-accent ring-offset-2',
+            custom && 'ring-2 ring-accent ring-offset-2 ring-offset-[var(--haze)]',
           )}
         >
           {custom ? (
@@ -316,11 +316,11 @@ function CoverPicker({ value, onChange, destination }: { value?: Photo; onChange
               aria-pressed={on}
               aria-label={p.alt}
               onClick={() => onChange(on ? undefined : p)}
-              className={cx('relative aspect-square overflow-hidden rounded-[16px] transition-shadow', on && 'ring-2 ring-accent ring-offset-2')}
+              className={cx('relative aspect-square overflow-hidden rounded-[16px] transition-shadow', on && 'ring-2 ring-accent ring-offset-2 ring-offset-[var(--haze)]')}
             >
               <Cover photo={p} seed={COVER_LIBRARY.indexOf(p)} className="absolute inset-0" />
               {on ? (
-                <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-accent text-white">
+                <span className="absolute top-1.5 right-1.5 flex size-5 items-center justify-center rounded-full bg-accent text-[var(--on-accent)]">
                   <Check size={13} weight="bold" aria-hidden />
                 </span>
               ) : null}

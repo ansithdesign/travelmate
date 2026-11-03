@@ -69,7 +69,7 @@ export function ExpenseDetailSheet({ expense, onClose }: { expense: Expense | nu
             {cat.label}
           </span>
         </div>
-        <dl className="divide-y divide-line border-y border-line">
+        <dl className="rows flat hairline">
           <DetailRow label="Paid by">{payer?.isYou ? 'You' : payer?.name}</DetailRow>
           <DetailRow label="When">
             {fmt.weekday(e.date)}, {fmt.time(e.date)}
@@ -77,8 +77,8 @@ export function ExpenseDetailSheet({ expense, onClose }: { expense: Expense | nu
           <DetailRow label="Split">{METHOD_LABEL[e.split.method]}</DetailRow>
         </dl>
 
-        <h3 className="mt-6 mb-1 text-meta font-medium text-ink-2">Who owes what</h3>
-        <ul className="divide-y divide-line">
+        <h3 className="mt-6 mb-1 pl-0.5 text-meta font-semibold text-ink-2">Who owes what</h3>
+        <ul className="rows flat">
           {e.split.participants.map((id) => {
             const p = person(id) as Person
             if (!p) return null

@@ -38,18 +38,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom))] z-[70] flex flex-col items-center gap-2 px-4 md:bottom-8"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(132px+env(safe-area-inset-bottom))] z-[70] flex flex-col items-center gap-2 px-4 md:bottom-8"
       >
         {items.map((t) => (
           <div
             key={t.id}
             role={t.tone === 'error' ? 'alert' : 'status'}
-            className="pointer-events-auto flex max-w-[440px] items-center gap-3 rounded-full bg-[#0b1433]/88 py-2 pr-2 pl-3 text-meta font-medium text-white shadow-[0_18px_40px_-14px_rgb(0_0_0/0.55),inset_0_1px_0_rgb(255_255_255/0.12)] backdrop-blur-xl [animation:toast-in_380ms_var(--ease-glide)]"
+            className="pointer-events-auto flex max-w-[440px] items-center gap-3 rounded-[20px] bg-[rgba(15,34,56,0.9)] py-2 pr-2 pl-3.5 text-[14px] font-medium text-white shadow-[var(--shadow-float)] backdrop-blur-[16px] [animation:toast-in_350ms_var(--ease-out-expo)]"
           >
             {t.tone === 'success' ? (
-              <CheckCircle size={22} weight="fill" className="shrink-0 text-[#6ee7c5]" aria-hidden />
+              <CheckCircle size={22} weight="fill" className="shrink-0 text-[#8fc6fb]" aria-hidden />
             ) : (
-              <WarningCircle size={22} weight="fill" className="shrink-0 text-[#ff9aa6]" aria-hidden />
+              <WarningCircle size={22} weight="fill" className="shrink-0 text-[#f8aaa3]" aria-hidden />
             )}
             <span className="py-1 pr-2">{t.message}</span>
             {t.action ? (
@@ -59,7 +59,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   t.action?.onClick()
                   dismiss(t.id)
                 }}
-                className="press h-8 rounded-full bg-white/14 px-3.5 font-semibold text-white hover:bg-white/22"
+                className="press h-9 rounded-full bg-white/14 px-3.5 font-semibold text-white hover:bg-white/22"
               >
                 {t.action.label}
               </button>

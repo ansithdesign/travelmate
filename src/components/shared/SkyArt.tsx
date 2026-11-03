@@ -1,4 +1,4 @@
-import { CloudShape } from '../sky/Sky'
+import { CloudShape } from '../sky/CloudShape'
 import { cx } from '../../utils/cx'
 
 /** A small sun resting behind a cloud. Used for empty and error states. */

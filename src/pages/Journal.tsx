@@ -1,10 +1,9 @@
 import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Check, CheckCircle, Images, PencilSimple, Plus, X } from '@phosphor-icons/react'
+import { ArrowRight, Check, CheckCircle, Images, PencilSimple, Plus, X } from '@phosphor-icons/react'
 import { CATEGORIES } from '../data/categories'
 import { TripTabs } from '../components/trips/TripHeader'
-import { ContentSheet, SkyHero } from '../components/shared/Page'
-import { useNavigate } from 'react-router-dom'
+import { ContentSheet, NavHeader, SkyHero } from '../components/shared/Page'
 import { useTripActions } from '../components/trips/useTripActions'
 import { AvatarStack } from '../components/ui/Avatar'
 import { Button, IconButton } from '../components/ui/Button'
@@ -35,7 +34,6 @@ function JournalBody({ view }: { view: TripView }) {
   const { person, saveTrip, me } = useStore()
   const toast = useToast()
   const { items, dialogs } = useTripActions(view)
-  const navigate = useNavigate()
   const members = trip.members.map(person).filter(Boolean) as Person[]
   const cur = trip.currency
   const days = tripLength(trip.startDate, trip.endDate)
@@ -55,14 +53,14 @@ function JournalBody({ view }: { view: TripView }) {
 
   return (
     <>
-      <SkyHero className="pt-[max(14px,env(safe-area-inset-top))] pb-6 lg:pt-8">
-        <div className="flex items-center justify-between gap-2">
-          <IconButton icon={ArrowLeft} label="Back to trips" tone="sky" onClick={() => navigate('/')} />
-          <div className="flex items-center gap-2">
+      <NavHeader
+        title={<span className="sr-only">{trip.name}</span>}
+        back="/"
+        actions={
+          <>
             {edit ? (
               <Button
                 size="sm"
-                variant="white"
                 icon={Check}
                 onClick={() => {
                   setJournal({ note: note.trim() })
@@ -73,18 +71,21 @@ function JournalBody({ view }: { view: TripView }) {
                 Done
               </Button>
             ) : (
-              <Button size="sm" variant="sky" icon={PencilSimple} onClick={() => (setNote(trip.journal.note), setEdit(true))}>
+              <Button size="sm" variant="secondary" icon={PencilSimple} onClick={() => (setNote(trip.journal.note), setEdit(true))}>
                 Edit
               </Button>
             )}
-            <Menu items={items} label="Trip actions" tone="sky" />
-          </div>
-        </div>
-        <header className="mt-6">
-          <p className="text-sky num text-[72px] leading-[0.95] font-extralight tracking-[-0.06em] sm:text-[96px]">{start.getFullYear()}</p>
-          <p className="text-sky-2 mt-1 text-heading font-medium">{start.toLocaleString('en-IN', { month: 'long' })}</p>
-          <h1 className="text-sky mt-4 text-hero">{trip.name}</h1>
-          <p className="text-sky-2 mt-1 text-body">
+            <Menu items={items} label="Trip actions" tone="plain" />
+          </>
+        }
+      />
+      <SkyHero className="pb-6">
+        <header>
+          <p className="text-meta font-medium text-ink-3">
+            {start.toLocaleString('en-IN', { month: 'long' })} {start.getFullYear()}
+          </p>
+          <h1 className="mt-1 text-hero">{trip.name}</h1>
+          <p className="mt-1.5 text-body text-ink-3">
             {trip.destination}
             {trip.region && trip.region !== trip.destination ? `, ${trip.region}` : ''} · {formatRange(trip.startDate, trip.endDate)}
           </p>
@@ -92,7 +93,7 @@ function JournalBody({ view }: { view: TripView }) {
         <TripTabs view={view} className="mt-6" />
       </SkyHero>
       <ContentSheet>
-      <article className="px-5 pt-6 pb-12 sm:px-7 lg:px-10 lg:pt-8">
+      <article className="px-5 pt-2 pb-12 sm:px-6 lg:px-10 lg:pt-4">
         {/* Photos */}
         <section aria-label="Photos">
           {photos.length ? (
@@ -106,7 +107,7 @@ function JournalBody({ view }: { view: TripView }) {
                   {edit && trip.journal.photos.some((x) => x.id === p.id) ? (
                     <IconButton
                       icon={X}
-                      tone="sky"
+                      tone="panel"
                       label="Remove photo"
                       className="absolute top-2 right-2 size-9"
                       onClick={() => setJournal({ photos: trip.journal.photos.filter((x) => x.id !== p.id) })}
@@ -155,7 +156,7 @@ function JournalBody({ view }: { view: TripView }) {
           <div className="min-w-0">
             {/* Note */}
             <section aria-labelledby="story">
-              <h2 id="story" className="text-heading">
+              <h2 id="story" className="flex min-h-11 items-center px-0.5 text-title">
                 The trip
               </h2>
               {edit ? (
@@ -180,13 +181,13 @@ function JournalBody({ view }: { view: TripView }) {
 
             {/* Places */}
             <section aria-labelledby="places" className="mt-12">
-              <h2 id="places" className="text-heading">
+              <h2 id="places" className="flex min-h-11 items-center px-0.5 text-title">
                 Places along the way
               </h2>
               {trip.journal.places.length ? (
-                <ol className="mt-4 flex flex-wrap gap-2">
+                <ol className="mt-2 flex flex-wrap gap-2">
                   {trip.journal.places.map((p, i) => (
-                    <li key={p + i} className="flex h-10 items-center gap-2 rounded-full bg-panel-strong py-1 pr-2 pl-1.5 shadow-[inset_0_0_0_1px_var(--color-line)]">
+                    <li key={p + i} className="glass-control flex h-[42px] items-center gap-2 rounded-full py-1 pr-2 pl-1.5">
                       <span aria-hidden className="num flex size-7 items-center justify-center rounded-full bg-accent-soft text-caption font-semibold text-accent">
                         {i + 1}
                       </span>
@@ -228,10 +229,10 @@ function JournalBody({ view }: { view: TripView }) {
           <aside className="flex min-w-0 flex-col gap-10">
             <section aria-labelledby="spend">
               <div className="flex items-baseline justify-between">
-                <h2 id="spend" className="text-heading">
+                <h2 id="spend" className="flex min-h-11 items-center px-0.5 text-title">
                   What it cost
                 </h2>
-                <Link to={`/trips/${trip.id}/expenses`} className="text-meta font-medium text-accent hover:underline">
+                <Link to={`/trips/${trip.id}/expenses`} className="text-[14px] font-semibold text-accent-ink">
                   {view.expenses.length} expenses
                 </Link>
               </div>
@@ -244,7 +245,7 @@ function JournalBody({ view }: { view: TripView }) {
                   <li key={c.id} className="grid grid-cols-[30px_84px_minmax(0,1fr)_auto] items-center gap-2.5 text-meta">
                     <CategoryTile id={c.id} size={30} />
                     <span className="truncate text-ink-2">{c.short}</span>
-                    <span className="h-2 rounded-full bg-well">
+                    <span className="h-1.5 rounded-full bg-accent-soft">
                       <span className="block h-full rounded-full" style={{ width: `${(v / ledger.total) * 100}%`, background: c.tint }} />
                     </span>
                     <span className="num w-[72px] text-right font-medium">{formatMoney(v, { currency: cur })}</span>
@@ -254,16 +255,16 @@ function JournalBody({ view }: { view: TripView }) {
             </section>
 
             <section aria-labelledby="settlement">
-              <h2 id="settlement" className="text-heading">
+              <h2 id="settlement" className="flex min-h-11 items-center px-0.5 text-title">
                 How it settled
               </h2>
               {settled ? (
-                <p className="mt-2 flex items-center gap-2 text-meta font-medium text-accent">
+                <p className="mt-2 flex items-center gap-2 text-meta font-semibold text-gain">
                   <CheckCircle size={16} aria-hidden /> All square
                   {payments[0] ? <span className="font-normal text-ink-3">since {fmt.dayMonth(payments[0].date)}</span> : null}
                 </p>
               ) : (
-                <div className="mt-2 rounded-[16px] bg-sun-soft p-3.5 text-meta text-sun">
+                <div className="mt-2 rounded-[18px] bg-sun-soft px-4 py-3.5 text-meta text-ink-2">
                   {transfers.length} {transfers.length === 1 ? 'payment' : 'payments'} still open.{' '}
                   <Link to={`/trips/${trip.id}/settle`} className="inline-flex items-center gap-1 font-semibold underline">
                     Settle up <ArrowRight size={13} aria-hidden />
@@ -271,7 +272,7 @@ function JournalBody({ view }: { view: TripView }) {
                 </div>
               )}
               {payments.length ? (
-                <ul className="mt-2 divide-y divide-line">
+                <ul className="rows flat mt-2">
                   {payments.map((p) => (
                     <li key={p.id} className="flex items-baseline justify-between gap-3 py-2.5 text-meta">
                       <span className="min-w-0 truncate">

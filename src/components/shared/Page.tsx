@@ -1,32 +1,68 @@
-import type { ReactNode } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useEffect, useState, type ReactNode } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { CaretLeft } from '@phosphor-icons/react'
 import { cx } from '../../utils/cx'
 
-/** Content placed directly on the sky. White type, glass controls. */
+/** Content placed directly on the sky: large titles and hero figures, no container. */
 export function SkyHero({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx('on-sky relative mx-auto w-full max-w-[1080px] px-5 sm:px-6 lg:px-10', className)}>{children}</div>
+  return <div className={cx('relative mx-auto w-full max-w-[1080px] px-6 lg:px-10', className)}>{children}</div>
 }
 
 /**
- * The frosted sheet that rises over the sky and holds the page's working
- * content. It rises a little on every navigation: the app's one page motion.
+ * The page's working content. It sits on the haze below the sky band with no
+ * sheet of its own: modules are frosted glass cards. A short fade on navigation.
  */
-export function ContentSheet({ children, className, wide }: { children: ReactNode; className?: string; wide?: boolean }) {
+export function ContentSheet({ children, className }: { children: ReactNode; className?: string; wide?: boolean }) {
   const { pathname } = useLocation()
   return (
-    <div
-      key={pathname}
-      className={cx(
-        'sheet-glass relative mx-auto min-h-[70dvh] w-full rounded-t-[34px] pb-[calc(110px+env(safe-area-inset-bottom))] [animation:rise_640ms_var(--ease-out-expo)_both] lg:mb-10 lg:min-h-0 lg:rounded-[34px] lg:pb-0',
-        wide ? 'lg:max-w-[1080px]' : 'lg:max-w-[1080px]',
-        className,
-      )}
-    >
+    <div key={pathname} className={cx('relative mx-auto w-full max-w-[1080px] [animation:rise_420ms_var(--ease-out-expo)_both]', className)}>
       {children}
     </div>
   )
 }
 
 export function SheetBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx('px-5 pt-6 pb-10 sm:px-7 lg:px-10 lg:pt-8', className)}>{children}</div>
+  return <div className={cx('px-6 pt-4 pb-12 lg:px-10', className)}>{children}</div>
+}
+
+/** True once the window has scrolled a few pixels, for headers that gain material. */
+export function useScrolled(threshold = 4) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > threshold)
+    on()
+    window.addEventListener('scroll', on, { passive: true })
+    return () => window.removeEventListener('scroll', on)
+  }, [threshold])
+  return scrolled
+}
+
+/**
+ * Sub-screen header: back on the left, a centred 17px title, actions on the
+ * right. Transparent on the sky; haze material once content scrolls beneath.
+ */
+export function NavHeader({ title, back, actions, children }: { title: ReactNode; back?: string | (() => void); actions?: ReactNode; children?: ReactNode }) {
+  const navigate = useNavigate()
+  const scrolled = useScrolled()
+  return (
+    <header className={cx('sticky top-0 z-30 transition-[background-color,box-shadow] duration-200', scrolled && 'header-material')}>
+      <div className="mx-auto grid min-h-[calc(52px+env(safe-area-inset-top))] w-full max-w-[1080px] grid-cols-[44px_1fr_auto] items-center px-4 pt-[env(safe-area-inset-top)] lg:px-8">
+        <div>
+          {back ? (
+            <button
+              type="button"
+              aria-label="Back"
+              onClick={() => (typeof back === 'string' ? navigate(back) : back())}
+              className="press flex size-11 items-center justify-center rounded-full text-ink hover:bg-well"
+            >
+              <CaretLeft size={24} weight="regular" aria-hidden />
+            </button>
+          ) : null}
+        </div>
+        <h1 className="truncate text-center text-[17px] font-semibold tracking-[-0.01em]">{title}</h1>
+        <div className="flex min-w-11 justify-end gap-0.5">{actions}</div>
+      </div>
+      {children}
+    </header>
+  )
 }

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle, Plus, Scan } from '@phosphor-icons/react'
+import { CaretRight, CheckCircle, Plus } from '@phosphor-icons/react'
 import { FeaturedTrip, PastTripCard, TripRow, TripWindowCard } from '../components/trips/TripCards'
 import { Button } from '../components/ui/Button'
 import { SkyArt } from '../components/shared/SkyArt'
@@ -19,7 +19,7 @@ import { cx } from '../utils/cx'
 export function Home() {
   const views = useAllTripViews()
   const { me, saveTrip } = useStore()
-  const { openTrip, openExpense } = useUI()
+  const { openTrip } = useUI()
   const toast = useToast()
   const { phase } = useSky()
   // The greeting agrees with the sky on screen.
@@ -36,43 +36,28 @@ export function Home() {
 
   return (
     <>
-      <SkyHero className="pt-[max(14px,env(safe-area-inset-top))] pb-8 lg:pt-8">
-        <header className="flex items-center justify-between gap-3 lg:hidden">
-          <span className="flex items-center gap-2.5">
-            <BrandMark size={30} />
-            <span className="text-sky text-heading">TripMate</span>
-          </span>
-          <Button size="sm" variant="sky" icon={Plus} onClick={() => openTrip()}>
+      <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-12 lg:pt-12">
+        <header className="flex items-end justify-between gap-3">
+          <h1 className="text-hero">
+            {greeting},<br className="sm:hidden" /> {firstName(me.name)}
+          </h1>
+          <Button size="sm" variant="secondary" icon={Plus} onClick={() => openTrip()} className="mb-0.5 lg:hidden">
             New trip
           </Button>
         </header>
-
-        <h1 className="text-sky mt-8 text-hero lg:mt-2">
-          {greeting},<br className="sm:hidden" /> {firstName(me.name)}
-        </h1>
         <YearLine views={views} />
 
-        <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:items-start lg:gap-10">
+        <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:items-start lg:gap-10">
         <div>
           {lead ? (
-            <>
-              <FeaturedTrip view={lead} />
-              <div className="mt-3 grid grid-cols-2 gap-2.5">
-                <Button variant="white" size="lg" icon={Plus} onClick={() => openExpense({ tripId: lead.trip.id })}>
-                  Add expense
-                </Button>
-                <Button variant="sky" size="lg" icon={Scan} iconWeight="bold" onClick={() => openExpense({ tripId: lead.trip.id, scan: true })}>
-                  Scan receipt
-                </Button>
-              </div>
-            </>
+            <FeaturedTrip view={lead} />
           ) : (
-            <div className="glass-control flex items-center gap-5 rounded-[30px] p-6">
-              <SkyArt size={110} className="shrink-0" />
+            <div className="panel flex items-center gap-5 rounded-[26px] p-5">
+              <SkyArt size={96} className="shrink-0" />
               <div>
-                <p className="text-sky text-title">Nothing booked yet</p>
-                <p className="text-sky-2 mt-1 text-body">Start a trip and the money, plans and people land in one place.</p>
-                <Button className="mt-4" variant="white" icon={Plus} onClick={() => openTrip()}>
+                <p className="text-title">Nothing planned yet</p>
+                <p className="mt-1 text-body text-ink-3">Start a trip and the money, plans and people land in one place.</p>
+                <Button className="mt-4" size="sm" icon={Plus} onClick={() => openTrip()}>
                   Plan a trip
                 </Button>
               </div>
@@ -81,9 +66,9 @@ export function Home() {
         </div>
         <aside className="hidden lg:block">
           {views.some((v) => v.transfers.some((t) => t.from === me.id || t.to === me.id)) ? (
-          <div className="sheet-glass rounded-[30px] p-5">
+          <div>
             <OutstandingSummary views={views} />
-            <p className="mt-4 text-meta text-ink-3">Balances update the moment anyone adds an expense or marks a payment.</p>
+            <p className="mt-3 px-1 text-caption text-ink-3">Balances update the moment anyone adds an expense or marks a payment.</p>
           </div>
           ) : null}
         </aside>
@@ -115,17 +100,17 @@ export function Home() {
             </div>
           ))}
 
-          <div className="grid gap-x-10 gap-y-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <div className="lg:hidden">
+          <div className="grid gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div className="section-rule lg:hidden">
               <OutstandingSummary views={views} />
             </div>
 
             {active.length > 1 ? (
-              <section aria-labelledby="coming-up">
-                <h2 id="coming-up" className="text-heading">
+              <section aria-labelledby="coming-up" className="section-rule">
+                <h2 id="coming-up" className="flex min-h-11 items-center px-0.5 text-title">
                   Also coming up
                 </h2>
-                <div className="mt-2 -mx-2 flex flex-col">
+                <div className="panel-strong rows mt-3 flex flex-col overflow-hidden rounded-[24px]">
                   {active.slice(1).map((v, i) => (
                     <TripRow key={v.trip.id} view={v} seed={i + 2} />
                   ))}
@@ -133,21 +118,21 @@ export function Home() {
               </section>
             ) : null}
 
-            <section aria-labelledby="past-trips" className="lg:col-span-2">
-              <div className="flex items-baseline justify-between">
-                <h2 id="past-trips" className="text-heading">
+            <section aria-labelledby="past-trips" className="section-rule lg:col-span-2">
+              <div className="flex min-h-11 items-center justify-between px-0.5">
+                <h2 id="past-trips" className="text-title">
                   Past trips
                 </h2>
                 <span className="num text-meta text-ink-3">{past.length}</span>
               </div>
               {past.length ? (
                 <>
-                  <div className="no-scrollbar -mx-5 mt-4 flex snap-x gap-5 overflow-x-auto px-5 pb-2 sm:-mx-7 sm:px-7 lg:hidden">
+                  <div className="no-scrollbar -mx-6 mt-3 flex snap-x gap-4 overflow-x-auto px-6 pt-1 pb-3 sm:-mx-6 sm:px-6 lg:hidden">
                     {past.map((v, i) => (
                       <TripWindowCard key={v.trip.id} view={v} seed={i + 1} />
                     ))}
                   </div>
-                  <div className="mt-4 hidden gap-4 lg:grid lg:grid-cols-2">
+                  <div className="mt-2 hidden gap-4 lg:grid lg:grid-cols-2">
                     {past.map((v, i) => (
                       <PastTripCard key={v.trip.id} view={v} seed={i + 1} />
                     ))}
@@ -171,14 +156,14 @@ function YearLine({ views }: { views: TripView[] }) {
   const thisYear = views.filter((v) => parseDate(v.trip.startDate).getFullYear() === year && v.trip.currency === 'INR')
   const myShare = thisYear.reduce((a, v) => a + (v.ledger.share[me.id] ?? 0), 0)
   const days = thisYear.filter((v) => v.status.phase !== 'upcoming').reduce((a, v) => a + tripLength(v.trip.startDate, v.trip.endDate), 0)
-  if (thisYear.length === 0) return <p className="text-sky-2 mt-2 text-body">Every trip, every expense, every memory, in one place.</p>
+  if (thisYear.length === 0) return <p className="mt-2 text-body text-ink-3">Every trip, every expense, every memory, in one place.</p>
   return (
-    <p className="text-sky-2 mt-2 max-w-[44ch] text-body">
-      {year} so far: <span className="num font-semibold text-white">{formatMoney(myShare, { round: true })}</span> your share across{' '}
-      <span className="num font-semibold text-white">{thisYear.length}</span> {thisYear.length === 1 ? 'trip' : 'trips'}
+    <p className="mt-2 max-w-[44ch] text-body text-ink-3">
+      {year} so far: <span className="num font-semibold text-ink">{formatMoney(myShare, { round: true })}</span> your share across{' '}
+      <span className="num font-semibold text-ink">{thisYear.length}</span> {thisYear.length === 1 ? 'trip' : 'trips'}
       {days ? (
         <>
-          , <span className="num font-semibold text-white">{days}</span> days away.
+          , <span className="num font-semibold text-ink">{days}</span> days away.
         </>
       ) : (
         '.'
@@ -199,20 +184,20 @@ function OutstandingSummary({ views }: { views: TripView[] }) {
   if (rows.length === 0) return null
   return (
     <section aria-labelledby="to-settle">
-      <h2 id="to-settle" className="text-heading">
+      <h2 id="to-settle" className="flex min-h-11 items-center px-0.5 text-title">
         To settle
       </h2>
-      <ul className="panel mt-3 divide-y divide-line overflow-hidden rounded-[24px]">
+      <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
         {rows.map((r, i) => (
           <li key={i}>
-            <Link to={`/trips/${r.trip.id}/settle`} className="group flex items-center gap-3 px-4 py-3.5 hover:bg-well">
-              <Avatar person={r.other!} size={40} />
+            <Link to={`/trips/${r.trip.id}/settle`} className="group flex min-h-[68px] items-center gap-4 px-5 py-3.5 hover:bg-well active:bg-well">
+              <Avatar person={r.other!} size={36} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold">{r.amount > 0 ? `${firstName(r.other!.name)} owes you` : `You owe ${firstName(r.other!.name)}`}</span>
-                <span className="block truncate text-meta text-ink-3">{r.trip.name}</span>
+                <span className="block truncate text-caption text-ink-3">{r.trip.name}</span>
               </span>
-              <span className={cx('num shrink-0 text-heading', r.amount > 0 ? 'text-gain' : 'text-loss')}>{formatMoney(Math.abs(r.amount), { currency: r.trip.currency })}</span>
-              <ArrowRight size={16} weight="bold" className="shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              <span className={cx('num shrink-0 font-semibold', r.amount > 0 ? 'text-gain' : 'text-loss')}>{formatMoney(Math.abs(r.amount), { currency: r.trip.currency })}</span>
+              <CaretRight size={14} weight="bold" className="shrink-0 text-faint" aria-hidden />
             </Link>
           </li>
         ))}
@@ -225,22 +210,23 @@ function FirstRun() {
   const { me, resetDemo } = useStore()
   const { openTrip } = useUI()
   return (
-    <SkyHero className="flex min-h-[86dvh] flex-col justify-center py-12">
-      <div className="mx-auto w-full max-w-[460px]">
-        <SkyArt size={200} className="mx-auto" />
-        <h1 className="text-sky mt-10 text-hero">Welcome aboard, {firstName(me.name)}</h1>
-        <p className="text-sky-2 mt-3 text-body">
+    <div className="px-4 pt-[max(16px,env(safe-area-inset-top))] lg:px-10 lg:pt-8">
+      <section className="tone-ink mx-auto flex min-h-[78dvh] max-w-[560px] flex-col justify-end rounded-[30px] px-6 pt-16 pb-6">
+        <BrandMark size={44} />
+        <h1 className="mt-6 text-hero">Welcome, {firstName(me.name)}</h1>
+        <p className="mt-3 text-body text-white/75">
           Make a trip, invite the people going, and add expenses as they happen. TripMate works out who owes whom, and keeps every trip as a journal when you are home.
         </p>
-        <div className="mt-8 flex flex-col gap-2.5">
-          <Button size="lg" variant="white" icon={Plus} onClick={() => openTrip()}>
+        <div className="mt-8 flex flex-col gap-2">
+          <button type="button" onClick={() => openTrip()} className="press flex h-14 items-center justify-center gap-2 rounded-full bg-white text-base font-semibold text-[#0d1b2a]">
+            <Plus size={18} weight="bold" aria-hidden />
             Create your first trip
-          </Button>
-          <Button size="lg" variant="sky" onClick={resetDemo}>
+          </button>
+          <button type="button" onClick={resetDemo} className="press flex h-14 items-center justify-center rounded-full bg-white/14 text-base font-semibold text-white backdrop-blur-[16px]">
             Explore sample trips
-          </Button>
+          </button>
         </div>
-      </div>
-    </SkyHero>
+      </section>
+    </div>
   )
 }

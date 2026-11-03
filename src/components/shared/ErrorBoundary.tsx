@@ -18,15 +18,15 @@ export class ErrorBoundary extends Component<{ children: ReactNode; resetKey?: s
   render() {
     if (!this.state.error) return this.props.children
     return (
-      <div className="on-sky mx-auto flex min-h-[80dvh] max-w-[420px] flex-col items-center justify-center px-6 text-center">
+      <div className="mx-auto flex min-h-[80dvh] max-w-[420px] flex-col items-center justify-center px-6 text-center">
         <SkyArt size={150} />
-        <h1 className="text-sky mt-8 text-display">Something went wrong</h1>
-        <p className="text-sky-2 mt-2 text-body">Something on this screen failed to load. Your trips and expenses are safe on this device.</p>
+        <h1 className="mt-8 text-display">Something went wrong</h1>
+        <p className="mt-2 text-body text-ink-3">Something on this screen failed to load. Your trips and expenses are safe on this device.</p>
         <div className="mt-6 flex gap-2">
-          <button type="button" onClick={() => this.setState({ error: null })} className="press h-12 rounded-full bg-white px-6 font-semibold text-[#0c1736]">
+          <button type="button" onClick={() => this.setState({ error: null })} className="luminous press h-12 rounded-full px-6 font-semibold">
             Try again
           </button>
-          <Link to="/" onClick={() => this.setState({ error: null })} className="press glass-control flex h-12 items-center rounded-full px-6 font-semibold text-white">
+          <Link to="/" onClick={() => this.setState({ error: null })} className="press glass-control flex h-12 items-center rounded-full px-6 font-semibold">
             Back to trips
           </Link>
         </div>

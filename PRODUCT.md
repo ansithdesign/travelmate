@@ -46,9 +46,10 @@ Replaces a mix of WhatsApp threads, Splitwise, spreadsheets, Maps and photo gall
 ## Brand Commitments
 
 - Name: TripMate.
-- Sky theme, set by the owner on 2026-11-03: a living sky that follows the time of day (dawn, clear day, golden hour, night). Users can pin one sky in Profile.
-- The owner wants a premium, modern, expressive finish: glass surfaces, rich motion and creative, non-generic icons are in scope. Plain line-icon UI was explicitly rejected.
-- Contemporary sans-serif throughout (Figtree), with Geist Mono only for codes and printed artefacts (receipts, booking references).
+- Visual system: the owner's Finbook "Under the Sky" theme, applied 2026-11-03. A band of sky that follows the time of day (morning, day, evening, night) fades into haze; content sits in borderless frosted glass; primary actions are midnight pills; the accent is for selection and data only. Users can pin one sky in Profile.
+- Airbnb-style calm on top of that theme, requested by the owner: a clear, restrained type hierarchy, photo-first trip cards with text underneath, generous space between sections. Soft edges: no hairline outlines, wide faint shadows (owner feedback: borders and shadows looked too sharp). Generous whitespace: the owner found earlier spacing congested.
+- The owner asked for a simpler UX: one way to do each thing, short forms by default, empty sections hidden.
+- Figtree throughout. No uppercase labels or monospace in the interface; Geist Mono only on printed receipts.
 - No emoji as UI icons. No purple-blue "AI startup" gradient blobs as decoration; colour comes from the sky itself.
 - Copy never uses em dashes.
 

@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom'
 import { Copy, LinkSimple, ShareNetwork, UserMinus, UserPlus } from '@phosphor-icons/react'
 import { TripSkyHeader } from '../components/trips/TripHeader'
 import { ContentSheet, SheetBody } from '../components/shared/Page'
-import { CloudShape } from '../components/sky/Sky'
 import { Avatar } from '../components/ui/Avatar'
 import { Button, IconButton } from '../components/ui/Button'
 import { InputField } from '../components/ui/Field'
@@ -22,7 +21,7 @@ export function People() {
   if (!view) return <NotFound />
   return (
     <>
-      <TripSkyHeader view={view} title="People" />
+      <TripSkyHeader view={view} title="People" tabs={false} />
       <ContentSheet>
         <SheetBody className="lg:max-w-[820px]">
           <PeopleBody view={view} />
@@ -38,7 +37,8 @@ function PeopleBody({ view }: { view: TripView }) {
   const { trip, ledger } = view
   const cur = trip.currency
   const members = trip.members.map(person).filter(Boolean) as Person[]
-  const [sheet, setSheet] = useState<null | 'invite' | 'add'>(null)
+  const [sheet, setSheet] = useState(false)
+  const [direct, setDirect] = useState(false)
   const [removing, setRemoving] = useState<Person | null>(null)
   const [name, setName] = useState('')
   const [contact, setContact] = useState('')
@@ -68,75 +68,68 @@ function PeopleBody({ view }: { view: TripView }) {
     const n = name.trim()
     if (!n) return setErr('Enter a name')
     if (members.some((m) => m.name.toLowerCase() === n.toLowerCase())) return setErr(`${n} is already on this trip`)
-    if (sheet === 'invite') {
+    if (!direct) {
       addInvite(trip.id, n, contact)
       toast.success(`Invite for ${n} is pending`)
     } else {
       addMember(trip.id, n, contact)
       toast.success(`${n} added to the trip`)
     }
-    setSheet(null)
+    setSheet(false)
   }
 
-  function openSheet(kind: 'invite' | 'add') {
+  function openSheet() {
     setName('')
     setContact('')
     setErr(undefined)
-    setSheet(kind)
+    setDirect(false)
+    setSheet(true)
   }
 
   return (
     <>
-      <p className="text-body text-ink-2">Everyone here can add expenses and is included in splits by default.</p>
+      <h2 className="px-0.5 pt-2 text-display">People</h2>
+      <p className="mt-1.5 px-0.5 text-body text-ink-3">Everyone on the trip can add expenses and is in every split by default.</p>
 
-      <section
-        aria-labelledby="invite-link"
-        className="on-sky relative mt-5 overflow-hidden rounded-[28px] bg-[linear-gradient(135deg,#2563eb_0%,#6f7fe0_45%,#d995c4_78%,#ffbe8f_100%)] p-5 text-white shadow-[0_20px_44px_-22px_rgb(37_99_235/0.8)]"
-      >
-        <div aria-hidden className="pointer-events-none absolute -top-6 -right-10 opacity-70" style={{ animation: 'bob 8s ease-in-out infinite' }}>
-          <CloudShape width={190} />
-        </div>
-        <h2 id="invite-link" className="text-sky relative flex items-center gap-2 text-heading">
-          <LinkSimple size={20} weight="bold" aria-hidden /> Invite link
+      <section aria-labelledby="invite-link" className="panel mt-5 rounded-[24px] p-6">
+        <h2 id="invite-link" className="flex items-center gap-2.5 text-heading">
+          <span className="flex size-9 items-center justify-center rounded-full bg-accent-soft text-accent">
+            <LinkSimple size={19} weight="duotone" aria-hidden />
+          </span>
+          Invite to {trip.name}
         </h2>
-        <p className="text-sky-2 relative mt-1 max-w-[30ch] text-meta">Anyone with this link can ask to join {trip.name}.</p>
-        <div className="glass relative mt-4 flex items-center gap-2 rounded-full py-1 pr-1 pl-4">
-          <code className="min-w-0 flex-1 truncate font-mono text-meta text-white">{link.replace(/^https?:\/\//, '')}</code>
-          <IconButton icon={Copy} label="Copy invite link" onClick={copy} weight="duotone" className="size-10 text-white hover:bg-white/15" />
+        <div className="mt-4 flex h-[54px] items-center gap-2 rounded-[16px] bg-well py-1 pr-1 pl-4">
+          <span className="min-w-0 flex-1 truncate text-meta font-medium text-ink-2">{link.replace(/^https?:\/\//, '')}</span>
+          <IconButton icon={Copy} label="Copy invite link" onClick={copy} weight="regular" className="size-11" />
         </div>
-        <div className="relative mt-3 flex flex-wrap gap-2">
-          <Button size="sm" variant="white" onClick={share} icon={ShareNetwork}>
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <Button onClick={share} icon={ShareNetwork}>
             Share link
           </Button>
-          <Button size="sm" variant="sky" icon={UserPlus} onClick={() => openSheet('invite')}>
+          <Button variant="secondary" icon={UserPlus} onClick={openSheet}>
             Invite by name
           </Button>
         </div>
       </section>
 
-      <section aria-labelledby="members" className="mt-8">
-        <div className="flex items-center justify-between">
-          <h2 id="members" className="text-heading">
-            On this trip <span className="num font-normal text-ink-3">{members.length}</span>
-          </h2>
-          <Button size="sm" variant="quiet" onClick={() => openSheet('add')}>
-            Add someone
-          </Button>
-        </div>
-        <ul className="panel mt-2 divide-y divide-line overflow-hidden rounded-[24px]">
+      <section aria-labelledby="members" className="mt-14">
+        <h2 id="members" className="flex min-h-11 items-center px-0.5 text-title">
+          On this trip <span className="num ml-1.5 font-medium text-ink-3">{members.length}</span>
+        </h2>
+        <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
           {members.map((m) => {
             const paid = ledger.paid[m.id] ?? 0
             const share = ledger.share[m.id] ?? 0
             const pct = ledger.total ? Math.round((share / ledger.total) * 100) : 0
             return (
-              <li key={m.id} className="flex items-center gap-3 px-4 py-3">
-                <Avatar person={m} size={42} />
+              <li key={m.id} className="flex min-h-[68px] items-center gap-4 py-3 pr-3 pl-5">
+                <Avatar person={m} size={36} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">
                     {m.name}
                     {m.isYou ? <span className="ml-1.5 text-meta font-normal text-ink-3">You</span> : null}
                   </p>
-                  <p className="num truncate text-meta text-ink-3">
+                  <p className="num truncate text-caption text-ink-3">
                     Paid {formatMoney(paid, { currency: cur })} · share {formatMoney(share, { currency: cur })}
                     {ledger.total ? ` (${pct}%)` : ''}
                   </p>
@@ -148,23 +141,22 @@ function PeopleBody({ view }: { view: TripView }) {
         </ul>
       </section>
 
-      <section aria-labelledby="pending" className="mt-8">
-        <h2 id="pending" className="text-heading">
-          Invited <span className="num font-normal text-ink-3">{trip.invites.length}</span>
+      {trip.invites.length ? (
+      <section aria-labelledby="pending" className="mt-14">
+        <h2 id="pending" className="flex min-h-11 items-center px-0.5 text-title">
+          Waiting to join <span className="num ml-1.5 font-medium text-ink-3">{trip.invites.length}</span>
         </h2>
-        {trip.invites.length === 0 ? (
-          <p className="mt-2 text-body text-ink-3">No pending invites.</p>
-        ) : (
-          <ul className="panel mt-2 divide-y divide-line overflow-hidden rounded-[24px]">
+        {(
+          <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
             {trip.invites.map((inv) => (
-              <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
-                <span className="flex size-[42px] shrink-0 items-center justify-center rounded-full border-2 border-dashed border-sun/60 bg-sun-soft text-sun">
-                  <UserPlus size={19} weight="duotone" aria-hidden />
+              <li key={inv.id} className="flex flex-wrap items-center gap-x-3.5 gap-y-2 px-4 py-2.5">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-aware-tint text-aware-ink">
+                  <UserPlus size={18} weight="duotone" aria-hidden />
                 </span>
                 <div className="min-w-[150px] flex-1">
                   <p className="truncate font-semibold">{inv.name}</p>
-                  <p className="truncate text-meta text-ink-3">
-                    {inv.contact ? `${inv.contact} · ` : ''}Invited {fmt.dayMonth(inv.createdAt)}, waiting to join
+                  <p className="truncate text-caption text-ink-3">
+                    {inv.contact ? `${inv.contact} · ` : ''}Invited {fmt.dayMonth(inv.createdAt)}
                   </p>
                 </div>
                 <div className="ml-auto flex gap-1">
@@ -194,17 +186,18 @@ function PeopleBody({ view }: { view: TripView }) {
             ))}
           </ul>
         )}
-        <p className="mt-3 text-caption text-ink-3">Invites are not delivered in this version. Share the link yourself and use Mark joined when they are in.</p>
+        <p className="mt-2.5 px-1 text-caption text-ink-3">Invites are not delivered in this version. Share the link yourself and use Mark joined when they are in.</p>
       </section>
+      ) : null}
 
       <Sheet
-        open={!!sheet}
-        onClose={() => setSheet(null)}
-        title={sheet === 'invite' ? 'Invite someone' : 'Add someone'}
-        description={sheet === 'invite' ? 'They show as invited until they join.' : 'For people who will not use the app. They join splits straight away.'}
+        open={sheet}
+        onClose={() => setSheet(false)}
+        title="Invite someone"
+        description={direct ? 'They join splits straight away.' : 'They show as waiting until they join.'}
         footer={
           <Button block size="lg" onClick={submit}>
-            {sheet === 'invite' ? 'Send invite' : 'Add to trip'}
+            {direct ? 'Add to trip' : 'Send invite'}
           </Button>
         }
       >
@@ -217,6 +210,17 @@ function PeopleBody({ view }: { view: TripView }) {
         >
           <InputField label="Name" data-autofocus value={name} error={err} onChange={(e) => (setName(e.target.value), setErr(undefined))} placeholder="Karthik Menon" autoComplete="off" />
           <InputField label="Email or phone" optional value={contact} onChange={(e) => setContact(e.target.value)} placeholder="karthik@example.in" autoComplete="off" />
+          <label className="panel-strong flex min-h-[68px] cursor-pointer items-center gap-4 rounded-[20px] px-5 py-3.5">
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">Add without inviting</span>
+              <span className="block text-caption text-ink-3">For someone who will not use the app</span>
+            </span>
+            <input type="checkbox" role="switch" checked={direct} onChange={(e) => setDirect(e.target.checked)} className="peer sr-only" />
+            <span
+              aria-hidden
+              className="relative h-[31px] w-[51px] shrink-0 rounded-full bg-line-strong transition-colors duration-200 peer-checked:bg-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent after:absolute after:top-[2px] after:left-[2px] after:size-[27px] after:rounded-full after:bg-white after:shadow-[0_3px_8px_rgba(0,0,0,0.18)] after:transition-transform after:duration-200 peer-checked:after:translate-x-5"
+            />
+          </label>
           <button type="submit" hidden />
         </form>
       </Sheet>

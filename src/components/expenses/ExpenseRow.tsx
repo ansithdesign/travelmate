@@ -2,7 +2,6 @@ import { Paperclip } from '@phosphor-icons/react'
 import { useStore } from '../../store/store'
 import type { CurrencyCode, Expense } from '../../types'
 import { cx } from '../../utils/cx'
-import { fmt } from '../../utils/dates'
 import { firstName } from '../../utils/id'
 import { formatMoney } from '../../utils/money'
 import { computeSplit } from '../../utils/split'
@@ -31,19 +30,19 @@ export function ExpenseRow({
   const n = expense.split.participants.length
 
   return (
-    <button type="button" onClick={onOpen} className="group flex w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-well">
-      <CategoryTile id={expense.category} size={46} className="transition-transform duration-500 ease-[var(--ease-glide)] group-hover:scale-105" />
+    <button type="button" onClick={onOpen} className="group flex min-h-[68px] w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-well active:bg-well">
+      <CategoryTile id={expense.category} size={36} />
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5">
-          <span className="line-clamp-2 font-semibold leading-5">{expense.title}</span>
+          <span className="truncate font-semibold">{expense.title}</span>
           {expense.receipt ? <Paperclip size={14} weight="bold" className="shrink-0 text-ink-3" aria-label="Receipt attached" /> : null}
         </span>
-        <span className="block truncate text-meta text-ink-3">
-          {iPaid ? 'You' : firstName(payer?.name ?? 'Someone')} paid · {n === 1 ? 'for 1' : `${n} ways`}
-          {tripName ? ` · ${tripName}` : <span className="hidden sm:inline"> · {fmt.time(expense.date)}</span>}
+        <span className="mt-0.5 block truncate text-caption text-ink-3">
+          {iPaid ? 'You' : firstName(payer?.name ?? 'Someone')} paid
+          {tripName ? ` · ${tripName}` : ` · ${n === 1 ? 'just them' : `split ${n} ways`}`}
         </span>
       </span>
-      <span className="shrink-0 text-right">
+      <span className="shrink-0 pl-2 text-right">
         <span className="num block font-semibold">{formatMoney(expense.amount, { currency })}</span>
         <span className={cx('num block text-caption font-medium', settled ? 'text-ink-3' : position > 0 ? 'text-gain' : position < 0 ? 'text-loss' : 'text-ink-3')}>
           {settled ? 'Settled' : position > 0 ? `you lent ${formatMoney(position, { currency })}` : position < 0 ? `you owe ${formatMoney(-position, { currency })}` : 'not involved'}

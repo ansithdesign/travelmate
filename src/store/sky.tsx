@@ -4,13 +4,13 @@ export type SkyPhase = 'dawn' | 'day' | 'golden' | 'night'
 export type SkyChoice = SkyPhase | 'auto'
 
 export const SKY_LABEL: Record<SkyPhase, string> = {
-  dawn: 'Dawn',
-  day: 'Clear day',
-  golden: 'Golden hour',
+  dawn: 'Morning',
+  day: 'Day',
+  golden: 'Evening',
   night: 'Night',
 }
 
-/** Local time decides the sky: 5 to 8 dawn, 8 to 16 day, 16 to 19 golden hour, otherwise night. */
+/** Local time decides the sky: 5 to 8 morning, 8 to 16 day, 16 to 19 evening, otherwise night. */
 export function phaseForHour(h: number): SkyPhase {
   if (h >= 5 && h < 8) return 'dawn'
   if (h >= 8 && h < 16) return 'day'
@@ -55,7 +55,7 @@ export function SkyProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.dataset.sky = phase
     const meta = document.querySelector('meta[name="theme-color"]')
-    meta?.setAttribute('content', { dawn: '#6f86cf', day: '#2f72e0', golden: '#5a66c9', night: '#0a1030' }[phase])
+    meta?.setAttribute('content', { dawn: '#8ec0f0', day: '#6fb6ef', golden: '#7c84d6', night: '#070f26' }[phase])
   }, [phase])
 
   const value = useMemo<SkyState>(

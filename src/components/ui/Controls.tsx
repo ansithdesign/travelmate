@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { Icon } from '@phosphor-icons/react'
 import { cx } from '../../utils/cx'
 
-/** Segmented control with a glass thumb that slides between options. */
+/** Segmented control: a fill track with a solid thumb that slides between options. */
 export function Segmented<T extends string>({
   value,
   onChange,
@@ -26,11 +26,11 @@ export function Segmented<T extends string>({
   }, [i, options.length])
 
   return (
-    <div ref={root} role="radiogroup" aria-label={label} className={cx('relative grid auto-cols-fr grid-flow-col rounded-full bg-well p-1', className)}>
+    <div ref={root} role="radiogroup" aria-label={label} className={cx('relative grid auto-cols-fr grid-flow-col gap-0.5 rounded-[12px] bg-well p-[3px]', className)}>
       {thumb ? (
         <span
           aria-hidden
-          className="absolute top-1 bottom-1 rounded-full bg-panel-strong shadow-[0_1px_2px_rgb(var(--t-shadow)/0.1),0_6px_16px_-8px_rgb(var(--t-shadow)/0.35),inset_0_0_0_1px_var(--color-line)] transition-[left,width] duration-500 ease-[var(--ease-glide)]"
+          className="absolute top-[3px] bottom-[3px] rounded-[9px] bg-solid shadow-[0_2px_8px_-2px_rgba(13,27,42,0.12)] transition-[left,width] duration-300 ease-[var(--ease-out-expo)]"
           style={{ left: thumb.x, width: thumb.w }}
         />
       ) : null}
@@ -48,7 +48,7 @@ export function Segmented<T extends string>({
               if (e.key === 'ArrowRight') onChange(options[(i + 1) % options.length].value)
               if (e.key === 'ArrowLeft') onChange(options[(i - 1 + options.length) % options.length].value)
             }}
-            className={cx('relative z-[1] h-9 rounded-full px-2 text-meta font-semibold transition-colors duration-200', active ? 'text-ink' : 'text-ink-3 hover:text-ink-2')}
+            className={cx('relative z-[1] min-h-[38px] rounded-[9px] px-1.5 text-meta font-semibold transition-colors duration-200', active ? 'text-ink' : 'text-ink-2 hover:text-ink')}
           >
             {o.label}
           </button>
@@ -79,36 +79,34 @@ export function Chip({
       aria-pressed={active}
       onClick={onClick}
       className={cx(
-        'press inline-flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-meta font-semibold whitespace-nowrap',
+        'press inline-flex h-[42px] shrink-0 items-center gap-1.5 rounded-full px-4 text-[14px] font-medium whitespace-nowrap',
         leading && 'pl-1.5',
-        active
-          ? 'bg-ink text-ink-inverse shadow-[0_8px_18px_-10px_rgb(var(--t-shadow)/0.6)]'
-          : 'bg-panel-strong text-ink-2 shadow-[inset_0_0_0_1px_var(--color-line)] hover:text-ink',
+        active ? 'luminous [&_svg]:text-accent-bright' : 'glass-control hover:bg-solid',
       )}
     >
       {leading}
       {I ? <I size={16} weight="bold" aria-hidden /> : null}
       {children}
-      {count !== undefined ? <span className={cx('num', active ? 'opacity-60' : 'text-ink-3')}>{count}</span> : null}
+      {count !== undefined ? <span className={cx('num', active ? 'opacity-70' : 'text-ink-3')}>{count}</span> : null}
     </button>
   )
 }
 
 export function EmptyState({ title, body, action, art }: { title: string; body: ReactNode; action?: ReactNode; art?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-3 px-4 py-8 text-center">
       {art}
-      <h3 className={cx('text-heading', art && 'mt-4')}>{title}</h3>
-      <p className="mt-1.5 max-w-[34ch] text-body text-ink-2">{body}</p>
-      {action ? <div className="mt-5">{action}</div> : null}
+      <h3 className="text-title">{title}</h3>
+      <p className="-mt-1.5 max-w-[34ch] text-body text-ink-3">{body}</p>
+      {action ? <div className="mt-2">{action}</div> : null}
     </div>
   )
 }
 
 export function SectionHeader({ title, action, id, count }: { title: string; action?: ReactNode; id?: string; count?: number }) {
   return (
-    <div className="flex min-h-11 items-center justify-between gap-3">
-      <h2 id={id} className="text-heading">
+    <div className="flex min-h-11 items-center justify-between gap-3 px-0.5">
+      <h2 id={id} className="text-title">
         {title}
         {count !== undefined ? <span className="num ml-1.5 font-medium text-ink-3">{count}</span> : null}
       </h2>
@@ -120,9 +118,9 @@ export function SectionHeader({ title, action, id, count }: { title: string; act
 /** Label / value row used for bookings, expense detail and receipts. */
 export function DetailRow({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
   return (
-    <div className={cx('flex items-baseline justify-between gap-4 py-3', className)}>
-      <dt className="shrink-0 text-meta text-ink-2">{label}</dt>
-      <dd className="min-w-0 text-right text-body">{children}</dd>
+    <div className={cx('flex items-baseline justify-between gap-4 py-[11px]', className)}>
+      <dt className="shrink-0 text-[14px] text-ink-3">{label}</dt>
+      <dd className="num min-w-0 text-right text-[14px] font-semibold">{children}</dd>
     </div>
   )
 }

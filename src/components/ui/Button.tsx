@@ -17,22 +17,22 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants: Record<Variant, string> = {
-  // Luminous sky-blue pill with a lit top edge
-  primary:
-    'luminous hover:brightness-[1.06] disabled:opacity-45 disabled:shadow-none',
-  secondary: 'bg-panel-strong text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong),0_1px_2px_rgb(var(--t-shadow)/0.06)] hover:bg-panel disabled:text-ink-3',
-  ghost: 'text-ink hover:bg-well disabled:text-ink-3',
-  quiet: 'text-accent hover:bg-accent-soft disabled:text-ink-3',
-  danger:
-    'text-white bg-[linear-gradient(180deg,#f2566a_0%,#d02c42_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_10px_24px_-12px_rgb(214_54_74/0.7)] hover:brightness-105 disabled:opacity-45',
-  sky: 'glass-control text-white hover:brightness-125',
-  white: 'bg-white text-[#0c1736] shadow-[0_10px_30px_-12px_rgb(8_20_60/0.5),inset_0_-1px_0_rgb(12_23_54/0.08)] hover:bg-white/92',
+  // Midnight pill. White with ink at night. The accent never fills a primary button.
+  primary: 'luminous hover:opacity-90 disabled:bg-well disabled:text-faint disabled:shadow-none',
+  // Strong glass with a hairline
+  secondary: 'glass-control hover:bg-solid disabled:text-faint',
+  ghost: 'text-ink hover:bg-well disabled:text-faint',
+  quiet: 'text-accent-ink hover:bg-accent-soft disabled:text-faint',
+  danger: 'bg-loss-soft text-loss hover:brightness-95 disabled:opacity-45',
+  // Kept as aliases so older call sites resolve to the system
+  sky: 'glass-control hover:bg-solid disabled:text-faint',
+  white: 'luminous hover:opacity-90 disabled:bg-well disabled:text-faint disabled:shadow-none',
 }
 
 const sizes: Record<Size, string> = {
-  sm: 'h-9 px-3.5 text-meta gap-1.5',
-  md: 'h-11 px-5 text-body gap-2',
-  lg: 'h-[52px] px-6 text-body gap-2',
+  sm: 'h-10 px-4 text-[14px] gap-1.5',
+  md: 'h-12 px-5 text-body gap-2',
+  lg: 'h-14 px-[26px] text-base gap-2',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -46,7 +46,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={disabled || loading}
       className={cx(
-        'press inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold tracking-[-0.005em] whitespace-nowrap disabled:cursor-not-allowed',
+        'press inline-flex shrink-0 select-none items-center justify-center rounded-full font-semibold tracking-[-0.01em] whitespace-nowrap disabled:cursor-not-allowed [&_svg]:shrink-0',
         variants[variant],
         sizes[size],
         block && 'w-full',
@@ -73,9 +73,8 @@ export const IconButton = forwardRef<
       title={label}
       className={cx(
         'press inline-flex size-11 shrink-0 items-center justify-center rounded-full',
-        tone === 'plain' && 'text-ink hover:bg-well',
-        tone === 'panel' && 'bg-panel-strong text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong)] hover:bg-panel',
-        tone === 'sky' && 'glass-control text-white hover:brightness-125',
+        tone === 'plain' && 'text-ink hover:bg-well active:bg-well',
+        (tone === 'panel' || tone === 'sky') && 'glass-control hover:bg-solid',
         className,
       )}
       {...rest}

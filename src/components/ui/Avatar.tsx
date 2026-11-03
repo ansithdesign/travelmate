@@ -2,16 +2,8 @@ import type { Person } from '../../types'
 import { cx } from '../../utils/cx'
 import { initials } from '../../utils/id'
 
-// Sky-light orbs. Each person gets a gradient pair, chosen by id so it never changes.
-const ORBS = [
-  ['#7cc4ff', '#2f6fe0'],
-  ['#ffc58a', '#f2766a'],
-  ['#b7a4ff', '#6a5ae0'],
-  ['#8ce6cf', '#1f9e8c'],
-  ['#ff9fc5', '#d24f8c'],
-  ['#ffe08a', '#e59a1a'],
-  ['#9fd6ff', '#5b6fe8'],
-]
+// Flat, calm fills from the series palette. Each person keeps one, chosen by id.
+const ORBS = ['#1f6fd6', '#c2558d', '#9c6f12', '#6a5bd8', '#1f857f', '#4f6278', '#2b7fd4']
 
 function orbFor(id: string) {
   let h = 0
@@ -32,7 +24,7 @@ export function Avatar({
   className?: string
   style?: React.CSSProperties
 }) {
-  const [a, b] = orbFor(person.id)
+  const fill = orbFor(person.id)
   return (
     <span
       aria-hidden
@@ -40,12 +32,12 @@ export function Avatar({
         width: size,
         height: size,
         fontSize: Math.max(10, Math.round(size * 0.36)),
-        background: `radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.55) 0%, transparent 42%), linear-gradient(145deg, ${a} 0%, ${b} 100%)`,
+        background: fill,
         ...style,
       }}
       className={cx(
-        'inline-flex shrink-0 items-center justify-center rounded-full font-semibold tracking-[0.02em] text-white [text-shadow:0_1px_2px_rgb(0_0_0/0.25)]',
-        ring && 'ring-2',
+        'inline-flex shrink-0 items-center justify-center rounded-full font-semibold tracking-[0.02em] text-white',
+        ring && 'ring-[1.5px]',
         className,
       )}
     >
@@ -59,7 +51,7 @@ export function AvatarStack({
   max = 4,
   size = 28,
   className,
-  ringClass = 'ring-white/80',
+  ringClass = 'ring-[var(--haze)]',
 }: {
   people: Person[]
   max?: number
@@ -78,7 +70,7 @@ export function AvatarStack({
       {extra > 0 ? (
         <span
           style={{ width: size, height: size, marginLeft: overlap }}
-          className={cx('inline-flex items-center justify-center rounded-full bg-white/70 text-[11px] font-semibold text-[#0c1736] ring-2', ringClass)}
+          className={cx('inline-flex items-center justify-center rounded-full bg-solid text-[11px] font-semibold text-ink-2 ring-[1.5px]', ringClass)}
         >
           +{extra}
         </span>

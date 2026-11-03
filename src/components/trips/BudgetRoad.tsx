@@ -4,8 +4,8 @@ import { cx } from '../../utils/cx'
 import { formatMoney } from '../../utils/money'
 
 /**
- * Budget as a clean bar: a sky-tinted fill shows how much is spent, with the
- * amount left on the right. Over budget, the bar turns coral.
+ * Budget as a thin bar: accent fill for what is spent, the amount left on the
+ * right. Over budget, the bar and the words turn to the act colour.
  */
 export function BudgetBar({ spent, budget, className, currency }: { spent: Paise; budget: Paise; className?: string; currency?: CurrencyCode }) {
   const ratio = budget > 0 ? spent / budget : 0
@@ -30,7 +30,7 @@ export function BudgetBar({ spent, budget, className, currency }: { spent: Paise
         </span>
       </div>
       <div
-        className="relative mt-2.5 h-2.5 overflow-hidden rounded-full bg-well"
+        className="relative mt-2.5 h-1.5 overflow-hidden rounded-full bg-accent-soft"
         role="meter"
         aria-valuemin={0}
         aria-valuemax={budget / 100}
@@ -40,7 +40,7 @@ export function BudgetBar({ spent, budget, className, currency }: { spent: Paise
         <div
           className={cx(
             'absolute inset-y-0 left-0 rounded-full transition-[width] duration-[1100ms] ease-[var(--ease-out-expo)]',
-            over ? 'bg-[linear-gradient(90deg,#ff9a8b,var(--color-loss))]' : 'bg-[linear-gradient(90deg,#7cc4ff_0%,var(--color-accent)_60%,#a78bfa_100%)]',
+            over ? 'bg-act' : 'bg-accent',
           )}
           style={{ width: `${shown}%` }}
         />

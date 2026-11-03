@@ -15,15 +15,7 @@ export function TripExpenses() {
   if (!view) return <NotFound />
   return (
     <>
-      <TripSkyHeader
-        view={view}
-        title="Expenses"
-        actions={
-          <Button size="sm" variant="white" icon={Plus} onClick={() => openExpense({ tripId: view.trip.id })}>
-            Add
-          </Button>
-        }
-      />
+      <TripSkyHeader view={view} title="Expenses" />
       <ContentSheet>
         <SheetBody className="lg:max-w-[820px]">
           <ExpenseList

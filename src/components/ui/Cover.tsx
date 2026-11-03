@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import type { Photo } from '../../types'
 import { cx } from '../../utils/cx'
-import { CloudShape } from '../sky/Sky'
+import { CloudShape } from '../sky/CloudShape'
 import { useSky, type SkyPhase } from '../../store/sky'
 
 // What you see through the window follows the sky you are under.
 const SKIES: Record<SkyPhase, string[]> = {
-  dawn: ['linear-gradient(180deg,#5168c2 0%,#b495d2 55%,#ffd2b4 100%)', 'linear-gradient(180deg,#6576cc 0%,#d6a0c6 60%,#ffe0c4 100%)'],
-  day: ['linear-gradient(180deg,#2f78e6 0%,#7ab6f6 60%,#d5ebff 100%)', 'linear-gradient(180deg,#1f63d6 0%,#5aa0f0 55%,#bfe0ff 100%)'],
-  golden: ['linear-gradient(180deg,#4a54bd 0%,#c486bf 55%,#ffb98a 100%)', 'linear-gradient(180deg,#5c5fc6 0%,#e0909f 60%,#ffc89a 100%)'],
-  night: ['linear-gradient(180deg,#060b26 0%,#142056 65%,#2a336f 100%)', 'linear-gradient(180deg,#0a1132 0%,#1b2560 60%,#3a3a78 100%)'],
+  dawn: ['linear-gradient(180deg,#6fa6e3 0%,#b9d3f0 55%,#f7d7c0 100%)', 'linear-gradient(180deg,#7aaee6 0%,#c5daf2 60%,#fbe2cf 100%)'],
+  day: ['linear-gradient(180deg,#3f95e6 0%,#8cc6f3 60%,#d6ebfa 100%)', 'linear-gradient(180deg,#4a9be6 0%,#a6d3f6 60%,#e2f0fb 100%)'],
+  golden: ['linear-gradient(180deg,#646fcf 0%,#b79ad8 55%,#f4bfb0 100%)', 'linear-gradient(180deg,#6f78d3 0%,#c3a6dc 60%,#f6c9b8 100%)'],
+  night: ['linear-gradient(180deg,#070f26 0%,#0e1d42 60%,#15295a 100%)', 'linear-gradient(180deg,#0a1430 0%,#13244f 60%,#1d3266 100%)'],
 }
 const CLOUD: Record<SkyPhase, [string, string, number]> = {
   dawn: ['#fff6f4', '#e6c3d6', 0.95],
@@ -111,11 +111,10 @@ export function PhotoCard({
 }) {
   return (
     <div
-      className={cx('relative overflow-hidden shadow-[0_18px_40px_-22px_rgb(8_20_60/0.55),0_2px_6px_-2px_rgb(8_20_60/0.18)]', className)}
+      className={cx('relative overflow-hidden shadow-[var(--shadow-soft)]', className)}
       style={{ borderRadius: radius }}
     >
       <Cover photo={photo} seed={seed} eager={eager} className="absolute inset-0" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.22)]" style={{ borderRadius: radius }} />
       {children}
     </div>
   )

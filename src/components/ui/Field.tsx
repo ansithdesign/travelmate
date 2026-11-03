@@ -21,26 +21,26 @@ export function Field({
 }) {
   return (
     <div className={cx('flex flex-col gap-1.5', className)}>
-      <label htmlFor={htmlFor} className="flex items-baseline gap-1.5 pl-1 text-meta font-medium text-ink-2">
+      <label htmlFor={htmlFor} className="flex items-baseline gap-1.5 pl-0.5 text-meta font-semibold text-ink-2">
         {label}
-        {optional ? <span className="font-normal text-ink-3">Optional</span> : null}
+        {optional ? <span className="font-normal text-ink-3">optional</span> : null}
       </label>
       {children}
       {error ? (
-        <p className="flex items-center gap-1.5 pl-1 text-meta text-loss" role="alert">
+        <p className="flex items-center gap-1.5 pl-0.5 text-caption font-semibold text-loss" role="alert">
           <WarningCircle size={15} weight="fill" aria-hidden />
           {error}
         </p>
       ) : hint ? (
-        <p className="pl-1 text-meta text-ink-3">{hint}</p>
+        <p className="pl-0.5 text-caption text-ink-3">{hint}</p>
       ) : null}
     </div>
   )
 }
 
-/** Soft filled input that lifts and glows on focus. */
+/** Strong glass with a hairline. Accent ring and halo on focus; act colour when invalid. */
 export const inputClass =
-  'h-[52px] w-full rounded-[16px] bg-panel-strong px-4 text-body text-ink outline-none transition-[box-shadow,background-color] duration-200 shadow-[inset_0_0_0_1px_var(--color-line-strong),0_1px_2px_rgb(var(--t-shadow)/0.04)] hover:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--color-ink)_22%,transparent)] focus:shadow-[inset_0_0_0_1.5px_var(--color-accent),0_0_0_4px_var(--color-accent-soft)] aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_var(--color-loss),0_0_0_4px_var(--color-loss-soft)]'
+  'h-[54px] w-full rounded-[16px] bg-panel-strong px-4 text-base font-medium text-ink outline-none transition-[box-shadow,background-color] duration-150 shadow-[0_1px_2px_rgba(23,63,112,0.04)] focus:shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--accent)_55%,transparent),0_0_0_4px_var(--accent-soft)] focus-visible:outline-none aria-[invalid=true]:bg-loss-soft aria-[invalid=true]:shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--act)_55%,transparent)]'
 
 export const TextInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement> & { invalid?: boolean }>(
   function TextInput({ className, invalid, ...rest }, ref) {

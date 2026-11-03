@@ -12,7 +12,6 @@ import { Field, TextInput, inputClass } from '../ui/Field'
 import { Sheet } from '../ui/Sheet'
 import { ExpenseDetailSheet } from './ExpenseDetailSheet'
 import { ExpenseRow } from './ExpenseRow'
-import { CategoryTile } from '../icons/CategoryIcon'
 import { SkyArt } from '../shared/SkyArt'
 import { Avatar } from '../ui/Avatar'
 import { firstName } from '../../utils/id'
@@ -131,18 +130,17 @@ export function ExpenseList({
         </div>
         <Button variant="secondary" size="lg" icon={SlidersHorizontal} onClick={() => setSheet(true)} aria-label="Filters and sort" className="relative h-12 px-4">
           <span className="hidden sm:inline">Filters</span>
-          {advanced ? <span className="num absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-white">{advanced}</span> : null}
+          {advanced ? <span className="num absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-[var(--on-accent)]">{advanced}</span> : null}
         </Button>
       </div>
 
-      <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 pb-1 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
+      <div className="no-scrollbar -mx-6 mt-3 flex gap-2 overflow-x-auto px-6 pb-1 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
         <Chip active={f.categories.length === 0} onClick={() => setF((x) => ({ ...x, categories: [] }))}>
           All
         </Chip>
         {CATEGORIES.filter((c) => catCounts[c.id]).map((c) => (
           <Chip
             key={c.id}
-            leading={<CategoryTile id={c.id} size={30} />}
             active={f.categories.includes(c.id)}
             count={catCounts[c.id]}
             onClick={() =>
@@ -175,11 +173,11 @@ export function ExpenseList({
             <section key={g.key} className="mt-4">
               {g.label ? (
                 <h3 className="flex items-baseline justify-between px-1 pb-2 text-meta">
-                  <span className="font-semibold text-ink-2">{g.label}</span>
+                  <span className="font-medium text-ink-3">{g.label}</span>
                   {singleCurrency ? <span className="num text-ink-3">{formatMoney(dayTotal, { currency: singleCurrency })}</span> : null}
                 </h3>
               ) : null}
-              <ul className="panel divide-y divide-line overflow-hidden rounded-[24px]">
+              <ul className="panel-strong rows overflow-hidden rounded-[24px]">
                 {g.items.map((e) => (
                   <li key={e.id}>
                     <ExpenseRow
@@ -243,7 +241,7 @@ export function ExpenseList({
                   type="button"
                   aria-pressed={f.paidBy === p.id}
                   onClick={() => setF((x) => ({ ...x, paidBy: p.id }))}
-                  className={cx('press inline-flex h-10 items-center gap-1.5 rounded-full py-0.5 pr-4 pl-1 text-meta font-semibold', f.paidBy === p.id ? 'bg-ink text-ink-inverse' : 'bg-panel-strong text-ink-2 ring-line')}
+                  className={cx('press inline-flex h-10 items-center gap-1.5 rounded-full py-0.5 pr-4 pl-1 text-meta font-semibold', f.paidBy === p.id ? 'luminous' : 'glass-control text-ink-2')}
                 >
                   <Avatar person={p} size={32} />
                   {p.isYou ? 'You' : firstName(p.name)}

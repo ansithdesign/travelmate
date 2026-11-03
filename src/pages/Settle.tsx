@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowRight, ArrowUUpLeft, Check, CheckCircle, HandCoins, SealCheck } from '@phosphor-icons/react'
+import { ArrowUUpLeft, CaretDown, Check, CheckCircle, HandCoins, SealCheck } from '@phosphor-icons/react'
 import { TripSkyHeader } from '../components/trips/TripHeader'
 import { ContentSheet, SheetBody } from '../components/shared/Page'
 import { Avatar } from '../components/ui/Avatar'
@@ -56,20 +56,23 @@ function SettleBody({ view }: { view: TripView }) {
   const tickets = stamping && !transfers.some((t) => key(t) === key(stamping)) ? [...transfers, stamping] : transfers
 
   return (
-    <div className="grid gap-x-10 gap-y-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="min-w-0">
-        <p className="max-w-[56ch] text-body text-ink-2">
+        <h2 className="px-0.5 pt-2 text-display">{settled && !stamping ? 'All square' : `${transfers.length} ${transfers.length === 1 ? 'payment' : 'payments'} to settle`}</h2>
+        <p className="mt-1.5 max-w-[56ch] px-0.5 text-body text-ink-3">
           {settled && !stamping
             ? 'Every balance on this trip is at zero.'
-            : `${transfers.length} ${transfers.length === 1 ? 'payment clears' : 'payments clear'} every balance. That is the fewest this group needs.`}
+            : 'The fewest payments that square everyone up. Tap Paid once the money has changed hands.'}
         </p>
 
         {settled && !stamping ? (
-          <div className="panel mt-5 flex items-center gap-4 rounded-[28px] bg-[linear-gradient(135deg,rgb(52_211_164/0.16),rgb(96_165_250/0.12))] p-5">
-            <SealCheck size={52} weight="duotone" className="shrink-0 text-gain" aria-hidden />
+          <div className="panel mt-5 flex items-center gap-4 rounded-[24px] p-6">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
+              <SealCheck size={28} weight="duotone" aria-hidden />
+            </span>
             <div>
-              <p className="text-title">All square</p>
-              <p className="text-meta text-ink-2">
+              <p className="text-heading">Nothing left to pay</p>
+              <p className="text-meta text-ink-3">
                 {payments.length} {payments.length === 1 ? 'payment' : 'payments'} recorded. New expenses reopen balances here.
               </p>
             </div>
@@ -95,22 +98,21 @@ function SettleBody({ view }: { view: TripView }) {
           </ol>
         )}
 
-        <section aria-labelledby="history" className="mt-10">
-          <h2 id="history" className="text-heading">
+        {payments.length ? (
+        <section aria-labelledby="history" className="mt-14">
+          <h2 id="history" className="flex min-h-11 items-center px-0.5 text-title">
             Payment history
           </h2>
-          {payments.length === 0 ? (
-            <p className="mt-2 text-body text-ink-3">No payments recorded yet.</p>
-          ) : (
-            <ul className="panel mt-3 divide-y divide-line overflow-hidden rounded-[24px]">
+          {(
+            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
               {payments.map((p) => (
-                <li key={p.id} className="flex items-center gap-3 px-4 py-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
-                    <CheckCircle size={22} weight="duotone" aria-hidden />
+                <li key={p.id} className="flex min-h-[68px] items-center gap-4 py-3 pr-3 pl-5">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
+                    <CheckCircle size={20} weight="duotone" aria-hidden />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-meta">
-                      <span className="font-semibold">{name(p.from)}</span> <span className="text-ink-2">paid</span> <span className="font-semibold">{name(p.to)}</span>
+                    <span className="block truncate font-semibold">
+                      {name(p.from)} paid {name(p.to) === 'You' ? 'you' : name(p.to)}
                     </span>
                     <span className="block text-caption text-ink-3">
                       {fmt.full(p.date)}
@@ -135,14 +137,20 @@ function SettleBody({ view }: { view: TripView }) {
             </ul>
           )}
         </section>
+        ) : null}
       </div>
 
       <aside className="min-w-0">
-        <section aria-labelledby="breakdown" className="panel rounded-[28px] p-5 sm:p-6">
-          <h2 id="breakdown" className="text-heading">
-            How it adds up
-          </h2>
-          <p className="mt-4 text-meta text-ink-2">Total spent</p>
+        <details className="panel group rounded-[24px] p-6" open={typeof window !== 'undefined' && window.innerWidth >= 1024}>
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+            <span>
+              <span className="block text-heading">How it adds up</span>
+              <span className="block text-caption text-ink-3">Who paid what, and each person's share</span>
+            </span>
+            <CaretDown size={16} weight="bold" className="shrink-0 text-ink-3 transition-transform group-open:rotate-180" aria-hidden />
+          </summary>
+          <div>
+          <p className="mt-5 text-meta text-ink-3">Total spent</p>
           <Figure value={ledger.total} currency={cur} size="md" />
           <p className="num mt-1 text-caption text-ink-3">
             {members.length} people · about {formatMoney(Math.round(ledger.total / Math.max(1, members.length)), { currency: cur })} each if shared evenly
@@ -165,7 +173,7 @@ function SettleBody({ view }: { view: TripView }) {
                 </th>
               </tr>
             </thead>
-            <tbody className="num divide-y divide-line border-t border-line">
+            <tbody className="num [&>tr]:shadow-[inset_0_1px_0_var(--divider)]">
               {members.map((m) => {
                 const net = ledger.net[m.id] ?? 0
                 return (
@@ -187,7 +195,8 @@ function SettleBody({ view }: { view: TripView }) {
             </tbody>
           </table>
           <p className="mt-4 text-caption text-ink-3">Net is what you paid minus your share, adjusted for payments already made. Positive gets money back.</p>
-        </section>
+          </div>
+        </details>
       </aside>
 
       <ConfirmDialog
@@ -245,28 +254,21 @@ function Ticket({
   return (
     <div
       className={cx(
-        'panel relative flex items-center gap-4 overflow-hidden rounded-[24px] p-4 transition-[opacity,transform] duration-500',
-        mine && 'shadow-[inset_0_0_0_1.5px_color-mix(in_oklab,var(--color-accent)_40%,transparent),0_14px_30px_-20px_rgb(37_99_235/0.6)]',
+        'panel relative flex items-center gap-3.5 overflow-hidden rounded-[24px] p-4 transition-[opacity,transform] duration-500',
+        mine && 'bg-panel-strong shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--accent)_35%,transparent),var(--shadow-soft)]',
         stamped && 'pointer-events-none',
       )}
     >
-      <Avatar person={from} size={44} />
+      <Avatar person={from} size={40} />
       <div className="min-w-0 flex-1">
-        <p className="flex min-w-0 items-center gap-1.5 text-meta text-ink-2">
-          <span className="truncate font-semibold text-ink">{youPay ? 'You' : firstName(from.name)}</span>
-          <ArrowRight size={13} weight="bold" className="shrink-0 text-ink-3" aria-label="pays" />
-          <span className="truncate font-semibold text-ink">{youGet ? 'You' : firstName(to.name)}</span>
-        </p>
-        <p className="num text-title">{amount}</p>
+        <p className="truncate text-meta text-ink-3">{youPay ? `You pay ${firstName(to.name)}` : youGet ? `${firstName(from.name)} pays you` : `${firstName(from.name)} pays ${firstName(to.name)}`}</p>
+        <p className="num text-[24px] leading-8 font-[650] tracking-[-0.03em]">{amount}</p>
       </div>
       <Button size="sm" variant={mine ? 'primary' : 'secondary'} icon={Check} onClick={onPaid} className="shrink-0">
         Paid
       </Button>
-      <span className="sr-only">
-        {from.name} pays {to.name} {amount}
-      </span>
       {stamped ? (
-        <span aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 bg-gain-soft text-heading text-gain backdrop-blur-sm [animation:fade-in_260ms_ease-out_both]">
+        <span aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 bg-[color-mix(in_srgb,var(--haze)_80%,transparent)] text-heading text-gain backdrop-blur-sm [animation:fade-in_260ms_ease-out_both]">
           <CheckCircle size={26} weight="fill" className="[animation:pop_420ms_var(--ease-out-expo)_both]" />
           Recorded
         </span>

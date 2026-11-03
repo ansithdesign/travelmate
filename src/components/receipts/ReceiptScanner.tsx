@@ -165,20 +165,20 @@ export function ReceiptScanner({
               type="button"
               data-autofocus
               onClick={() => setStage('camera')}
-              className="flex h-28 flex-col items-start justify-between rounded-[16px] bg-ink p-4 text-left text-white transition-colors hover:bg-[#2a302c]"
+              className="luminous press flex h-28 flex-col items-start justify-between rounded-[20px] p-4 text-left"
             >
               <Camera size={22} weight="bold" aria-hidden />
               <span>
                 <span className="block font-medium">Scan with camera</span>
-                <span className="block text-caption text-white/70">Simulated</span>
+                <span className="block text-caption opacity-70">Simulated</span>
               </span>
             </button>
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="flex h-28 flex-col items-start justify-between rounded-[16px] bg-panel-strong p-4 text-left ring-line transition-colors hover:bg-well"
+              className="panel-strong press flex h-28 flex-col items-start justify-between rounded-[20px] p-4 text-left"
             >
-              <UploadSimple size={22} weight="bold" aria-hidden />
+              <UploadSimple size={22} weight="regular" className="text-accent" aria-hidden />
               <span>
                 <span className="block font-medium">Upload a photo</span>
                 <span className="block text-caption text-ink-3">Fields entered by you</span>
@@ -186,16 +186,16 @@ export function ReceiptScanner({
             </button>
           </div>
           <div>
-            <h3 className="text-meta font-medium text-ink-2">Or try a sample receipt</h3>
-            <ul className="mt-2 divide-y divide-line">
+            <h3 className="pl-0.5 text-meta font-semibold text-ink-2">Or try a sample receipt</h3>
+            <ul className="rows flat mt-2">
               {SAMPLE_RECEIPTS.map((s) => (
                 <li key={s.id}>
-                  <button type="button" onClick={() => loadSample(s)} className="flex w-full items-center justify-between gap-3 py-3 text-left hover:text-accent">
+                  <button type="button" onClick={() => loadSample(s)} className="flex min-h-[56px] w-full items-center justify-between gap-3 px-0.5 py-2.5 text-left hover:text-accent-ink">
                     <span className="min-w-0">
-                      <span className="block truncate font-medium">{s.merchant}</span>
-                      <span className="block truncate text-meta text-ink-3">{s.address}</span>
+                      <span className="block truncate font-semibold">{s.merchant}</span>
+                      <span className="block truncate text-caption text-ink-3">{s.address}</span>
                     </span>
-                    <span className="num shrink-0 font-medium">{formatMoney(s.total)}</span>
+                    <span className="num shrink-0 font-semibold">{formatMoney(s.total)}</span>
                   </button>
                 </li>
               ))}
@@ -255,7 +255,7 @@ export function ReceiptScanner({
                   type="button"
                   onClick={() => setSample(s)}
                   aria-pressed={s.id === sample.id}
-                  className={cx('h-9 shrink-0 rounded-full px-3.5 text-meta font-medium', s.id === sample.id ? 'bg-ink text-white' : 'bg-panel-strong text-ink-2 ring-line')}
+                  className={cx('press h-9 shrink-0 rounded-full px-3.5 text-meta font-medium', s.id === sample.id ? 'luminous' : 'glass-control text-ink-2')}
                 >
                   {s.merchant}
                 </button>
@@ -340,7 +340,7 @@ export function ReceiptScanner({
 
 function SimulationNote() {
   return (
-    <p className="flex items-start gap-2 rounded-[16px] bg-sun-soft px-3 py-2.5 text-meta text-sun">
+    <p className="flex items-start gap-2.5 rounded-[18px] bg-accent-soft px-4 py-3 text-meta text-ink-2">
       <Info size={16} className="mt-px shrink-0" aria-hidden />
       Scanning is a simulation in this version. Sample receipts fill the fields; you can correct anything.
     </p>

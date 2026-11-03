@@ -26,31 +26,27 @@ export function Expenses() {
 
   return (
     <>
-      <SkyHero className="pt-[max(18px,env(safe-area-inset-top))] pb-6 lg:pt-10">
-        <div className="flex items-center justify-between gap-3">
-          <h1 className="text-sky text-hero">Expenses</h1>
-          <Button icon={Plus} size="sm" variant="white" onClick={() => openExpense({ tripId: tripId === 'all' ? undefined : tripId })} disabled={data.trips.length === 0}>
-            Add
-          </Button>
-        </div>
+      <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-8 lg:pt-12">
+        <h1 className="text-hero">Expenses</h1>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="glass-control rounded-[24px] px-4 py-3.5">
-            <p className="text-sky-2 text-caption font-semibold">You are owed</p>
-            <p className="text-sky num mt-0.5 text-title">{owedToMe ? formatMoney(owedToMe) : 'Nothing'}</p>
+        {/* Stats are open: a hairline and a figure, no box */}
+        <div className="mt-8 grid max-w-[520px] grid-cols-2 gap-6">
+          <div className="hairline pt-3">
+            <p className="text-meta font-medium text-ink-3">You are owed</p>
+            <p className={cx('num mt-1 text-[26px] leading-8 font-[650] tracking-[-0.03em]', owedToMe ? 'text-gain' : 'text-ink')}>{owedToMe ? formatMoney(owedToMe) : 'Nothing'}</p>
           </div>
-          <div className="glass-control rounded-[24px] px-4 py-3.5">
-            <p className="text-sky-2 text-caption font-semibold">You owe</p>
-            <p className="text-sky num mt-0.5 text-title">{iOwe ? formatMoney(iOwe) : 'All clear'}</p>
+          <div className="hairline pt-3">
+            <p className="text-meta font-medium text-ink-3">You owe</p>
+            <p className={cx('num mt-1 text-[26px] leading-8 font-[650] tracking-[-0.03em]', iOwe ? 'text-loss' : 'text-ink')}>{iOwe ? formatMoney(iOwe) : 'All clear'}</p>
           </div>
         </div>
 
-        <div className="no-scrollbar -mx-5 mt-5 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:px-0" role="group" aria-label="Trip">
+        <div className="no-scrollbar -mx-6 mt-6 flex gap-2 overflow-x-auto px-6 py-1 sm:mx-0 sm:px-0" role="group" aria-label="Trip">
           <button
             type="button"
             aria-pressed={tripId === 'all'}
             onClick={() => setTripId('all')}
-            className={cx('press flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-meta font-semibold', tripId === 'all' ? 'bg-white text-[#0c1736]' : 'glass-control text-white')}
+            className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full px-4 text-[14px] font-medium', tripId === 'all' ? 'luminous' : 'glass-control')}
           >
             All trips <span className="num opacity-60">{data.expenses.length}</span>
           </button>
@@ -60,7 +56,7 @@ export function Expenses() {
               type="button"
               aria-pressed={tripId === v.trip.id}
               onClick={() => setTripId(v.trip.id)}
-              className={cx('press flex h-10 shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-meta font-semibold', tripId === v.trip.id ? 'bg-white text-[#0c1736]' : 'glass-control text-white')}
+              className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-[14px] font-medium', tripId === v.trip.id ? 'luminous' : 'glass-control')}
             >
               <PhotoCard photo={v.trip.cover} seed={i + 1} radius={999} className="size-7" />
               {v.trip.name}

@@ -1,365 +1,188 @@
 ---
 name: TripMate
-description: A shared travel companion under a living, painted sky.
+description: A shared travel companion, Under the Sky. A band of sky over calm haze, frosted glass modules, Airbnb-calm type.
+source: Ported from the owner's Finbook "Under the Sky" system (2026-11-03), with an Airbnb-style type hierarchy and listing-style photo cards.
 colors:
-  accent: "#2563eb"
-  accent-golden: "#3b5bdb"
-  accent-night: "#86acff"
-  accent-ink: "#1749c4"
-  accent-ink-night: "#b0c8ff"
-  accent-soft: "rgb(37 99 235 / 0.1)"
-  navy-ink: "#0c1736"
-  ink-2: "#45507a"
-  ink-3: "#5f6a90"
-  moon-ink: "#eef2ff"
-  moon-ink-2: "#bcc5e8"
-  moon-ink-3: "#98a2cb"
-  gain: "#0b8a6a"
-  gain-night: "#4fd8ad"
-  loss: "#d6364a"
-  loss-night: "#ff8996"
-  sun: "#b86e00"
-  sun-night: "#ffc861"
-  cloud: "#ffffff"
-  panel: "rgb(255 255 255 / 0.62)"
-  panel-strong: "rgb(255 255 255 / 0.88)"
-  panel-night: "rgb(255 255 255 / 0.06)"
-  panel-strong-night: "rgb(30 38 78 / 0.86)"
-  well: "rgb(12 23 54 / 0.05)"
-  line: "rgb(12 23 54 / 0.08)"
-  line-strong: "rgb(12 23 54 / 0.14)"
-  sheet-day: "rgb(244 248 255 / 0.8)"
-  sheet-dawn: "rgb(250 247 255 / 0.82)"
-  sheet-golden: "rgb(255 248 246 / 0.82)"
-  sheet-night: "rgb(13 19 46 / 0.76)"
-  sky-day-zenith: "#1452c6"
-  sky-day-horizon: "#b9dafc"
-  sky-dawn-zenith: "#4560b8"
-  sky-dawn-horizon: "#f0b39c"
-  sky-golden-zenith: "#2c3fa3"
-  sky-golden-horizon: "#eda07f"
-  sky-night-zenith: "#040820"
-  sky-night-horizon: "#2b2f6e"
+  ink: "#0d1b2a"
+  ink-2: "#2a3c52"
+  muted: "#4f6278"
+  faint: "#8d9cae"
+  midnight: "#0f2238"
+  accent: "#1769d6"
+  accent-ink: "#0f56b5"
+  accent-soft: "rgba(23, 105, 214, 0.12)"
+  accent-bright: "#8fc6fb"
+  haze-day: "#eef5fb"
+  haze-morning: "#f5f4f2"
+  haze-evening: "#f3f0f7"
+  haze-night: "#0a1430"
+  sky-day: ["#6fb6ef", "#a6d3f6", "#d6ebfa"]
+  sky-morning: ["#8ec0f0", "#cfe1f4", "#fbe2cf"]
+  sky-evening: ["#7c84d6", "#c3a6dc", "#f4bfb0"]
+  sky-night: ["#070f26", "#0e1d42", "#15295a"]
+  glass: "rgba(255, 255, 255, 0.56)"
+  glass-strong: "rgba(255, 255, 255, 0.8)"
+  glass-edge: "rgba(255, 255, 255, 0.9)"
+  line: "rgba(13, 27, 42, 0.1)"
+  fill: "rgba(13, 27, 42, 0.06)"
+  border-strong: "rgba(13, 27, 42, 0.18)"
+  ok: "#23915c"
+  ok-ink: "#15693f"
+  aware: "#c99a00"
+  aware-ink: "#6b5200"
+  prepare: "#ea8a26"
+  prepare-ink: "#8a4806"
+  act: "#d23f33"
+  act-ink: "#a0261c"
+  night-ink: "#eef4fb"
+  night-accent: "#6cb4ff"
+  night-ok-ink: "#8fe2b8"
+  night-act-ink: "#f8aaa3"
+  series: ["#1f6fd6", "#e46aa6", "#c9922a", "#6a5bd8", "#2aa5a0", "#8fc6fb", "#9aa8b8"]
 typography:
-  hero:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "2.375rem"
-    fontWeight: 600
-    lineHeight: "2.625rem"
-    letterSpacing: "-0.035em"
-  display:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.875rem"
-    fontWeight: 600
-    lineHeight: "2.25rem"
-    letterSpacing: "-0.03em"
-  title:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.3125rem"
-    fontWeight: 600
-    lineHeight: "1.75rem"
-    letterSpacing: "-0.02em"
-  heading:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1.0625rem"
-    fontWeight: 600
-    lineHeight: "1.5rem"
-    letterSpacing: "-0.015em"
-  body:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.9375rem"
-    fontWeight: 400
-    lineHeight: "1.375rem"
-    fontFeature: "'ss01', 'cv11'"
-  meta:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.8125rem"
-    fontWeight: 400
-    lineHeight: "1.125rem"
-  caption:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 400
-    lineHeight: "1rem"
-  figure:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "46px"
-    fontWeight: 300
-    lineHeight: "50px"
-    letterSpacing: "-0.045em"
-    fontFeature: "'tnum', 'ss01'"
-  countdown:
-    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(84px, 24vw, 128px)"
-    fontWeight: 200
-    lineHeight: 0.95
-    letterSpacing: "-0.06em"
-    fontFeature: "'tnum', 'ss01'"
-  code:
-    fontFamily: "Geist Mono Variable, ui-monospace, SF Mono, Menlo, monospace"
-    fontSize: "30px"
-    fontWeight: 600
-    lineHeight: "36px"
-    letterSpacing: "-0.02em"
-rounded:
-  field: "16px"
-  menu: "22px"
-  panel: "24px"
-  card: "28px"
-  dialog: "30px"
-  sheet: "34px"
-  pill: "9999px"
-spacing:
-  gutter-mobile: "20px"
-  gutter-tablet: "24px"
-  gutter-desktop: "40px"
-  sheet-top: "24px"
-  control-sm: "36px"
-  control-md: "44px"
-  control-lg: "52px"
-components:
-  button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.cloud}"
-    rounded: "{rounded.pill}"
-    typography: "{typography.body}"
-    padding: "0 20px"
-    height: "44px"
-  button-white:
-    backgroundColor: "{colors.cloud}"
-    textColor: "{colors.navy-ink}"
-    rounded: "{rounded.pill}"
-    padding: "0 20px"
-    height: "44px"
-  button-sky:
-    backgroundColor: "rgb(8 22 76 / 0.44)"
-    textColor: "{colors.cloud}"
-    rounded: "{rounded.pill}"
-    padding: "0 20px"
-    height: "44px"
-  button-secondary:
-    backgroundColor: "{colors.panel-strong}"
-    textColor: "{colors.navy-ink}"
-    rounded: "{rounded.pill}"
-    padding: "0 20px"
-    height: "44px"
-  button-danger:
-    backgroundColor: "{colors.loss}"
-    textColor: "{colors.cloud}"
-    rounded: "{rounded.pill}"
-    height: "44px"
-  chip:
-    backgroundColor: "{colors.panel-strong}"
-    textColor: "{colors.ink-2}"
-    typography: "{typography.meta}"
-    rounded: "{rounded.pill}"
-    padding: "0 16px"
-    height: "40px"
-  chip-active:
-    backgroundColor: "{colors.navy-ink}"
-    textColor: "{colors.cloud}"
-    rounded: "{rounded.pill}"
-    height: "40px"
-  input:
-    backgroundColor: "{colors.panel-strong}"
-    textColor: "{colors.navy-ink}"
-    typography: "{typography.body}"
-    rounded: "{rounded.field}"
-    padding: "0 16px"
-    height: "52px"
-  panel:
-    backgroundColor: "{colors.panel}"
-    rounded: "{rounded.panel}"
-  content-sheet:
-    backgroundColor: "{colors.sheet-day}"
-    rounded: "{rounded.sheet}"
-    padding: "24px 20px 40px"
-  tab-bar-item:
-    textColor: "{colors.ink-3}"
-    rounded: "{rounded.pill}"
-    height: "52px"
-    width: "76px"
-  tab-bar-item-active:
-    backgroundColor: "{colors.accent-soft}"
-    textColor: "{colors.accent}"
-    rounded: "{rounded.pill}"
+  family: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
+  hero: { fontSize: "32px", fontWeight: 700, lineHeight: 1.1, letterSpacing: "-0.025em" }
+  display: { fontSize: "26px", fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em" }
+  title: { fontSize: "22px", fontWeight: 600, lineHeight: 1.25, letterSpacing: "-0.018em" }
+  heading: { fontSize: "17px", fontWeight: 600, lineHeight: 1.35, letterSpacing: "-0.01em" }
+  body: { fontSize: "15px", fontWeight: 400, lineHeight: 1.5 }
+  meta: { fontSize: "14px", fontWeight: 400, lineHeight: 1.4 }
+  caption: { fontSize: "13px", fontWeight: 400, lineHeight: 1.35 }
+  figure-xl: { fontSize: "60px", fontWeight: 650, letterSpacing: "-0.045em" }
+  figure-lg: { fontSize: "40px", fontWeight: 650, letterSpacing: "-0.035em" }
+  figure-md: { fontSize: "28px", fontWeight: 650, letterSpacing: "-0.03em" }
+  nav-title: { fontSize: "17px", fontWeight: 600 }
+  tab: { fontSize: "10.5px", fontWeight: 500 }
+radii:
+  input: 16
+  segment-track: 12
+  segment: 9
+  photo-small: 16
+  photo-featured: 20
+  list: 24
+  card: 24
+  dialog: 30
+  sheet: 34
+  pill: 999
+motion:
+  ease: "cubic-bezier(0.16, 1, 0.3, 1)"
+  press: "scale(0.97), 200ms"
 ---
 
-# Design System: TripMate
+# TripMate design system
 
 ## Overview
 
-**Creative North Star: "A Living, Painted Sky"**
+TripMate uses the owner's **Under the Sky** system from Finbook, with an Airbnb-calm layer on top for hierarchy and photography.
 
-The whole app sits under a full-bleed sky whose gradient, sun or moon, clouds and stars follow local time through four phases: dawn, day, golden and night. The phase is set on the root element (`html[data-sky]`) and every ink, glass and accent token re-resolves from it.
+- **The sky is a band, not a backdrop.** Every screen opens with a band of sky (620px on top-level screens and the trip overview, a 360px cloudless soft band on sub-screens) that fades into **haze**. Content lives on the haze.
+- **Hero figures sit straight on the sky.** The big number on a screen (what the group has spent) has no container.
+- **Modules are borderless frosted glass.** 20px blur, a barely-there 1px inner light and a wide, faint shadow. No borders, no hard edge lines. Edges come from light, not lines.
+- **Airbnb calm.** Few weights, one clear step from title to body to a muted secondary line. Photos lead, words sit underneath. Sections are separated by space, not by rules or more boxes.
 
-Density is calm and phone-first: one primary figure per view, set large and light, with money always tabular and always worded ("You owe", "You get back"). Depth is glass over sky, never flat white. Colour comes from the sky itself; the only saturated UI colour is the luminous blue of primary actions plus gain, loss and sun tones for meaning.
-
-**Key Characteristics:**
-- Living sky backdrop in four phases, crossfading on change.
-- Frosted content sheet (34px top radius) that rises on every navigation.
-- Rounded photo cards for trips, with a phase-matched sky-and-cloud fallback in place of any missing photo.
-- Ultralight headline numerals that count up; Geist Mono reserved for codes and printed artefacts.
-- Phosphor throughout: regular and fill for navigation, duotone glyphs centred in soft category-tinted circles for categories, bold for small controls. No 3D objects.
+The sky follows the time of day: morning, day, evening, night (auto by clock, or pinned in Profile). Internally the phases are `dawn`, `day`, `golden`, `night` on `html[data-sky]`.
 
 ## Colors
 
-A sky-derived palette: navy ink on the light phases, moonlit ink at night, one luminous blue for action, and green/coral/amber reserved for money meaning.
-
-### Primary
-- **Luminous Sky Blue** (accent): primary buttons, active tab, focus ring, caret, selection tint, the budget bar. It deepens to a periwinkle (accent-golden) at golden hour and lifts to a pale moonlit blue (accent-night) at night. Primary pills render it through one shared `.luminous` material: a lit gradient (`#4f8dff` to `#2563eb`, brighter at night) with a bright top edge. Never re-type the gradient inline.
-- **Deep Sky Blue** (accent-ink): accent used as text on light glass where contrast needs it.
-
-### Secondary
-- **Contrail Green** (gain): "You get back", money left in budget, the recorded-payment check.
-- **Sunset Coral** (loss): "You owe", over budget, field errors, destructive actions.
-- **Brass Sun** (sun): warm highlight tone; soft variant for tinted wells.
-
-### Neutral
-- **Navy Ink / Moon Ink** (navy-ink, moon-ink and their -2, -3 steps): three text levels per phase; primary, secondary, tertiary.
-- **Glass Panel / Panel Strong**: translucent white panels on light phases; near-transparent white and deep indigo at night.
-- **Well, Line, Line Strong**: navy (or white at night) at 5%, 8% and 14% for inset wells, hairline rings and dividers.
-- **Phase Sheets** (sheet-day, sheet-dawn, sheet-golden, sheet-night): the frosted sheet tint, faintly cool, lilac, peach or deep indigo per phase.
-- **Sky gradients** (sky-*-zenith to sky-*-horizon): the full multi-stop gradients live in the sidecar; these pairs are the endpoints.
-
-### Named Rules
-**The Phase Token Rule.** UI colour is read from phase tokens on `html[data-sky]`, never hard-coded per screen. A colour that does not change between day and night is either cloud white, the navy used on white pills, or a mistake.
-
-**The Sky Supplies the Colour Rule.** Gradients belong to the sky, to sky fallbacks inside photo cards, the budget bar, and to lit pills. No decorative gradient blobs elsewhere.
-
-**The Worded Money Rule.** Gain and loss colours support a sentence ("You owe", "Owed", "All square"); they never carry meaning alone.
+- **Ink** for text everywhere, including on the sky. Muted (`#4f6278`) for secondary lines, faint for placeholders and chevrons.
+- **Midnight** fills primary buttons and selected chips. At night it inverts to white with ink text.
+- **Accent** marks selection and data: the active tab, focus rings, list icons, the budget bar, links. **It never fills a primary button.**
+- **Bulletin colours are for state only.** `ok` for "gets back", "settled"; `act` for "owes", over budget, destructive; `aware` for waiting invites; `prepare` for gentle notices. Always paired with words.
+- **Series colours** are for charts only (where the money went). Lists use the accent, so they stay calm.
 
 ## Typography
 
-**Display Font:** Figtree Variable (with ui-sans-serif, system-ui)
-**Body Font:** Figtree Variable, stylistic sets ss01 and cv11 on
-**Label/Mono Font:** Geist Mono Variable, only for codes and printed artefacts (receipts, booking references, invite links; never on interface labels).
+Figtree throughout. No uppercase labels, no monospace in the interface (Geist Mono is kept only for printed receipts).
 
-**Character:** One contemporary sans carrying semibold, tightly tracked headings against very light, oversized numerals, the way a weather app sets its figures.
+| Role | Size / weight | Use |
+| --- | --- | --- |
+| Hero | 32 / 700 | Large left title on the sky: greeting, trip name, Expenses, Profile |
+| Display | 26 / 600 | Page headline on sub-screens (Settle, People, Plans) |
+| Title | 22 / 600 | Section titles (Balances, Recent activity, Past trips) |
+| Heading | 17 / 600 | Card titles, row titles, sheet section names |
+| Body | 15 / 400 | Paragraphs, row text |
+| Meta | 14 / 400 muted | The secondary line under a title |
+| Caption | 13 / 400 muted | Third lines, footnotes |
+| Figures | 60, 40, 28 / 650 tabular, tight | Money. Currency symbol smaller and raised, paise muted |
 
-### Hierarchy
-- **Hero** (600, 2.375rem, 2.625rem): greeting on the sky.
-- **Display** (600, 1.875rem, 2.25rem): page titles in the sky header.
-- **Title** (600, 1.3125rem, 1.75rem): sheet and dialog titles, trip names.
-- **Heading** (600, 1.0625rem, 1.5rem): section headers inside the sheet, payment amounts.
-- **Body** (400, 0.9375rem, 1.375rem): default text; button labels at 600.
-- **Meta** (400 to 600, 0.8125rem): secondary lines, field labels, chips, tab labels.
-- **Caption** (0.75rem): dates under photo cards, place chips, axis labels.
-- **Figure** (300, 34 / 46 / 64px, tracking -0.045em, tabular): money totals; currency symbol at half size and raised, paise dimmed.
-- **Countdown** (200, clamp 84 to 128px, tracking -0.06em, tabular): the single huge numeral on the sky; also the journal year and the amount entry (60px).
-
-### Named Rules
-**The Light Numeral Rule.** Headline numbers are set extralight or light and large; labels around them stay semibold and small. Never bold a hero figure.
-
-**The Tabular Money Rule.** Every amount uses tabular figures (`tnum`).
-
-**The Mono Is Print Rule.** Geist Mono appears only where a real artefact would be printed: booking codes, receipts, links.
+Rule: one title, one secondary line. If a row needs a third line, it is a caption.
 
 ## Layout
 
-Mobile-first two-layer page: a sky hero (on-sky content, gutters 20px, 24px from 640px, 40px from 1024px, max width 1080px) above a frosted content sheet that fills to the bottom and reserves room for the floating tab bar. From 1024px the sheet becomes a fully rounded card and a 264px floating dark-glass side rail replaces the tab bar. Modal sheets rise from the bottom on phones and become a 460px (or 540px) floating right panel from 768px. Controls are 36, 44 or 52px tall; touch targets never fall below 44px except dense in-sheet segmented options (36px). Section headers sit in a 44px row with an optional trailing action.
+- 24px side gutter on phones, 40px on desktop. Content max width 1080px.
+- Generous whitespace is part of the system: list rows at least 68px with 20px side padding, cards padded 24px, about 56px between sections, 32px between fields in forms.
+- One title line and one secondary line per row. Truncate rather than wrap.
+- Top-level screens: large left title on the sky, actions on the right.
+- Sub-screens: back chevron left, centred 17px title, actions right. Transparent on the sky, haze material once content scrolls beneath.
+- Section heads are 44px tall with the title left and one link right ("See all 4", "Settle up").
+- Sections are separated by about 56px of space. No rules between them.
 
-## Elevation & Depth
+## Elevation
 
-Depth is glass over sky. Surfaces stack in a fixed order: sky, then on-sky glass controls, then the frosted sheet, then panels inside the sheet, then floating bars, menus and modal sheets. Each layer is a backdrop blur plus a lit inner top edge plus a soft, long, low-opacity shadow tinted from the phase (`--t-shadow`: navy by day, black at night). No hard offset shadows.
+| Surface | Material |
+| --- | --- |
+| Card (`.panel`) | glass 0.6, blur 20, soft inner light, shadow-soft |
+| List (`.panel-strong`) | glass 0.82, same light and shadow |
+| Secondary control (`.glass-control`) | glass 0.82, a faint lift shadow, no outline |
 
-### Shadow Vocabulary
-- **Sheet** (`inset 0 1px 0 sheet-edge, 0 -12px 40px -20px shadow/0.35`, blur 28px saturate 1.6): the content sheet and modal sheets.
-- **Panel** (`inset 0 0 0 1px line, 0 1px 2px shadow/0.04, 0 10px 28px -18px shadow/0.22`): lists and cards inside the sheet.
-- **Sky glass** (`inset 0 1px 0 white/0.45, inset 0 0 0 1px white/0.22, 0 8px 24px -12px`, blur 18px saturate 1.8): floating glass on the sky.
-- **Glass control** (deeper fill `rgb(8 22 76 / 0.44)`, blur 18px saturate 1.6): pills and strips on the sky that carry white labels.
-- **Glass bar** (panel-strong mixed with sheet, blur 24px saturate 1.8, `0 18px 40px -18px shadow/0.5`): tab bar and menus floating over content.
-- **Lit pill** (`inset 0 1px 0 white/0.35, 0 10px 24px -10px accent/0.7`): primary and danger buttons, the add button.
-
-### Named Rules
-**The Lit Edge Rule.** Every glass surface carries a one-pixel bright inner top edge; it is what makes glass read as glass on a moving sky.
-
-**The Four Glasses Rule.** Pick the material by where it sits: sheet on the sky as ground, panel inside the sheet, glass-control for pills on the sky, glass-bar for anything floating over content.
-
-## Shapes
-
-Pills for every control (buttons, chips, segmented tracks, tab bar, toasts, trip tabs). Soft, generous corners for containers stepping up with size: fields 16px, menus and rows 22px, panels 24px, feature cards 28 to 30px, dialogs and the side rail 30px, the content sheet 34px (modal sheets 32px on phones).
+`shadow-soft` is `0 1px 2px` at 3% plus `0 10px 30px -14px` at 14%: wide and faint. Dividers are 1px at 6% ink.
+| Sheet, dialog | haze, float shadow |
+| Tab bar | haze 70%, blur 24, hairline top |
+| Popover menu | solid 88%, float shadow |
 
 ## Components
 
 ### Buttons
-Luminous, tactile pills that compress on press.
-- **Shape:** full pill; heights 36 / 44 / 52px, padding 14 / 20 / 24px.
-- **Primary:** lit blue gradient, white semibold label, glow beneath. Used once per view for the main action inside the sheet.
-- **White:** solid white pill with navy label; the primary action when placed directly on the sky.
-- **Sky:** glass-control pill with white label; secondary action on the sky (Scan receipt, New trip, Back).
-- **Secondary / Ghost / Quiet:** panel-strong with line ring; transparent with well on hover; accent text with accent-soft on hover.
-- **Danger:** coral lit gradient for destructive confirmation.
-- **States:** hover brightens (1.06) or tints; press scales to 0.965 in 120ms and springs back on the glide curve; disabled at 45% opacity, shadow removed; loading swaps the leading icon for a spinner.
-- **Icon button:** 44px circle in plain, panel or sky tone.
+Pill, 56px large, 48px default, 40px small. Primary midnight; secondary strong glass; ghost and quiet use accent ink; danger is act tint with act ink. Press scales to 0.97.
 
-### Chips and Segmented
-- **Chip:** 40px pill, panel-strong with hairline ring and ink-2 label; active inverts to solid ink with inverse label. Optional count in tabular figures.
-- **Segmented:** well track with a panel-strong thumb that slides between options (500ms glide); arrow keys move selection.
+### Lists
+Strong glass, radius 24, rows at least 68px with 20px side padding, a 36px accent-soft circle with a duotone icon or a 36px avatar on the left, value right-aligned and tabular. Dividers are 1px at 6% and start after the leading icon at 72px (`.rows`), or at 20px for text-only rows (`.rows.flat`), and stop 20px short of the right edge.
 
-### Cards / Containers
-- **Content sheet:** frosted phase sheet, 34px top radius (all corners from 1024px), body padding 24px top, 20 / 28 / 40px sides.
-- **Panel:** translucent panel, 24px radius, hairline ring, divided lists inside.
-- **Trip cards:** a rounded PhotoCard with a soft scrim; the featured one carries name, dates, avatars and a light countdown numeral over the photo; hover lifts 4px on the expo curve.
+### Photo cards (Airbnb listing style)
+The featured trip: photo at 4:3 (16:10 on wider screens), radius 20, one white pill badge top-left ("In 39 days"). Under the photo: trip name (heading), place and dates (meta), spend (meta with the amount in ink), and your balance on the right. Past trips: square photo, radius 16, three short lines underneath. Nothing overlays the photo except the badge.
 
-### Inputs / Fields
-- **Style:** 52px soft-filled panel-strong field, 16px radius, inset line-strong ring; label above in meta medium ink-2, optional marker in ink-3.
-- **Focus:** ring becomes 1.5px accent plus a 4px accent-soft halo.
-- **Error:** same treatment in loss and loss-soft, with a filled warning icon and message below.
+### Status chip (`.level`)
+11.5px / 650 pill with a 7px dot. `ok`, `act`, `aware`, `quiet`. Used for "You owe ₹4,300" under the hero figure and "Settled".
 
-### Navigation
-- **Phone tab bar:** floating glass-bar capsule of three 76 x 52px items with authored glyphs over 11px semibold labels; an accent-soft indicator slides to the active item (500ms glide). A separate 64px luminous round add button sits beside it.
-- **Desktop rail:** 264px floating dark glass panel over the sky with white type; active item is a white pill with navy label; lists upcoming and past trips with miniature windows.
-- **Trip tabs:** glass-control pill strip on the sky; active tab is a white pill, others text-sky-2; scrolls horizontally with edge fades on phones.
-- **Menus:** glass-bar popover, 22px radius, pops in at 260ms.
-- **Toast:** dark navy pill at the bottom above the tab bar, filled status icon, optional action pill.
+### Trip sections
+A scrolling chip row: Overview, Expenses, Settle up, Plans (and Journal once a trip is complete). Selected chip is midnight. People is reached from the traveller avatars on the overview, not from a tab.
 
-### PhotoCard
-A trip photo in a rounded card (radius 16 to 30 by size) with a hairline light edge and soft depth. When the photo is missing or fails, the card shows a sky that matches the current phase, with clouds and stars varied per trip.
+### Inputs
+Strong glass, 54px, radius 16, no outline at rest. Focus: a softened 1.5px accent ring and a 4px accent-soft halo. Invalid: act tint background and act ring, with a caption-size message underneath.
 
-### Budget bar
-A 10px rounded track in the well colour with a sky-tinted fill (light blue to accent to violet) that eases to the share spent on open; coral when over budget. Percentage and amount left sit above it.
+### Segmented control
+Fill track radius 12, 3px padding, solid thumb radius 9 that slides. Used for split method and the sky picker.
 
-### Payment card
-Each suggested settlement is a panel card: the payer's avatar, "Payer -> Payee" in words with a small arrow, the amount in title type and a "Paid" button (filled when it involves you). Recording a payment shows a green check overlay before the card leaves.
+### Chips
+Strong glass, 42px, medium 14px label. Selected is midnight.
 
-### Places
-A finished trip's places are numbered chips that wrap; in edit mode each chip carries a remove control.
+### Sheets and dialogs
+Haze, radius 34 (sheet) or 30 (dialog), grabber 38 x 5, 21px bold title, a plain close icon. Backdrop `rgba(8,20,40,0.32)` with a 3px blur.
 
-- **Category icons:** Phosphor duotone glyphs (bed, fork and knife, car, ticket, bag, plane, sparkle) centred in a circle tinted 16% with the category colour; selected, the circle fills with the colour and the glyph turns white.
-- **Nav icons:** Phosphor House, Receipt and UserCircle; regular when idle, fill when active.
-- **UI icons:** Phosphor in bold for actions, duotone for illustrative spots, fill for status.
+### Tab bar
+Full width, haze material. Three tabs (Trips, Expenses, Profile), 25px icons, regular when idle and fill when active, active label in accent. Add expense is a 54px midnight button floating bottom right, hidden on Profile.
 
-### Motion grammar
-- **Sky crossfade:** phase gradients crossfade over 1800ms; stars fade in over 2000ms; the luminary moves and recolours over 1800ms.
-- **Clouds:** volumetric cumulus drift across in 130 to 280s linear loops and lift at 0.18 of scroll (parallax, capped at 1200px).
-- **Sheet rise:** the content sheet rises 18px and fades in over 640ms (expo) on every navigation; this is the only page transition.
-- **Modal sheet:** slides up (phones) or in from the right (768px+) in 520ms on the glide curve; drags down to dismiss.
-- **Count-up:** reserved for the two headline moments, the trip's group spend on the overview and the home countdown (1100ms / 1400ms, exponential ease). Figures in sheets, tables and summaries are static, so no one ever reads an amount mid-count.
-- **Budget fill, payment recorded check** as described above.
-- All motion collapses under `prefers-reduced-motion`; count-ups and the budget fill jump straight to their values.
+### Key moments
+First run uses the full twilight sky (`.tone-ink`) with white type, a white primary button and a translucent secondary.
 
-Easing: **expo** `cubic-bezier(0.16, 1, 0.3, 1)` for arrivals; **glide** `cubic-bezier(0.22, 1, 0.36, 1)` for sliding indicators, sheets and presses.
+## Interaction rules
 
-## Do's and Don'ts
+- **Add expense is short by default.** Amount, what it was for, category (guessed from the name), and who paid. The split is one summary line ("Split equally · Everyone · ₹600 each") with Change. Date and note sit behind "Date and note". Scan lives in the sheet header.
+- **One way to do each thing.** Adding an expense is the floating button (or the rail button on desktop). Inviting is the People page. There are no duplicate action rows on Home or the overview.
+- **Hide empty sections** (no payment history yet, no pending invites, plan kinds with nothing added). Offer one add row instead.
+- **Plain sentences for money.** "You pay Rohan", "Meera pays you", "gets back", "owes". Colour supports the words, never replaces them.
 
-### Do:
-- **Do** set type placed directly on the sky with the sky text styles (white with an atmospheric shadow; 92% white for secondary), so it holds when a cloud drifts behind it.
-- **Do** put pill controls and strips on the sky in the glass-control material, so white labels keep 4.5:1 in every phase; use the white pill for the one primary action on the sky.
-- **Do** keep the luminary clear of controls and titles: on phones the sun or moon sits above the top edge so only its glow spills into the sky; from 1024px it is shown whole in the open sky right of centre (x 70%).
-- **Do** let photo fallbacks show the sky you are under: the fallback follows the phase (sunset tones at golden hour, a starry night sky at night), varied per trip.
-- **Do** match words to the sky: the home greeting follows the phase, not the raw clock.
-- **Do** read every UI colour from the phase tokens and check new surfaces in all four phases, night included.
-- **Do** show trip imagery in rounded PhotoCards and rely on their sky fallback rather than a placeholder or broken image.
-- **Do** keep metaphors out of working elements: the sky is the atmosphere; payments, budgets and places use plain, familiar patterns.
-- **Do** word every balance ("You owe", "You get back", "All square") and set amounts in tabular figures.
-- **Do** honour reduced motion for every new animation.
+## Do
 
-### Don't:
-- **Don't** use em dashes in copy.
-- **Don't** use emoji or 3D rendered objects as icons; categories use tinted duotone glyphs in circles, navigation uses Phosphor regular and fill.
-- **Don't** place navy ink or unshadowed white text directly on the sky.
-- **Don't** add decorative gradient blobs; colour comes from the sky.
-- **Don't** lay content on a flat opaque white page; working content sits on the frosted sheet.
-- **Don't** add uppercase eyebrow labels above headings; the only tracked uppercase in the world belongs to printed artefacts (receipt headers).
-- **Don't** use Geist Mono for interface labels or headings.
+- Put the one number that matters on the sky with no box.
+- Use the accent for selection and data only.
+- Let photos lead and keep text under them.
+- Use space between sections.
+
+## Don't
+
+- Fill a primary button with the accent, or use gradients on controls.
+- Add borders or hairline outlines to cards, inputs or controls.
+- Use uppercase labels, monospace in the UI, or more than one bold weight per block.
+- Show colour without words for any balance.
+- Overlay text on photos beyond one small badge.

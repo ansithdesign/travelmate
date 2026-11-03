@@ -54,7 +54,7 @@ export function useCountUp(target: number, ms = 1100): number {
 }
 
 /**
- * Large figure in light weight, Apple-Weather style. The currency symbol sits
+ * Large figure: Figtree 650, tabular, tight. The currency symbol sits
  * smaller and raised; paise sit quieter. Counts up when it first appears.
  */
 export function Figure({
@@ -76,18 +76,18 @@ export function Figure({
   const [main, frac] = text.split('.')
   const sym = currencySymbol(currency).trim()
   const sizes = {
-    md: 'text-[34px] leading-[38px]',
-    lg: 'text-[46px] leading-[50px]',
-    xl: 'text-[64px] leading-[64px]',
+    md: 'text-[28px] leading-[32px] tracking-[-0.03em]',
+    lg: 'text-[40px] leading-[42px] tracking-[-0.035em]',
+    xl: 'text-[60px] leading-[58px] tracking-[-0.045em]',
   }
   return (
-    <span className={cx('num inline-flex items-start font-light tracking-[-0.045em]', sizes[size], className)} aria-label={formatMoney(value, { currency })}>
-      <span aria-hidden className="mt-[0.14em] mr-[0.06em] text-[0.5em] leading-none font-normal tracking-normal opacity-70">
+    <span className={cx('num inline-flex items-start font-[650]', sizes[size], className)} aria-label={formatMoney(value, { currency })}>
+      <span aria-hidden className="mt-[0.12em] mr-[0.05em] text-[0.55em] leading-none font-semibold tracking-normal text-ink-3">
         {sym}
       </span>
       <span aria-hidden>{main}</span>
       {frac && value % 100 !== 0 ? (
-        <span aria-hidden className="opacity-55">
+        <span aria-hidden className="text-ink-3">
           .{frac}
         </span>
       ) : null}

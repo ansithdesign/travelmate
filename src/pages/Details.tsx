@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { AirplaneTilt, ArrowSquareOut, Bed, Copy, type Icon, LinkSimple, MapPin, PencilSimple, Plus, Trash } from '@phosphor-icons/react'
+import { AirplaneTilt, ArrowSquareOut, Bed, Copy, type Icon, LinkSimple, MapPin, PencilSimple, Trash } from '@phosphor-icons/react'
 import { TripSkyHeader } from '../components/trips/TripHeader'
 import { ContentSheet, SheetBody } from '../components/shared/Page'
 import { Button } from '../components/ui/Button'
@@ -30,7 +30,7 @@ export function Details() {
   if (!view) return <NotFound />
   return (
     <>
-      <TripSkyHeader view={view} title="Details" />
+      <TripSkyHeader view={view} title="Plans" />
       <ContentSheet>
         <SheetBody>
         <DetailsBody view={view} />
@@ -57,40 +57,44 @@ function DetailsBody({ view }: { view: TripView }) {
   }
 
   return (
-    <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div className="grid gap-x-12 gap-y-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="min-w-0">
-        <p className="text-body text-ink-2">Bookings, addresses and links, so nobody scrolls back through the group chat.</p>
+        <h2 className="px-0.5 pt-2 text-display">Plans</h2>
+        <p className="mt-1.5 px-0.5 text-body text-ink-3">Bookings, addresses and links, so nobody scrolls back through the group chat.</p>
 
-        {KINDS.map(({ kind, label, icon: Icon, add }) => {
+        {KINDS.filter(({ kind }) => trip.info.some((i) => i.kind === kind)).map(({ kind, label }) => {
           const items = trip.info.filter((i) => i.kind === kind)
           return (
             <section key={kind} aria-labelledby={`k-${kind}`} className="mt-7">
-              <div className="flex items-center justify-between">
-                <h2 id={`k-${kind}`} className="flex items-center gap-2 text-heading">
-                  <span className="flex size-8 items-center justify-center rounded-full bg-accent-soft text-accent">
-                    <Icon size={18} weight="duotone" aria-hidden />
-                  </span>
-                  {label}
-                </h2>
-                <Button size="sm" variant="quiet" icon={Plus} onClick={() => setEditing({ id: uid('i-'), kind, title: '' })}>
-                  {add.replace(/^Add (a |an )?/, 'Add ')}
-                </Button>
-              </div>
-              {items.length === 0 ? (
-                <p className="mt-1 text-meta text-ink-3">Nothing added.</p>
-              ) : (
-                <ul className="panel mt-2 divide-y divide-line overflow-hidden rounded-[24px]">
-                  {items.map((it) => (
-                    <InfoRow key={it.id} item={it} onEdit={() => setEditing(it)} onDelete={() => setDeleting(it)} />
-                  ))}
-                </ul>
-              )}
+              <h2 id={`k-${kind}`} className="flex min-h-11 items-center px-0.5 text-title">
+                {label}
+              </h2>
+              <ul className="panel-strong rows flat mt-3 overflow-hidden rounded-[24px]">
+                {items.map((it) => (
+                  <InfoRow key={it.id} item={it} onEdit={() => setEditing(it)} onDelete={() => setDeleting(it)} />
+                ))}
+              </ul>
             </section>
           )
         })}
 
-        <section aria-labelledby="notes" className="mt-10">
-          <h2 id="notes" className="text-heading">
+        {/* One place to add anything, instead of an empty section per kind */}
+        <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label="Add to plans">
+          {KINDS.map(({ kind, icon: Icon, add }) => (
+            <button
+              key={kind}
+              type="button"
+              onClick={() => setEditing({ id: uid('i-'), kind, title: '' })}
+              className="glass-control press inline-flex h-[42px] items-center gap-2 rounded-full pr-4 pl-3 text-[14px] font-medium hover:bg-solid"
+            >
+              <Icon size={18} weight="duotone" className="text-accent" aria-hidden />
+              {add}
+            </button>
+          ))}
+        </div>
+
+        <section aria-labelledby="notes" className="mt-14">
+          <h2 id="notes" className="flex min-h-11 items-center px-0.5 text-title">
             Notes
           </h2>
           <TextArea
@@ -148,14 +152,14 @@ function InfoRow({ item, onEdit, onDelete }: { item: InfoItem; onEdit: () => voi
     <li className="flex items-start gap-2 py-3 pr-2 pl-4">
       <div className="min-w-0 flex-1">
         {item.kind === 'link' && item.url ? (
-          <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 font-semibold text-accent hover:underline">
+          <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 font-semibold text-accent-ink hover:underline">
             {item.title} <ArrowSquareOut size={15} weight="bold" aria-hidden />
           </a>
         ) : (
           <p className="font-semibold">{item.title}</p>
         )}
-        {item.subtitle ? <p className="text-meta text-ink-2">{item.subtitle}</p> : null}
-        {item.detail ? <p className="mt-0.5 text-meta text-ink-3">{item.detail}</p> : null}
+        {item.subtitle ? <p className="text-caption text-ink-2">{item.subtitle}</p> : null}
+        {item.detail ? <p className="mt-0.5 text-caption text-ink-3">{item.detail}</p> : null}
         {item.reference ? (
           <button
             type="button"
@@ -167,7 +171,7 @@ function InfoRow({ item, onEdit, onDelete }: { item: InfoItem; onEdit: () => voi
                 toast.error('Could not copy')
               }
             }}
-            className="press mt-2 inline-flex h-7 items-center gap-1.5 rounded-full bg-well px-3 font-mono text-[11px] font-medium tracking-[0.06em] text-ink-2 hover:bg-accent-soft hover:text-accent"
+            className="press mt-2 inline-flex h-7 items-center gap-1.5 rounded-full bg-well px-3 text-[12px] font-semibold text-ink-2 hover:bg-accent-soft hover:text-accent-ink"
             aria-label={`Copy reference ${item.reference}`}
           >
             {item.reference}
@@ -255,8 +259,8 @@ function Itinerary({ view }: { view: TripView }) {
   }
 
   return (
-    <section aria-labelledby="itinerary" className="min-w-0 lg:pt-[52px]">
-      <h2 id="itinerary" className="text-heading">
+    <section aria-labelledby="itinerary" className="min-w-0 lg:pt-2">
+      <h2 id="itinerary" className="flex min-h-11 items-center px-0.5 text-title">
         Day by day
       </h2>
       <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0" role="tablist" aria-label="Trip days">
@@ -271,20 +275,18 @@ function Itinerary({ view }: { view: TripView }) {
               aria-selected={on}
               onClick={() => setActive(d)}
               className={cx(
-                'press flex h-[68px] w-[56px] shrink-0 flex-col items-center justify-center rounded-[22px] transition-colors',
-                on
-                  ? 'luminous'
-                  : 'bg-panel-strong text-ink ring-line hover:bg-well',
+                'press flex h-[60px] w-[52px] shrink-0 flex-col items-center justify-center rounded-[16px] leading-none transition-colors',
+                on ? 'luminous' : 'bg-panel-strong text-ink hover:bg-solid',
               )}
             >
-              <span className={cx('text-[10px] font-semibold tracking-[0.06em] uppercase', on ? 'text-white/80' : 'text-ink-3')}>Day {i + 1}</span>
-              <span className="num text-[22px] leading-7 font-light tracking-[-0.03em]">{parseDate(d).getDate()}</span>
-              <span aria-hidden className={cx('mt-0.5 size-1 rounded-full', has ? (on ? 'bg-sun' : 'bg-accent') : 'bg-transparent')} />
+              <span className="num text-[20px] font-bold tracking-[-0.03em]">{parseDate(d).getDate()}</span>
+              <span className={cx('mt-1 text-[10.5px] font-semibold', on ? 'opacity-75' : 'text-accent-ink')}>Day {i + 1}</span>
+              <span aria-hidden className={cx('mt-1 size-1 rounded-full', has ? (on ? 'bg-accent-bright' : 'bg-accent') : 'bg-transparent')} />
             </button>
           )
         })}
       </div>
-      <div className="panel mt-4 rounded-[28px] p-5" role="tabpanel">
+      <div className="panel mt-3 rounded-[24px] p-6" role="tabpanel">
         <p className="text-heading">{fmt.long(active)}</p>
         <TextArea
           aria-label={`Plan for ${fmt.long(active)}`}
