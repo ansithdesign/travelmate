@@ -25,6 +25,7 @@
   --color-solid: var(--solid);
   --color-well: var(--fill);
   --color-haze: var(--haze);
+  --color-paper: var(--paper);
   --color-midnight: var(--midnight);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
@@ -107,6 +108,7 @@
   --ridge-near: rgba(120, 148, 214, 0.34);
   --mist: rgba(255, 255, 255, 0.95);
   --frame: #f6f8fd;
+  --paper: #fbfcff;
   --glass: rgba(255, 255, 255, 0.6);
   --glass-strong: rgba(255, 255, 255, 0.82);
   --glass-edge: rgba(255, 255, 255, 0.5);
@@ -160,6 +162,7 @@
   --ridge-near: rgba(34, 58, 128, 0.5);
   --mist: rgba(110, 138, 214, 0.22);
   --frame: rgba(255, 255, 255, 0.13);
+  --paper: #e9eefb;
   --glass: rgba(255, 255, 255, 0.07);
   --glass-strong: rgba(255, 255, 255, 0.1);
   --glass-edge: rgba(255, 255, 255, 0.05);

@@ -1,21 +1,63 @@
 import { Link } from 'react-router-dom'
 import type { TripView } from '../../hooks/useTrip'
 import { useStore } from '../../store/store'
-import type { CurrencyCode } from '../../types'
+import { COVER_LIBRARY } from '../../data/photos'
+import type { CurrencyCode, Photo, Trip } from '../../types'
 import { cx } from '../../utils/cx'
 import { formatRange } from '../../utils/dates'
 import { formatMoney } from '../../utils/money'
 import { PhotoCard } from '../ui/Cover'
 import { phaseLabel } from './status'
 
-/** A photo in a white frame with a slight tilt, like a print set down on the table. */
-export function Framed({ children, tilt = 0, className }: { children: React.ReactNode; tilt?: number; className?: string }) {
+/** The two other photos that peek out behind a trip's cover: its journal photos first, then a steady pick from the library. */
+function backPhotos(trip: Trip): [Photo, Photo] {
+  const own = trip.journal.photos.filter((p) => p.id !== trip.cover?.id)
+  const pool = COVER_LIBRARY.filter((p) => p.id !== trip.cover?.id && !own.some((o) => o.id === p.id))
+  let h = 0
+  for (const c of trip.id) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  const rest = [...pool.slice(h % pool.length), ...pool.slice(0, h % pool.length)]
+  const all = [...own, ...rest]
+  return [all[0], all[1]]
+}
+
+/**
+ * Fanned prints: the cover on top, two more photos from the trip peeking out
+ * behind it, each a white print that is slightly rotated. It says the trip has
+ * more to see. Prints stay inside the box so nothing stretches the page.
+ */
+export function Fan({
+  trip,
+  seed = 0,
+  aspect = '4 / 3',
+  spread = 1,
+  eager,
+  children,
+  className,
+}: {
+  trip: Trip
+  seed?: number
+  aspect?: string
+  /** Scales the rotation and offset of the back prints */
+  spread?: number
+  eager?: boolean
+  children?: React.ReactNode
+  className?: string
+}) {
+  const [b1, b2] = backPhotos(trip)
+  const print = 'absolute inset-y-0 inset-x-[18px] rounded-[20px] bg-paper p-1.5 shadow-[0_2px_6px_rgba(13,27,42,0.06),0_18px_34px_-16px_rgba(13,27,42,0.3)] transition-transform duration-500 ease-[var(--ease-out-expo)]'
   return (
-    <div
-      className={cx('rounded-[24px] bg-[var(--frame)] p-1.5 shadow-[0_2px_6px_rgba(13,27,42,0.06),0_18px_34px_-16px_rgba(13,27,42,0.28)] backdrop-blur-[10px] transition-transform duration-300 ease-[var(--ease-out-expo)]', className)}
-      style={{ transform: `rotate(${tilt}deg)` }}
-    >
-      {children}
+    <div className={cx('relative w-full', className)} style={{ aspectRatio: aspect }}>
+      <div className={print} style={{ transform: `rotate(${-7.5 * spread}deg) translate(${-14 * spread}px, ${5 * spread}px)` }}>
+        <PhotoCard photo={b1} seed={seed + 1} radius={14} className="size-full shadow-none" />
+      </div>
+      <div className={print} style={{ transform: `rotate(${6.5 * spread}deg) translate(${14 * spread}px, ${3 * spread}px)` }}>
+        <PhotoCard photo={b2} seed={seed + 2} radius={14} className="size-full shadow-none" />
+      </div>
+      <div className={cx(print, 'group-hover:-translate-y-0.5')} style={{ transform: 'rotate(-1deg)' }}>
+        <PhotoCard photo={trip.cover} seed={seed} eager={eager} radius={14} className="size-full shadow-none">
+          {children}
+        </PhotoCard>
+      </div>
     </div>
   )
 }
@@ -37,14 +79,12 @@ export function FeaturedTrip({ view, seed = 0 }: { view: TripView; seed?: number
 
   return (
     <Link to={`/trips/${trip.id}`} className="group block" aria-label={`${trip.name}, ${phaseLabel(trip, status)}`}>
-      <Framed tilt={-1.2} className="group-active:scale-[0.985]">
-        <PhotoCard photo={trip.cover} seed={seed} eager radius={18} className="aspect-[4/3] w-full shadow-none sm:aspect-[16/10]">
-          <span className="absolute top-3 left-3 rounded-full bg-white/95 px-3 py-1.5 text-[13px] font-semibold text-[#0d1b2a] shadow-[0_2px_10px_rgba(13,27,42,0.16)]">
-            {phaseLabel(trip, status)}
-          </span>
-        </PhotoCard>
-      </Framed>
-      <div className="mt-5 flex items-start justify-between gap-3 px-0.5">
+      <Fan trip={trip} seed={seed} eager aspect="4 / 3.1" className="transition-transform duration-200 group-active:scale-[0.985]">
+        <span className="absolute top-3 left-3 rounded-full bg-white/95 px-3 py-1.5 text-[13px] font-semibold text-[#0d1b2a] shadow-[0_2px_10px_rgba(13,27,42,0.16)]">
+          {phaseLabel(trip, status)}
+        </span>
+      </Fan>
+      <div className="mt-10 flex items-start justify-between gap-3 px-0.5">
         <div className="min-w-0">
           <h3 className="truncate text-heading">{trip.name}</h3>
           <p className="truncate text-meta text-ink-3">
@@ -68,10 +108,8 @@ export function TripWindowCard({ view, seed = 0 }: { view: TripView; seed?: numb
   const myNet = ledger.net[me.id] ?? 0
   return (
     <Link to={`/trips/${trip.id}`} className="group block w-[172px] shrink-0 snap-start">
-      <Framed tilt={seed % 2 ? 1.6 : -1.6} className="group-active:scale-[0.985]">
-        <PhotoCard photo={trip.cover} seed={seed} radius={18} className="aspect-[4/5] w-full shadow-none" />
-      </Framed>
-      <p className="mt-4 truncate text-[15px] font-semibold">{trip.name}</p>
+      <Fan trip={trip} seed={seed} aspect="4 / 4.9" spread={0.75} className="transition-transform duration-200 group-active:scale-[0.985]" />
+      <p className="mt-7 truncate text-[15px] font-semibold">{trip.name}</p>
       <p className="truncate text-meta text-ink-3">{phaseLabel(trip, status)}</p>
       <p className={cx('num truncate text-meta font-medium', myNet === 0 ? 'text-ink-3' : myNet > 0 ? 'text-gain' : 'text-loss')}>
         {myNet === 0 ? `${formatMoney(ledger.total, { currency: trip.currency })} · settled` : myNet > 0 ? `Owed ${formatMoney(myNet, { currency: trip.currency })}` : `You owe ${formatMoney(-myNet, { currency: trip.currency })}`}

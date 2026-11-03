@@ -137,14 +137,8 @@ Pill, 56px large, 48px default, 40px small. Primary midnight; secondary strong g
 ### Lists
 Strong glass, radius 24, rows at least 68px with 20px side padding, a 36px accent-soft circle with a duotone icon or a 36px avatar on the left, value right-aligned and tabular. Dividers are 1px at 6% and start after the leading icon at 72px (`.rows`), or at 20px for text-only rows (`.rows.flat`), and stop 20px short of the right edge.
 
-### Photo cards (Airbnb listing style)
-The featured trip: photo at 4:3 (16:10 on wider screens), radius 20, one white pill badge top-left ("In 39 days"). Under the photo: trip name (heading), place and dates (meta), spend (meta with the amount in ink), and your balance on the right. Past trips: square photo, radius 16, three short lines underneath. Nothing overlays the photo except the badge.
-
-### Cover photos
-Twenty owner-supplied landscapes and places (beaches, mountains, tea hills, backwaters, forests, ruins, streets, camps), bundled in `src/assets/covers/*.webp`, so they load offline. They are offered in the trip form and used by the sample trips. The painted scene stays behind each photo as the loading fallback. Source tiles are about 294 x 449, so they read best at card size.
-
-### Category icons
-Fifteen artwork icons supplied by the owner (stay, food, drinks, groceries, cabs, fuel, rentals, flights, sightseeing, activities, shopping, gifts, health, admin, other): soft clay-like 3D objects on transparent backgrounds, used exactly as drawn with no added shadow, plate or tint. They stand free in rows and the picker. The selected category lifts onto an accent-soft pad. Files live in `src/assets/categories/{id}.png` at 160px. Tours and Transit were deliberately left out. Everything else in the interface stays flat duotone line icons.
+### Photo cards: fanned prints
+Trip covers are shown as fanned prints. The cover sits on top as a white print (radius 20, 6px mat, slight -1 degree tilt) with two more photos from the trip peeking out behind it, rotated about -7.5 and +6.5 degrees and offset a few pixels. The back prints are the trip's journal photos, then a steady pick from the 20 bundled covers. One white badge ("In 39 days") sits on the cover. Under the fan: trip name (heading), place and dates (meta), spend and balance. Past trips use a narrower fan (spread 0.75). Prints stay inside the box so nothing stretches the page.
 
 ### Status chip (`.level`)
 11.5px / 650 pill with a 7px dot. `ok`, `act`, `aware`, `quiet`. Used for "You owe ₹4,300" under the hero figure and "Settled".
