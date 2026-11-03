@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react'
-import { DownloadSimple, File as FileIcon, FileImage, FilePdf, PencilSimple, Plus, Trash, UploadSimple, X } from '@phosphor-icons/react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowSquareOut, CaretLeft, CaretRight, DownloadSimple, File as FileIcon, FileImage, FilePdf, PencilSimple, Plus, Trash, UploadSimple, X } from '@phosphor-icons/react'
 import type { Trip, TripFile } from '../../types'
-import { deleteFile, filesArePersistent, formatSize, openStored, putFile } from '../../utils/files'
+import { deleteFile, filesArePersistent, formatSize, getFile, openStored, putFile } from '../../utils/files'
 import { uid } from '../../utils/id'
 import { useStore } from '../../store/store'
 import { Button } from '../ui/Button'
@@ -20,6 +20,93 @@ function iconFor(mime: string) {
 
 const stem = (n: string) => n.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim()
 
+/** Shows a stored file inside the app: images and PDFs inline, anything else as a card with a download. */
+function FilePreview({ files, id, onClose, onChange, onOpen }: { files: TripFile[]; id: string | null; onClose: () => void; onChange: (id: string) => void; onOpen: (f: TripFile, download?: boolean) => void }) {
+  const idx = files.findIndex((f) => f.id === id)
+  const f = idx >= 0 ? files[idx] : null
+  const [url, setUrl] = useState<string | null>(null)
+  const [missing, setMissing] = useState(false)
+
+  useEffect(() => {
+    let live = true
+    let made: string | null = null
+    setUrl(null)
+    setMissing(false)
+    if (f) {
+      getFile(f.id).then((b) => {
+        if (!live) return
+        if (!b) return setMissing(true)
+        made = URL.createObjectURL(b)
+        setUrl(made)
+      })
+    }
+    return () => {
+      live = false
+      if (made) URL.revokeObjectURL(made)
+    }
+  }, [f?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const Icon = f ? iconFor(f.mime) : FileIcon
+  const step = (d: number) => onChange(files[(idx + d + files.length) % files.length].id)
+
+  return (
+    <Sheet
+      open={!!f}
+      onClose={onClose}
+      title={f?.name ?? 'File'}
+      description={f ? `${f.fileName} · ${formatSize(f.size)}` : undefined}
+      footer={
+        f ? (
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="secondary" size="lg" icon={ArrowSquareOut} onClick={() => onOpen(f)}>
+              Open in new tab
+            </Button>
+            <Button size="lg" icon={DownloadSimple} onClick={() => onOpen(f, true)}>
+              Download
+            </Button>
+          </div>
+        ) : undefined
+      }
+    >
+      {f ? (
+        <div>
+          <div className="flex min-h-[52dvh] items-center justify-center overflow-hidden rounded-[22px] bg-well">
+            {missing ? (
+              <p className="px-6 text-center text-body text-ink-3">This file is not on this device. It was added from another browser.</p>
+            ) : !url ? (
+              <p className="text-meta text-ink-3">Loading</p>
+            ) : f.mime.startsWith('image/') ? (
+              <img src={url} alt={f.name} className="max-h-[60dvh] w-full object-contain" />
+            ) : f.mime === 'application/pdf' ? (
+              <iframe src={url} title={f.name} className="h-[60dvh] w-full border-0 bg-white" />
+            ) : (
+              <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
+                <span className="flex size-16 items-center justify-center rounded-[20px] bg-accent-soft text-accent-ink">
+                  <Icon size={32} weight="duotone" aria-hidden />
+                </span>
+                <p className="text-body text-ink-3">This kind of file cannot be shown here. Download it to open it in another app.</p>
+              </div>
+            )}
+          </div>
+          {files.length > 1 ? (
+            <div className="mt-3 flex items-center justify-between">
+              <button type="button" onClick={() => step(-1)} aria-label="Previous file" className="press flex size-11 items-center justify-center rounded-full bg-well text-ink-2">
+                <CaretLeft size={18} weight="bold" aria-hidden />
+              </button>
+              <p className="num text-caption font-semibold text-ink-3">
+                {idx + 1} of {files.length}
+              </p>
+              <button type="button" onClick={() => step(1)} aria-label="Next file" className="press flex size-11 items-center justify-center rounded-full bg-well text-ink-2">
+                <CaretRight size={18} weight="bold" aria-hidden />
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </Sheet>
+  )
+}
+
 interface Draft {
   key: string
   file: File
@@ -36,6 +123,7 @@ export function TripFiles({ trip }: { trip: Trip }) {
   const [newName, setNewName] = useState('')
   const [removing, setRemoving] = useState<TripFile | null>(null)
   const [saving, setSaving] = useState(false)
+  const [previewing, setPreviewing] = useState<string | null>(null)
   const files = trip.files ?? []
 
   function picked(list: FileList | null) {
@@ -86,7 +174,7 @@ export function TripFiles({ trip }: { trip: Trip }) {
             const Icon = iconFor(f.mime)
             return (
               <li key={f.id} className="relative flex items-center gap-3 py-3 pr-2 pl-4 focus-within:z-10">
-                <button type="button" onClick={() => open(f)} className="press flex min-w-0 flex-1 items-center gap-3 text-left" aria-label={`Open ${f.name}`}>
+                <button type="button" onClick={() => setPreviewing(f.id)} className="press flex min-w-0 flex-1 items-center gap-3 text-left" aria-label={`Preview ${f.name}`}>
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-accent-soft text-accent-ink">
                     <Icon size={22} weight="duotone" aria-hidden />
                   </span>
@@ -101,6 +189,7 @@ export function TripFiles({ trip }: { trip: Trip }) {
                   label={`Actions for ${f.name}`}
                   items={[
                     { label: 'Rename', icon: PencilSimple, onSelect: () => (setRenaming(f), setNewName(f.name)) },
+                    { label: 'Open in new tab', icon: ArrowSquareOut, onSelect: () => open(f) },
                     { label: 'Download', icon: DownloadSimple, onSelect: () => open(f, true) },
                     { label: 'Remove', icon: Trash, onSelect: () => setRemoving(f), danger: true },
                   ]}
@@ -175,6 +264,8 @@ export function TripFiles({ trip }: { trip: Trip }) {
       >
         <InputField label="Name" data-autofocus value={newName} onChange={(e) => setNewName(e.target.value)} />
       </Sheet>
+
+      <FilePreview files={files} id={previewing} onClose={() => setPreviewing(null)} onChange={setPreviewing} onOpen={open} />
 
       <ConfirmDialog
         open={!!removing}
