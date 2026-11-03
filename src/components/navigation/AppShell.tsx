@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useMatch } from 'react-router-dom'
 import { Coins, House, Plus, Receipt, UserCircle, type Icon } from '@phosphor-icons/react'
-import type { CategoryId } from '../../types'
-import { CategoryIcon } from '../icons/CategoryIcon'
 import { useAllTripViews } from '../../hooks/useTrip'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
@@ -41,37 +38,19 @@ export function AppShell() {
   )
 }
 
-const ARC: { id: CategoryId; label: string; angle: number }[] = [
-  { id: 'food', label: 'Food', angle: -70 },
-  { id: 'cabs', label: 'Cabs', angle: -35 },
-  { id: 'drinks', label: 'Drinks', angle: 0 },
-  { id: 'stay', label: 'Stay', angle: 35 },
-  { id: 'activities', label: 'Activities', angle: 70 },
-]
-
 /**
- * A bar with four tabs and a raised Add button in the middle. Tapping Add fans
- * the most common categories out in an arc: tap one and the expense form opens
- * with it chosen. Tapping the current tab scrolls to the top.
+ * A bar with four tabs and a raised Add button in the middle. Tapping Add opens
+ * the expense form opens straight away. Tapping the current tab scrolls to the top.
  */
 function TabBar({ pathname }: { pathname: string }) {
   const { openExpense } = useUI()
   const { data } = useStore()
   const views = useAllTripViews()
   const tripMatch = useMatch('/trips/:tripId/*')
-  const [fan, setFan] = useState(false)
   const tripId = tripMatch?.params.tripId
   const settleTrip = tripId ?? views.find((v) => v.status.phase !== 'completed')?.trip.id ?? views[0]?.trip.id
   const settleTo = settleTrip ? `/trips/${settleTrip}/settle` : '/'
   const onSettle = pathname.endsWith('/settle')
-
-  useEffect(() => setFan(false), [pathname])
-  useEffect(() => {
-    if (!fan) return
-    const k = (e: KeyboardEvent) => e.key === 'Escape' && setFan(false)
-    window.addEventListener('keydown', k)
-    return () => window.removeEventListener('keydown', k)
-  }, [fan])
 
   const items = [
     { to: '/', label: 'Trips', icon: House, on: !onSettle && (pathname === '/' || pathname.startsWith('/trips')) },
@@ -83,34 +62,6 @@ function TabBar({ pathname }: { pathname: string }) {
 
   return (
     <div className="lg:hidden">
-      {fan ? (
-        <>
-          <button type="button" aria-label="Close" onClick={() => setFan(false)} className="fixed inset-0 z-40 bg-[rgba(8,20,40,0.42)] backdrop-blur-[3px] [animation:fade-in_200ms_ease-out_both]" />
-          <p className="pointer-events-none fixed inset-x-0 bottom-[calc(330px+env(safe-area-inset-bottom))] z-50 text-center text-[14px] font-semibold text-white [animation:fade-in_300ms_ease-out_both]">Pick a category, then type the amount</p>
-          {ARC.map((c, i) => {
-            const r = 168
-            const rad = (c.angle * Math.PI) / 180
-            return (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => {
-                  setFan(false)
-                  openExpense({ tripId, category: c.id })
-                }}
-                className="fixed z-50 flex w-[72px] flex-col items-center text-center [animation:pop_360ms_var(--ease-out-expo)_both]"
-                style={{ left: `calc(50% + ${r * Math.sin(rad) - 36}px)`, bottom: `calc(${100 + r * Math.cos(rad) - 36}px + env(safe-area-inset-bottom))`, animationDelay: `${i * 35}ms` }}
-              >
-                <span className="flex size-[72px] items-center justify-center rounded-full bg-[var(--haze)] shadow-[var(--shadow-float)]">
-                  <CategoryIcon id={c.id} size={50} />
-                </span>
-                <span className="mt-1.5 text-caption font-semibold text-white">{c.label}</span>
-              </button>
-            )
-          })}
-        </>
-      ) : null}
-
       <nav aria-label="Primary" className="tab-material safe-bottom fixed inset-x-0 bottom-0 z-40">
         <ul className="mx-auto grid h-[84px] max-w-[520px] grid-cols-5 items-start px-2 pt-2">
           {items.map((it, i) =>
@@ -137,14 +88,13 @@ function TabBar({ pathname }: { pathname: string }) {
 
       <button
         type="button"
-        aria-label={fan ? 'Close add menu' : 'Add expense'}
-        aria-expanded={fan}
+        aria-label="Add expense"
         disabled={data.trips.length === 0}
-        onClick={() => setFan((v) => !v)}
-        className="press fixed bottom-[calc(46px+env(safe-area-inset-bottom))] left-1/2 z-[60] flex size-[66px] -translate-x-1/2 items-center justify-center rounded-full shadow-[0_0_0_6px_var(--haze),0_14px_26px_-8px_rgba(15,34,56,0.55)] transition-[background-color,color] duration-200 disabled:opacity-50"
-        style={fan ? { background: 'var(--haze)', color: 'var(--ink)' } : { background: 'var(--midnight)', color: '#fff' }}
+        onClick={() => openExpense({ tripId })}
+        className="press fixed bottom-[calc(46px+env(safe-area-inset-bottom))] left-1/2 z-[60] flex size-[66px] -translate-x-1/2 items-center justify-center rounded-full shadow-[0_0_0_6px_var(--haze),0_14px_26px_-8px_rgba(15,34,56,0.55)] disabled:bg-well disabled:opacity-60"
+        style={{ background: 'var(--midnight)', color: '#fff' }}
       >
-        <Plus size={30} weight="bold" aria-hidden className={cx('transition-transform duration-300 ease-[var(--ease-out-expo)]', fan && 'rotate-45')} />
+        <Plus size={30} weight="bold" aria-hidden />
       </button>
     </div>
   )

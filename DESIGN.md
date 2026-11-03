@@ -158,8 +158,8 @@ Strong glass, 42px, medium 14px label. Selected is midnight.
 ### Sheets and dialogs
 Haze, radius 34 (sheet) or 30 (dialog), grabber 38 x 5, 21px bold title, a plain close icon. Backdrop `rgba(8,20,40,0.32)` with a 3px blur.
 
-### Tab bar: category arc
-A haze-material bar with four tabs (Trips, Expenses, Settle, Profile) and a raised 66px Add button in the middle. A 3px accent line sits over the active tab. Tapping Add dims the screen and fans five category icons (Food, Cabs, Drinks, Stay, Activities) in an arc above it; tapping one opens the expense form with that category chosen. Settle opens the current trip's settle screen, or the next active trip. Escape or tapping outside closes the arc. Tapping the current tab scrolls to the top.
+### Tab bar
+A haze-material bar with four tabs (Trips, Expenses, Settle, Profile) and a raised 66px Add button in the middle that opens the expense form directly. A 3px accent line sits over the active tab. Settle opens the current trip's settle screen, or the next active trip. Tapping the current tab scrolls to the top.
 
 ### Key moments
 First run uses the full twilight sky (`.tone-ink`) with white type, a white primary button and a translucent secondary.
