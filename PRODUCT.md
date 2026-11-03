@@ -46,9 +46,10 @@ Replaces a mix of WhatsApp threads, Splitwise, spreadsheets, Maps and photo gall
 ## Brand Commitments
 
 - Name: TripMate.
-- Light theme. Warm off-white ground, white surfaces, deep charcoal text, forest or deep emerald accent, subtle warm amber support.
-- One contemporary sans-serif used throughout. Lucide icons only, no emoji as UI.
-- No gradients as decoration, no glassmorphism, no neon, no purple-blue AI look, no decorative blobs, no heavy shadows.
+- Sky theme, set by the owner on 2026-11-03: a living sky that follows the time of day (dawn, clear day, golden hour, night). Users can pin one sky in Profile.
+- The owner wants a premium, modern, expressive finish: glass surfaces, rich motion and creative, non-generic icons are in scope. Plain line-icon UI was explicitly rejected.
+- Contemporary sans-serif throughout (Geist), with Geist Mono only for codes and printed artefacts (receipts, boarding-pass codes).
+- No emoji as UI icons. No purple-blue "AI startup" gradient blobs as decoration; colour comes from the sky itself.
 - Copy never uses em dashes.
 
 ## Evidence on Hand

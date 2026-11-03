@@ -7,18 +7,18 @@ related_targets: []
 
 ## Scope
 
-Whole TripMate web app (mobile-first, responsive). Mode: Operate.
+Whole TripMate web app (mobile-first, responsive). Mode: Operate. Replacement visual world, set by the owner: living sky.
 
 ## Direction contract
 
-THESIS: The trip is the unit and money is legible in seconds. Refuses the category default of a grey dashboard of stat cards with a floating plus button.
+THESIS: You look at your trips through an airplane window, under the sky of this moment. Refuses the category default of a flat white dashboard with line icons and a floating plus.
 
-OWN-WORLD: Indian highway milestone. Warm stone ground (#F6F4EF), white surfaces, charcoal lettering with a green cast, forest-green caps (#1F5A43) for brand, progress and "gets back", amber caps (#C98A1E) for upcoming and attention, brick only for "owes" and delete. Geist, tabular figures. 1px stone hairlines instead of cards; 12px radius; shadow only on sheets. Desktop shell is a forest side rail.
+OWN-WORLD: A full-bleed sky behind everything whose gradient, sun or moon, clouds and stars follow local time (dawn, day, golden hour, night). Working content rises on frosted glass sheets (34px top radius); panels inside are lighter glass. Navy ink on light phases, moonlit ink on night. Luminous blue pill for primary actions, white pill on the sky. Geist, ultralight figures for headline numbers, Geist Mono for codes. Phosphor duotone UI icons; hand-drawn dimensional category objects.
 
-STORY: Open the app, see the next trip with its countdown and your balance. Open a trip, read total, budget left and who owes whom without scrolling. Add an expense in one sheet with a live split ledger. Settle in the minimum payments. A finished trip becomes a journal.
+STORY: Open the app and the sky tells you the time of day; the next trip waits in a cabin window with its countdown in huge light numerals. Open a trip: spend, your position, the budget as a flight path and who owes whom, people owed first. Add an expense in a glass sheet with a live split ledger. Settle with boarding-pass tickets that get stamped PAID. A finished trip becomes a journal with its route of places.
 
-FIRST VIEWPORT: Mobile Trips: greeting, then the upcoming trip as a full-width cover with a milestone marker (amber cap, "IN / 39 / days") at its lower left, title, dates, avatars; below it a one-line balance summary and completed trips as compact rows each with a small green-capped year marker. Primary action "New trip" top right, tab bar bottom.
+FIRST VIEWPORT: Mobile Trips: brand and New trip glass pill on the sky; greeting in hero type; one sentence of the year; the next trip as a cabin window left and the countdown numeral right, name, dates, avatars; a glass strip with spend and balance; Add expense (white) and Scan receipt (glass). The frosted sheet begins below with To settle and the past-trip window row. Floating capsule tab bar with sliding indicator and a separate luminous add button.
 
-FORM: Highway milestone; candidate 6 of my ordered list (1 boarding pass stub, 2 travel journal, 3 railway reservation chart, 4 postcards and postmarks, 5 survey contour map, 6 highway milestone, 7 hotel key tags). seed:80998429158c8340. Signature move: the domed milestone marker (countdown, day N of M, year) and the budget drawn as a road with kilometre-stone ticks.
+FORM: Window seat under a living sky; candidate 4 of my ordered list (1 weather atmosphere, 2 boarding pass, 3 departure board, 4 window seat, 5 airmail postcard, 6 cloud atlas, 7 balloon festival). seed:0fc975564b5e6724. Signature moves: the cabin-window frame with a drawn shade; the flight-path budget; boarding-pass settlement tickets.
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance

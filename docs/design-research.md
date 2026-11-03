@@ -49,3 +49,23 @@ Research ran on Mobbin (iOS) through its MCP connector on 2026-11-03. Screens we
 - **Type:** Geist (variable), one family. Tabular figures for every amount.
 - **Colour roles:** forest for brand, positive balance and progress; amber for upcoming and attention; brick red only for "owes" and destructive actions.
 - **Navigation:** three tabs on mobile (Trips, Expenses, Profile). Forest side rail on desktop with the same three destinations plus the current trip's sections.
+
+## Round 2: sky redesign (2026-11-03)
+
+The owner rejected the first visual world as too plain and asked for a premium sky theme with richer surfaces, motion and icons. Second Mobbin pass, iOS:
+
+| Reference | What it showed | Taken into TripMate |
+|---|---|---|
+| Apple Weather | The sky is the whole ground; translucent panels; huge thin numerals | Living sky ground, glass sheets, ultralight countdown and spend figures |
+| TIDE, Crouton, Alan | Floating capsule tab bar over atmospheric imagery (iOS 26 style) | Floating glass tab bar with a sliding indicator and a separate add button |
+| Moonlitt, Lumy | Dusk and night skies with glass cards and warm numerals | Night phase with dark glass and moonlit ink |
+| Alan, Airbnb (2025) | Soft dimensional rendered objects instead of line icons | Hand-drawn dimensional category icons (house, bowl, car, balloon, bag, plane, star) |
+| Apple Wallet, FocusFlight, Qantas | Boarding passes: big codes, perforation, stub | Settlement tickets with initials as codes and a perforated amount stub |
+| Tripsy, Wanderlog | Trip as the frame for logistics | Kept: trip hero, details hub, day chips |
+
+Decisions:
+
+- **Living sky** (owner's choice): the phase follows local time; Profile lets you pin one.
+- **Window seat** as the signature frame: every trip cover is a cabin window. Its fallback shows sky and clouds, so a missing photo still looks intended.
+- **Budget as a flight path**: the plane flies to the share of budget spent.
+- **Glass with a job**: sheets and panels are frosted because there is a sky behind them to read through, not as decoration on a flat page.
