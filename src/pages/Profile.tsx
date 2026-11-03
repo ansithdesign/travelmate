@@ -81,12 +81,12 @@ export function Profile() {
           {/* Places stamped on the page beside it */}
           <ul className="relative min-h-[236px] min-w-0 flex-1" aria-label="Places you have been">
             {stamps.map((st, i) => (
-              <li key={st.place} className="absolute" style={{ left: [0, 34, 0][i], top: [4, 84, 164][i] }}>
+              <li key={st.place} className={cx('absolute', ['left-0', 'left-4 min-[360px]:left-[34px]', 'left-0'][i])} style={{ top: [4, 84, 164][i] }}>
                 <div
-                  className="flex size-[86px] flex-col items-center justify-center rounded-full border-[2.5px] border-white text-center text-[10px] leading-tight font-bold tracking-[0.06em] text-white"
+                  className="flex size-[76px] flex-col items-center justify-center rounded-full min-[360px]:size-[86px] border-[2.5px] border-white text-center text-[10px] leading-tight font-bold tracking-[0.06em] text-white"
                   style={{ transform: `rotate(${[10, -12, 6, -8][i % 4]}deg)`, borderStyle: i === 0 ? 'dashed' : 'solid' }}
                 >
-                  <span className="max-w-[70px] truncate">{st.place.toUpperCase()}</span>
+                  <span className="max-w-[64px] truncate">{st.place.toUpperCase()}</span>
                   <span className="num text-[11px]">{st.when}</span>
                 </div>
               </li>

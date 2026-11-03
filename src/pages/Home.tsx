@@ -7,6 +7,7 @@ import { ExpenseDetailSheet } from '../components/expenses/ExpenseDetailSheet'
 import { ExpenseRow } from '../components/expenses/ExpenseRow'
 import { BrandMark } from '../components/shared/BrandMark'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
+import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { Segmented } from '../components/ui/Controls'
 import { Cover } from '../components/ui/Cover'
@@ -43,8 +44,6 @@ export function Home() {
   const [panel, setPanel] = useState<Panel>('activity')
   const [open, setOpen] = useState<Expense | null>(null)
   const { data } = useStore()
-  const h = new Date().getHours()
-  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
 
   // Rail order: what is happening or coming first, then trips that just ended, then the journal.
   const ordered = useMemo(() => {
@@ -67,17 +66,14 @@ export function Home() {
     <>
       <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-2 lg:pt-12">
         <div className="on-sky">
-          <header className="flex items-end justify-between gap-3">
-            <div>
-              <p className="text-body text-ink-3">{greeting},</p>
-              <h1 className="mt-0.5 text-[46px] leading-[1.02] font-semibold tracking-[-0.045em]">
-                {firstName(me.name)}
-                <Dot />
-              </h1>
-            </div>
-            <Button size="sm" variant="secondary" icon={Plus} onClick={() => openTrip()} className="mb-0.5 lg:hidden">
-              New trip
-            </Button>
+          <header className="flex items-center justify-between gap-3">
+            <h1 className="text-[40px] leading-[1.02] font-semibold tracking-[-0.04em]">
+              Trips
+              <Dot />
+            </h1>
+            <Link to="/profile" aria-label="Profile" className="press rounded-full">
+              <Avatar person={me} size={40} />
+            </Link>
           </header>
 
           {/* Story rail: each trip is a round cover whose ring fills as the budget is used */}
@@ -122,11 +118,13 @@ export function Home() {
               {trip.budget ? <span className="text-caption font-medium text-ink-3">{Math.round((ledger.total / trip.budget) * 100)}% of budget</span> : null}
             </div>
             {bars.length > 1 ? (
-              <div className="mt-6">
-                <div className="flex h-[70px] items-end gap-[6px]" role="img" aria-label={`Spend by day, peak ${formatMoney(peak, { currency: cur })}`}>
-                  {bars.map(([d, v]) => (
-                    <span key={d} className="flex-1 rounded-[6px]" style={{ height: `${Math.max(8, (v / peak) * 100)}%`, background: v === peak ? '#fff' : 'rgba(255,255,255,0.35)' }} />
-                  ))}
+              <div className="mt-6 max-w-[420px]">
+                <div className="flex h-[64px] items-end gap-[5px]" role="img" aria-label={`Spend by day, biggest day ${formatMoney(peak, { currency: cur })}`}>
+                  {bars.map(([d, v]) => {
+                    // Square-root scale so one big day does not flatten every other day
+                    const h = 22 + 78 * Math.sqrt(v / peak)
+                    return <span key={d} className="max-w-[22px] flex-1 rounded-[7px]" style={{ height: `${h}%`, background: v === peak ? '#fff' : 'rgba(255,255,255,0.38)' }} />
+                  })}
                 </div>
                 {peakDay ? <p className="num mt-2 text-caption text-ink-3">Biggest day: {fmt.dayMonth(peakDay[0])}, {formatMoney(peak, { currency: cur })}</p> : null}
               </div>
