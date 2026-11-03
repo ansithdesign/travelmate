@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowRight, CaretDown, Check, CheckCircle, HandCoins, SealCheck } from '@phosphor-icons/react'
+import { CaretDown, Check, CheckCircle, HandCoins, SealCheck } from '@phosphor-icons/react'
 import { TripSkyHeader } from '../components/trips/TripHeader'
 import { ContentSheet, SheetBody } from '../components/shared/Page'
 import { Avatar } from '../components/ui/Avatar'
@@ -54,6 +54,11 @@ function SettleBody({ view }: { view: TripView }) {
   }
 
   // Keep a ticket on screen while its stamp lands, even though the ledger already moved on.
+  const paidTotal = payments.reduce((a, p) => a + p.amount, 0)
+  const dueTotal = transfers.reduce((a, t) => a + t.amount, 0)
+  const pct = paidTotal + dueTotal === 0 ? 100 : Math.round((paidTotal / (paidTotal + dueTotal)) * 100)
+  const byNet = [...members].sort((a, b) => (ledger.net[b.id] ?? 0) - (ledger.net[a.id] ?? 0))
+  const maxNet = Math.max(1, ...members.map((m) => Math.abs(ledger.net[m.id] ?? 0)))
   const tickets = stamping && !transfers.some((t) => key(t) === key(stamping)) ? [...transfers, stamping] : transfers
 
   return (
@@ -64,8 +69,44 @@ function SettleBody({ view }: { view: TripView }) {
           {settled && !stamping ? 'Every balance on this trip is zero.' : gross > transfers.length && payments.length === 0 ? `Netted down from ${gross} debts.` : 'The fewest payments that settle everyone.'}
         </p>
 
+        {/* The picture first: how far along settling is, and who is ahead or behind */}
+        <section aria-label="Settlement overview" className="panel mt-6 rounded-[28px] p-5">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <p className="text-meta font-medium text-ink-3">Settled so far</p>
+              <p className="num mt-0.5 text-[26px] leading-8 font-[650] tracking-[-0.03em]">
+                {formatMoney(paidTotal, { currency: cur })}
+                <span className="text-meta font-medium text-ink-3"> of {formatMoney(paidTotal + dueTotal, { currency: cur })}</span>
+              </p>
+            </div>
+            <span className={cx('level num', settled ? 'ok' : 'aware')}>{pct}%</span>
+          </div>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-accent-soft" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label="Share of the trip settled">
+            <div className="h-full rounded-full bg-[var(--ok)] transition-[width] duration-700 ease-[var(--ease-out-expo)]" style={{ width: `${pct}%` }} />
+          </div>
+          <ul className="mt-5 flex flex-col gap-2.5">
+            {byNet.map((m) => {
+              const net = ledger.net[m.id] ?? 0
+              const w = (Math.abs(net) / maxNet) * 50
+              return (
+                <li key={m.id} className="grid grid-cols-[28px_52px_minmax(0,1fr)_auto] items-center gap-2.5">
+                  <Avatar person={m} size={28} />
+                  <span className="truncate text-[14px] font-semibold">{m.isYou ? 'You' : firstName(m.name)}</span>
+                  <span aria-hidden className="relative h-2.5">
+                    <span className="absolute inset-y-[-3px] left-1/2 w-px bg-line-strong" />
+                    {net !== 0 ? <span className={cx('absolute inset-y-0 rounded-full', net > 0 ? 'left-1/2 bg-[var(--ok)]' : 'right-1/2 bg-[var(--act)]')} style={{ width: `${Math.max(w, 2)}%` }} /> : null}
+                  </span>
+                  <span className={cx('num w-[84px] text-right text-[13px] font-semibold', net > 0 ? 'text-gain' : net < 0 ? 'text-loss' : 'text-ink-3')}>
+                    {net === 0 ? 'settled' : formatMoney(Math.abs(net), { currency: cur })}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+
         {settled && !stamping ? (
-          <div className="panel mt-6 flex items-center gap-4 rounded-[28px] p-6">
+          <div className="panel mt-6 flex items-center gap-4 rounded-[28px] p-5">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
               <SealCheck size={28} weight="duotone" aria-hidden />
             </span>
@@ -75,14 +116,14 @@ function SettleBody({ view }: { view: TripView }) {
             </div>
           </div>
         ) : (
-          <section aria-labelledby="to-pay" className="mt-6">
-            <h3 id="to-pay" className="sr-only">
+          <section aria-labelledby="to-pay" className="mt-8">
+            <h3 id="to-pay" className="flex min-h-11 items-center px-0.5 text-title">
               To pay
             </h3>
-            <ol className="flex flex-col gap-3">
+            <ol className="panel-strong rows mt-1 overflow-hidden rounded-[28px]">
               {tickets.map((t) => (
                 <li key={key(t)}>
-                  <PayCard
+                  <PayRow
                     from={person(t.from)!}
                     to={person(t.to)!}
                     sentence={t.from === me.id ? `You pay ${firstName(person(t.to)!.name)}` : t.to === me.id ? `${firstName(person(t.from)!.name)} pays you` : `${firstName(person(t.from)!.name)} pays ${firstName(person(t.to)!.name)}`}
@@ -225,28 +266,22 @@ function SettleBody({ view }: { view: TripView }) {
 }
 
 /**
- * One payment still to make. It says who pays whom, how much, that it is not
- * paid yet, and has one action. Every card looks the same so the button never
- * changes meaning or colour.
+ * One payment still to make, as a compact row: who pays whom, the amount, and
+ * one small action. The label never changes, so the button never changes meaning.
  */
-function PayCard({ from, to, sentence, amount, stamped, onPaid }: { from: Person; to: Person; sentence: string; amount: string; stamped: boolean; onPaid: () => void }) {
+function PayRow({ from, sentence, amount, stamped, onPaid }: { from: Person; to?: Person; sentence: string; amount: string; stamped: boolean; onPaid: () => void }) {
   return (
-    <div className={cx('panel relative overflow-hidden rounded-[28px] p-5 transition-[opacity,transform] duration-500', stamped && 'pointer-events-none')}>
-      <div className="flex items-center gap-2.5">
-        <Avatar person={from} size={36} />
-        <ArrowRight size={14} weight="bold" className="shrink-0 text-ink-3" aria-hidden />
-        <Avatar person={to} size={36} />
-        <p className="ml-1 min-w-0 flex-1 truncate font-semibold">{sentence}</p>
+    <div className={cx('relative flex min-h-[76px] items-center gap-3.5 overflow-hidden px-5 py-3 transition-opacity duration-500', stamped && 'pointer-events-none')}>
+      <Avatar person={from} size={38} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[14px] font-semibold">{sentence}</p>
+        <p className="num text-[19px] leading-6 font-[650] tracking-[-0.02em]">{amount}</p>
       </div>
-      <div className="mt-4 flex items-end justify-between gap-3">
-        <p className="num text-[30px] leading-9 font-[650] tracking-[-0.035em]">{amount}</p>
-        <span className="level aware mb-1.5">Not paid yet</span>
-      </div>
-      <Button block className="mt-4" icon={Check} onClick={onPaid}>
-        Mark as paid
+      <Button size="sm" icon={Check} onClick={onPaid} className="shrink-0 px-3.5">
+        Mark paid
       </Button>
       {stamped ? (
-        <span aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 bg-[color-mix(in_srgb,var(--haze)_82%,transparent)] text-heading text-gain backdrop-blur-sm [animation:fade-in_260ms_ease-out_both]">
+        <span aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 bg-[color-mix(in_srgb,var(--haze)_86%,transparent)] text-heading text-gain backdrop-blur-sm [animation:fade-in_260ms_ease-out_both]">
           <CheckCircle size={26} weight="fill" className="[animation:pop_420ms_var(--ease-out-expo)_both]" />
           Marked as paid
         </span>

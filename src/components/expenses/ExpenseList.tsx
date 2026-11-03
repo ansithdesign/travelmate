@@ -9,6 +9,7 @@ import { formatMoney } from '../../utils/money'
 import { Button } from '../ui/Button'
 import { Chip, EmptyState, Segmented } from '../ui/Controls'
 import { Field, TextInput, inputClass } from '../ui/Field'
+import { ScrollRow } from '../ui/ScrollRow'
 import { Sheet } from '../ui/Sheet'
 import { ExpenseDetailSheet } from './ExpenseDetailSheet'
 import { ExpenseRow } from './ExpenseRow'
@@ -131,14 +132,14 @@ export function ExpenseList({
     <div>
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <MagnifyingGlass size={19} weight="bold" className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-ink-3" aria-hidden />
+          <MagnifyingGlass size={19} weight="bold" className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-accent" aria-hidden />
           <TextInput
             type="search"
             aria-label="Search expenses"
             placeholder={multiTrip ? 'Search expenses, people, trips' : 'Search expenses or people'}
             value={f.q}
             onChange={(e) => setF((x) => ({ ...x, q: e.target.value }))}
-            className="h-12 rounded-full pl-11"
+            className="h-12 rounded-full bg-accent-soft pl-11 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--accent)_22%,transparent)] placeholder:text-ink-3"
           />
         </div>
         <Button variant="secondary" size="lg" icon={SlidersHorizontal} onClick={() => setSheet(true)} aria-label="Filters and sort" className="relative h-12 px-4">
@@ -147,7 +148,7 @@ export function ExpenseList({
         </Button>
       </div>
 
-      <div className="no-scrollbar -mx-6 mt-3 flex gap-2 overflow-x-auto px-6 pb-1 sm:-mx-7 sm:px-7 lg:mx-0 lg:px-0">
+      <ScrollRow className="-mx-6 mt-3 flex gap-2 px-6 pb-1 lg:mx-0 lg:px-0">
         <Chip active={f.categories.length === 0} onClick={() => setF((x) => ({ ...x, categories: [] }))}>
           All
         </Chip>
@@ -163,7 +164,8 @@ export function ExpenseList({
             {c.short}
           </Chip>
         ))}
-      </div>
+        <span aria-hidden className="w-6 shrink-0" />
+      </ScrollRow>
 
       <div className="mt-5 flex items-baseline justify-between gap-3 px-1 text-meta">
         <span className="text-ink-2">

@@ -21,7 +21,7 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
     if (el && ref.current) ref.current.scrollTo({ left: Math.max(0, el.offsetLeft - ref.current.offsetLeft - (ref.current.clientWidth - el.clientWidth) / 2) })
   }, [trip.id])
   return (
-    <nav ref={ref} aria-label="Trip sections" className={cx('no-scrollbar -mx-6 flex gap-2.5 overflow-x-auto px-6 py-1 sm:mx-0 sm:px-0', className)}>
+    <nav ref={ref} aria-label="Trip sections" className={cx('no-scrollbar -mx-6 flex gap-2.5 overflow-x-auto px-6 py-1 [mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)] sm:mx-0 sm:px-0 sm:[mask-image:none]', className)}>
       {tabs.map((t) => (
         <NavLink
           key={t.to}
@@ -30,7 +30,7 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
           className={({ isActive }) =>
             cx(
               'press flex h-9 shrink-0 items-center rounded-full px-4 text-[14px] font-medium whitespace-nowrap',
-              isActive ? 'luminous font-semibold' : 'glass-control text-ink-2 hover:text-ink',
+              isActive ? 'bg-white font-semibold text-[#14224a] shadow-[0_8px_18px_-10px_rgba(8,20,60,0.5)]' : 'bg-white/18 text-white/90 hover:bg-white/25',
             )
           }
         >

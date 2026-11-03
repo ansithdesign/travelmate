@@ -193,3 +193,14 @@ First run uses the full twilight sky (`.tone-ink`) with white type, a white prim
 - **Expenses:** category bubbles sized by spend (3D icons, amount underneath). Tapping a bubble filters the list; tapping again clears it. A status chip and expense count sit below.
 - **Profile:** a navy passport cover (gold emblem, name, trips and days) with up to three stamps for the places visited.
 - **Scrollbars:** hidden everywhere; scrolling still works.
+
+## Update: sky, dark theme, controls
+
+- **Light sky:** slightly deeper blue (`#2a4a96` to `#5a7fc8` to `#9db8e6`) with soft clouds and slow, drifting snow particles (canvas, ~50 soft dots, fading near the bottom of the band, paused when the tab is hidden, still for reduced motion).
+- **Dark theme:** deep purple with aurora ribbons (violet, magenta) and faint stardust. Surfaces are near-opaque (`glass` 82%, `glass-strong` 94%) with 14 to 24% white hairlines so cards and text keep contrast. Accent is lilac.
+- **Add button:** the one warm colour, a coral-to-rose gradient by day and pink-to-violet at night (`.cta`).
+- **Hierarchy:** badges (`.level`) carry state colour; selected chips are filled accent; unselected chips and secondary buttons are tinted, not white; the search field is accent-tinted; trip tabs on the sky are white when selected.
+- **Scroll hints:** horizontal rows (`ScrollRow`) fade the last 56px while more content is off to the right.
+- **Home rail:** selecting a trip turns its ring gold and underlines its name (no scaling, nothing shifts); tapping the selected cover, or the headline chevron, opens the trip.
+- **Trip photo:** fades into the page with a mask instead of a hard edge.
+- **Settle:** a chart panel (progress and who is ahead or behind) above compact payment rows.

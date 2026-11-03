@@ -42,10 +42,10 @@ function Overview({ view }: { view: TripView }) {
 
   return (
     <div className="relative">
-      {/* The trip photo runs behind the header and the title */}
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[420px] overflow-hidden rounded-b-[34px] lg:left-[296px] lg:inset-x-auto lg:right-0 lg:rounded-b-[40px]" style={{ left: 0 }}>
+      {/* The trip photo runs behind the header and title, and fades into the page */}
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[470px] lg:inset-x-auto lg:right-0 lg:left-0" style={{ WebkitMaskImage: 'linear-gradient(180deg, #000 52%, transparent 100%)', maskImage: 'linear-gradient(180deg, #000 52%, transparent 100%)' }}>
         <Cover photo={trip.cover} eager className="size-full" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,40,0.55)_0%,rgba(8,20,40,0.05)_38%,rgba(8,20,40,0.65)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,40,0.55)_0%,rgba(8,20,40,0.08)_40%,transparent_70%)]" />
       </div>
 
       <NavHeader title={<span className="sr-only">{trip.name}</span>} back="/" actions={<Menu items={items} label="Trip actions" tone="plain" />} />
@@ -60,7 +60,7 @@ function Overview({ view }: { view: TripView }) {
       </SkyHero>
 
       {/* The money sits on a frosted card that overlaps the photo */}
-      <SkyHero className="mt-[78px]">
+      <SkyHero className="mt-[96px]">
         <section aria-labelledby="money" className="panel rounded-[28px] p-6">
           <h2 id="money" className="text-meta font-medium text-ink-3">
             {expenses.length ? 'Group has spent' : 'Nothing spent yet'}

@@ -3,6 +3,7 @@ import { Plus } from '@phosphor-icons/react'
 import { ExpenseList } from '../components/expenses/ExpenseList'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
 import { Button } from '../components/ui/Button'
+import { ScrollRow } from '../components/ui/ScrollRow'
 import { PhotoCard } from '../components/ui/Cover'
 import { useAllTripViews } from '../hooks/useTrip'
 import { useStore } from '../store/store'
@@ -44,7 +45,7 @@ export function Expenses() {
 
         {/* Where the money went: each category is a bubble sized by spend. Tap one to filter. */}
         {bubbles.length ? (
-          <div className="no-scrollbar -mx-6 mt-8 flex items-end gap-3 overflow-x-auto px-6 pt-1 pb-1" role="group" aria-label="Spend by category">
+          <ScrollRow className="-mx-6 mt-8 flex items-end gap-3 px-6 pt-1 pb-1" role="group" aria-label="Spend by category">
             {bubbles.map((b) => {
               const size = Math.round(54 + 44 * Math.sqrt(b.total / bubbles[0].total))
               const on = cat === b.id
@@ -60,7 +61,8 @@ export function Expenses() {
                 </button>
               )
             })}
-          </div>
+            <span aria-hidden className="w-4 shrink-0" />
+          </ScrollRow>
         ) : null}
 
         <div className="mt-5 flex flex-wrap items-center gap-2.5">
@@ -74,14 +76,14 @@ export function Expenses() {
         </div>
 
         </div>
-        <div className="no-scrollbar -mx-6 mt-6 flex gap-2 overflow-x-auto px-6 py-1 sm:mx-0 sm:px-0" role="group" aria-label="Trip">
+        <ScrollRow className="-mx-6 mt-6 flex gap-2 px-6 py-1 sm:mx-0 sm:px-0" role="group" aria-label="Trip">
           <button
             type="button"
             aria-pressed={tripId === 'all'}
             onClick={() => setTripId('all')}
-            className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full px-4 text-[14px] font-medium', tripId === 'all' ? 'luminous' : 'glass-control')}
+            className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full px-4 text-[14px] font-medium', tripId === 'all' ? 'bg-white text-[#14224a]' : 'bg-white/20 text-white')}
           >
-            All trips <span className="num opacity-60">{data.expenses.length}</span>
+            All trips <span className="num opacity-80">{data.expenses.length}</span>
           </button>
           {sorted.map((v, i) => (
             <button
@@ -89,14 +91,15 @@ export function Expenses() {
               type="button"
               aria-pressed={tripId === v.trip.id}
               onClick={() => setTripId(v.trip.id)}
-              className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-[14px] font-medium', tripId === v.trip.id ? 'luminous' : 'glass-control')}
+              className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-[14px] font-medium', tripId === v.trip.id ? 'bg-white text-[#14224a]' : 'bg-white/20 text-white')}
             >
               <PhotoCard photo={v.trip.cover} seed={i + 1} radius={999} className="size-7" />
               {v.trip.name}
-              <span className="num opacity-60">{v.expenses.length}</span>
+              <span className="num opacity-80">{v.expenses.length}</span>
             </button>
           ))}
-        </div>
+          <span aria-hidden className="w-6 shrink-0" />
+        </ScrollRow>
       </SkyHero>
 
       <ContentSheet>

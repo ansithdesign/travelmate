@@ -1,6 +1,7 @@
 import { memo } from 'react'
 import { useSky } from '../../store/sky'
 import { cx } from '../../utils/cx'
+import { SkyParticles } from './SkyParticles'
 
 /** Two soft ridgelines that melt into the mist at the foot of the sky band. */
 function Ridges({ soft }: { soft: boolean }) {
@@ -31,11 +32,15 @@ export const Sky = memo(function Sky({ soft = false }: { soft?: boolean }) {
       ) : null}
       {phase === 'night' ? (
         <>
+          <span className="aurora a1" />
+          <span className="aurora a2" />
+          {!soft ? <span className="aurora a3" /> : null}
           <span className="stars" />
           <span className="stars s2" />
           {!soft ? <span className="shoot" /> : null}
         </>
       ) : null}
+      <SkyParticles night={phase === 'night'} soft={soft} />
       <Ridges soft={soft} />
       <span className="mist" />
     </div>

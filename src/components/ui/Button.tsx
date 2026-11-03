@@ -18,15 +18,15 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   // Midnight pill. White with ink at night. The accent never fills a primary button.
-  primary: 'luminous hover:opacity-90 disabled:bg-well disabled:text-faint disabled:shadow-none',
+  primary: 'luminous hover:opacity-90 disabled:bg-well disabled:text-ink-3 disabled:shadow-none',
   // Strong glass with a hairline
-  secondary: 'glass-control hover:bg-solid disabled:text-faint',
-  ghost: 'text-ink hover:bg-well disabled:text-faint',
-  quiet: 'text-accent-ink hover:bg-accent-soft disabled:text-faint',
+  secondary: 'glass-control hover:bg-solid disabled:text-ink-3',
+  ghost: 'text-ink hover:bg-well disabled:text-ink-3',
+  quiet: 'text-accent-ink hover:bg-accent-soft disabled:text-ink-3',
   danger: 'bg-loss-soft text-loss hover:brightness-95 disabled:opacity-45',
   // Kept as aliases so older call sites resolve to the system
-  sky: 'glass-control hover:bg-solid disabled:text-faint',
-  white: 'luminous hover:opacity-90 disabled:bg-well disabled:text-faint disabled:shadow-none',
+  sky: 'glass-control hover:bg-solid disabled:text-ink-3',
+  white: 'luminous hover:opacity-90 disabled:bg-well disabled:text-ink-3 disabled:shadow-none',
 }
 
 const sizes: Record<Size, string> = {

@@ -10,6 +10,7 @@ import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page
 import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { Segmented } from '../components/ui/Controls'
+import { ScrollRow } from '../components/ui/ScrollRow'
 import { Cover } from '../components/ui/Cover'
 import { Figure } from '../components/ui/Money'
 import { useToast } from '../components/ui/Toast'
@@ -76,40 +77,49 @@ export function Home() {
             </Link>
           </header>
 
-          {/* Story rail: each trip is a round cover whose ring fills as the budget is used */}
-          <div role="tablist" aria-label="Your trips" className="no-scrollbar -mx-6 mt-8 flex gap-5 overflow-x-auto px-6 py-1 lg:mx-0 lg:px-0">
-            <button type="button" onClick={() => openTrip()} className="press group shrink-0 text-center" aria-label="Plan a new trip">
+          {/* Story rail: each trip is a round cover whose ring fills as the budget is used.
+              The selected trip's ring turns gold and its name gets an underline. */}
+          <ScrollRow role="tablist" aria-label="Your trips" className="-mx-6 mt-7 flex gap-5 px-6 pt-3 pb-1 lg:mx-0 lg:px-0">
+            <button type="button" onClick={() => openTrip()} className="press shrink-0 text-center" aria-label="Plan a new trip">
               <span className="flex size-[72px] items-center justify-center rounded-full bg-white/20 text-white">
                 <Plus size={26} weight="bold" aria-hidden />
               </span>
               <span className="mt-2 block text-caption font-medium text-ink-3">New</span>
+              <span aria-hidden className="mt-1 block h-[3px]" />
             </button>
             {ordered.map((v, i) => {
               const on = v.trip.id === trip.id
               const ratio = v.trip.budget ? Math.min(1, v.ledger.total / v.trip.budget) : v.status.phase === 'completed' ? 1 : 0.12
+              const ring = on ? '#ffd479' : '#ffffff'
               return (
-                <button key={v.trip.id} type="button" role="tab" aria-selected={on} onClick={() => setPicked(v.trip.id)} className="press shrink-0 text-center">
-                  <span className={cx('relative block size-[72px] rounded-full p-[3px] transition-transform duration-300 ease-[var(--ease-out-expo)]', on && 'scale-[1.08] shadow-[0_0_0_4px_rgba(255,255,255,0.28)]')} style={{ background: `conic-gradient(#fff ${ratio * 360}deg, rgba(255,255,255,0.3) 0)` }}>
+                <button key={v.trip.id} type="button" role="tab" aria-selected={on} onClick={() => (on ? navigate(`/trips/${v.trip.id}`) : setPicked(v.trip.id))} className="press shrink-0 text-center" aria-label={on ? `Open ${v.trip.name}` : v.trip.name}>
+                  <span className="relative block size-[72px] rounded-full p-[3px]" style={{ background: `conic-gradient(${ring} ${ratio * 360}deg, rgba(255,255,255,0.3) 0)` }}>
                     <Cover photo={v.trip.cover} seed={i + 1} className="size-full rounded-full border-[3px] border-[var(--sky-1)]" />
                     {v.status.phase === 'ongoing' ? (
-                      <span className="absolute -top-1 -right-2 flex items-center gap-1 rounded-full bg-[#1f9d63] px-2 py-[3px] text-[10px] leading-none font-bold tracking-wide text-white shadow-[0_2px_8px_rgba(8,60,30,0.4)]">
+                      <span className="absolute -top-1 right-0 flex items-center gap-1 rounded-full bg-[#1f9d63] px-2 py-[3px] text-[10px] leading-none font-bold tracking-wide text-white shadow-[0_2px_8px_rgba(8,60,30,0.4)]">
                         <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-white" />
                         LIVE
                       </span>
                     ) : null}
                   </span>
                   <span className={cx('mt-2 block max-w-[76px] truncate text-caption', on ? 'font-bold text-ink' : 'font-medium text-ink-3')}>{v.trip.name.split(/[ ,]/)[0]}</span>
-                  <span aria-hidden className={cx('mx-auto mt-1 block h-[3px] rounded-full bg-white transition-all duration-300', on ? 'w-5 opacity-100' : 'w-0 opacity-0')} />
+                  <span aria-hidden className={cx('mx-auto mt-1 block h-[3px] w-5 rounded-full bg-[#ffd479] transition-opacity duration-300', on ? 'opacity-100' : 'opacity-0')} />
                 </button>
               )
             })}
-          </div>
+            <span aria-hidden className="w-4 shrink-0" />
+          </ScrollRow>
 
           {/* The selected trip's numbers sit straight on the sky */}
           <div className="mt-7">
-            <p className="text-meta font-semibold text-ink-3">
-              {trip.name} · {phaseLabel(trip, status)}
-            </p>
+            <Link to={`/trips/${trip.id}`} className="press -ml-1 inline-flex items-center gap-1 rounded-full py-1 pr-2 pl-1 text-meta font-semibold text-ink-3 hover:text-ink">
+              <span className="truncate">
+                {trip.name} · {phaseLabel(trip, status)}
+              </span>
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-white">
+                <CaretRight size={12} weight="bold" aria-hidden />
+              </span>
+            </Link>
             <Figure value={ledger.total} currency={cur} size="xl" className="mt-1.5" />
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <span className={cx('level num', myNet > 0 ? 'ok' : myNet < 0 ? 'act' : 'quiet')}>
@@ -196,10 +206,7 @@ export function Home() {
                 Settle up
               </Button>
             </div>
-            <Link to={`/trips/${trip.id}`} className="mt-4 flex h-12 items-center justify-center gap-1 text-[14px] font-semibold text-accent-ink">
-              Open {trip.name} <CaretRight size={14} weight="bold" aria-hidden />
-            </Link>
-            <p className="num mt-1 text-center text-caption text-ink-3">
+            <p className="num mt-5 text-center text-caption text-ink-3">
               {formatRange(trip.startDate, trip.endDate)} · {members.length} {members.length === 1 ? 'traveller' : 'travellers'}
             </p>
           </div>

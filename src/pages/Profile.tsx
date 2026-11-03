@@ -61,37 +61,39 @@ export function Profile() {
           Profile
           <Dot />
         </h1>
-        <div className="mt-8 flex items-start gap-3 sm:gap-6">
+        <div className="mt-8 flex items-stretch gap-4 sm:gap-8">
           {/* The passport cover */}
           <div
-            className="relative w-[168px] shrink-0 -rotate-3 rounded-l-[12px] rounded-r-[22px] px-4 pt-5 pb-5 text-center text-[#e8c97a] shadow-[0_18px_30px_-12px_rgba(8,20,60,0.6),inset_6px_0_10px_rgba(0,0,0,0.25)]"
-            style={{ background: 'linear-gradient(160deg, #1c2f66, #0e1a40)', minHeight: 236 }}
+            className="flex w-[172px] shrink-0 flex-col items-center rounded-l-[12px] rounded-r-[22px] px-4 py-6 text-center text-[#e8c97a] shadow-[0_18px_30px_-12px_rgba(8,6,40,0.65),inset_6px_0_10px_rgba(0,0,0,0.25)]"
+            style={{ background: 'linear-gradient(160deg, #2a2072, #130c3a)' }}
           >
-            <p className="text-[10px] font-bold tracking-[0.18em]">TRAVEL LOG</p>
-            <svg viewBox="0 0 60 60" width="64" height="64" className="mx-auto mt-5" aria-hidden>
+            <p className="text-[10px] font-bold tracking-[0.2em]">TRAVEL LOG</p>
+            <svg viewBox="0 0 60 60" width="62" height="62" className="mt-5" aria-hidden>
               <circle cx="30" cy="30" r="22" fill="none" stroke="#e8c97a" strokeWidth="2" />
               <path d="M8 30h44M30 8c-9 8-9 36 0 44M30 8c9 8 9 36 0 44" fill="none" stroke="#e8c97a" strokeWidth="1.6" />
             </svg>
-            <p className="mt-5 text-[18px] leading-[1.1] font-bold text-white">{me.name}</p>
-            <p className="mt-1 truncate text-[11px] text-[#e8c97a]/80">{me.email}</p>
-            <p className="num mt-4 text-[10px] font-bold tracking-[0.14em]">
-              {views.length} {views.length === 1 ? 'TRIP' : 'TRIPS'} · {days} {days === 1 ? 'DAY' : 'DAYS'}
-            </p>
+            <p className="mt-5 text-[19px] leading-[1.15] font-bold text-white">{me.name}</p>
+            <p className="mt-1 max-w-full truncate text-[11px] text-[#e8c97a]/85">{me.email}</p>
+            <div className="mt-auto w-full border-t border-[#e8c97a]/30 pt-3">
+              <p className="num text-[10px] font-bold tracking-[0.14em]">
+                {views.length} {views.length === 1 ? 'TRIP' : 'TRIPS'} · {days} {days === 1 ? 'DAY' : 'DAYS'}
+              </p>
+            </div>
           </div>
-          {/* Places stamped on the page beside it */}
-          <ul className="relative min-h-[236px] min-w-0 flex-1" aria-label="Places you have been">
+          {/* Places stamped beside it, evenly spaced and centred */}
+          <ul className="flex min-w-0 flex-1 flex-col items-center justify-between gap-2" aria-label="Places you have been">
             {stamps.map((st, i) => (
-              <li key={st.place} className={cx('absolute', ['left-0', 'left-4 min-[360px]:left-[34px]', 'left-0'][i])} style={{ top: [4, 84, 164][i] }}>
+              <li key={st.place}>
                 <div
-                  className="flex size-[76px] flex-col items-center justify-center rounded-full min-[360px]:size-[86px] border-[2.5px] border-white text-center text-[10px] leading-tight font-bold tracking-[0.06em] text-white"
-                  style={{ transform: `rotate(${[10, -12, 6, -8][i % 4]}deg)`, borderStyle: i === 0 ? 'dashed' : 'solid' }}
+                  className="flex size-[80px] flex-col items-center justify-center rounded-full border-[2.5px] border-white/95 text-center text-[9px] leading-tight font-bold tracking-[0.06em] text-white"
+                  style={{ transform: `rotate(${[8, -7, 5][i % 3]}deg)`, borderStyle: i === 0 ? 'dashed' : 'solid' }}
                 >
-                  <span className="max-w-[64px] truncate">{st.place.toUpperCase()}</span>
-                  <span className="num text-[11px]">{st.when}</span>
+                  <span className="max-w-[68px] truncate">{st.place.toUpperCase()}</span>
+                  <span className="num text-[10.5px]">{st.when}</span>
                 </div>
               </li>
             ))}
-            {stamps.length === 0 ? <li className="text-meta text-ink-3">Your places will be stamped here after your first trip.</li> : null}
+            {stamps.length === 0 ? <li className="self-center text-center text-meta text-ink-3">Your places will be stamped here after your first trip.</li> : null}
           </ul>
         </div>
         <p className="num mt-6 text-meta text-ink-3">

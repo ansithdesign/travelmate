@@ -81,7 +81,7 @@ export function Chip({
       className={cx(
         'press inline-flex h-[42px] shrink-0 items-center gap-1.5 rounded-full px-4 text-[14px] font-medium whitespace-nowrap',
         leading && 'pl-1.5',
-        active ? 'luminous [&_svg]:text-accent-bright' : 'glass-control hover:bg-solid',
+        active ? 'bg-accent text-[var(--on-accent)] shadow-[0_8px_18px_-10px_var(--accent)]' : 'glass-control text-ink-2 hover:text-ink',
       )}
     >
       {leading}
