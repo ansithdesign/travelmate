@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { DEFAULT_SKY_THEME, skyThemeById, skyVars } from '../data/skyThemes'
 
 /** Two themes: a light sky ("day") and a dark one ("night"). */
 export type SkyPhase = 'day' | 'night'
@@ -7,6 +8,7 @@ export type SkyChoice = SkyPhase | 'auto'
 export const SKY_LABEL: Record<SkyPhase, string> = { day: 'Light', night: 'Dark' }
 
 const KEY = 'tripmate:sky'
+const LIGHT_KEY = 'tripmate:lightsky'
 const VALID = ['day', 'night', 'auto']
 const ALIAS: Record<string, SkyChoice> = { light: 'day', dark: 'night', dawn: 'day', golden: 'day' }
 
@@ -22,6 +24,16 @@ function readChoice(): SkyChoice {
   return 'auto'
 }
 
+function readLightSky(): string {
+  try {
+    const q = new URLSearchParams(window.location.search).get('lsky')
+    if (q) return skyThemeById(q).id
+    return skyThemeById(localStorage.getItem(LIGHT_KEY) ?? DEFAULT_SKY_THEME).id
+  } catch {
+    return DEFAULT_SKY_THEME
+  }
+}
+
 function systemPhase(): SkyPhase {
   try {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day'
@@ -34,6 +46,9 @@ interface SkyState {
   phase: SkyPhase
   choice: SkyChoice
   setChoice: (c: SkyChoice) => void
+  /** Which light-theme sky is chosen */
+  lightSky: string
+  setLightSky: (id: string) => void
 }
 
 const SkyContext = createContext<SkyState | null>(null)
@@ -41,6 +56,7 @@ const SkyContext = createContext<SkyState | null>(null)
 export function SkyProvider({ children }: { children: ReactNode }) {
   const [choice, setChoiceState] = useState<SkyChoice>(readChoice)
   const [system, setSystem] = useState<SkyPhase>(systemPhase)
+  const [lightSky, setLightSkyState] = useState<string>(readLightSky)
 
   // Follow the device when the choice is Auto.
   useEffect(() => {
@@ -54,15 +70,32 @@ export function SkyProvider({ children }: { children: ReactNode }) {
   const phase = choice === 'auto' ? system : choice
 
   useEffect(() => {
-    document.documentElement.dataset.sky = phase
+    const root = document.documentElement
+    root.dataset.sky = phase
+    const theme = skyThemeById(lightSky)
+    const vars = skyVars(theme)
+    // The chosen sky only paints the light theme; the purple night keeps its own colours.
+    for (const [k, v] of Object.entries(vars)) {
+      if (phase === 'day') root.style.setProperty(k, v)
+      else root.style.removeProperty(k)
+    }
     const meta = document.querySelector('meta[name="theme-color"]')
-    meta?.setAttribute('content', { day: '#78b8ee', night: '#070f26' }[phase])
-  }, [phase])
+    meta?.setAttribute('content', phase === 'day' ? theme.c[0] : '#050214')
+  }, [phase, lightSky])
 
   const value = useMemo<SkyState>(
     () => ({
       phase,
       choice,
+      lightSky,
+      setLightSky: (id) => {
+        setLightSkyState(skyThemeById(id).id)
+        try {
+          localStorage.setItem(LIGHT_KEY, skyThemeById(id).id)
+        } catch {
+          /* ignore */
+        }
+      },
       setChoice: (c) => {
         setChoiceState(c)
         try {
@@ -72,7 +105,7 @@ export function SkyProvider({ children }: { children: ReactNode }) {
         }
       },
     }),
-    [phase, choice],
+    [phase, choice, lightSky],
   )
   return <SkyContext.Provider value={value}>{children}</SkyContext.Provider>
 }

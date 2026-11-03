@@ -3,7 +3,7 @@ import { cx } from '../../utils/cx'
 import { initials } from '../../utils/id'
 
 // Flat, calm fills from the series palette. Each person keeps one, chosen by id.
-const ORBS = ['#1f6fd6', '#c2558d', '#9c6f12', '#6a5bd8', '#1f857f', '#4f6278', '#2b7fd4']
+const ORBS = ['#1a5fc0', '#a8406f', '#8a5f0e', '#5a4bc8', '#17706b', '#4a5d74', '#2468b8']
 
 function orbFor(id: string) {
   let h = 0

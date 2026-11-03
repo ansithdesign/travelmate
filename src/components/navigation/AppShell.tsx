@@ -91,7 +91,7 @@ function TabBar({ pathname }: { pathname: string }) {
         aria-label="Add expense"
         disabled={data.trips.length === 0}
         onClick={() => openExpense({ tripId })}
-        className="cta press fixed bottom-[calc(46px+env(safe-area-inset-bottom))] left-1/2 z-[60] flex size-[66px] -translate-x-1/2 items-center justify-center rounded-full ring-[6px] ring-[var(--haze)] disabled:opacity-50"
+        className="cta press fixed bottom-[calc(46px+env(safe-area-inset-bottom))] left-1/2 z-40 flex size-[66px] -translate-x-1/2 items-center justify-center rounded-full ring-[6px] ring-[var(--haze)] disabled:opacity-50"
       >
         <Plus size={30} weight="bold" aria-hidden />
       </button>

@@ -188,7 +188,7 @@ function JournalBody({ view }: { view: TripView }) {
                 <ol className="mt-2 flex flex-wrap gap-2">
                   {trip.journal.places.map((p, i) => (
                     <li key={p + i} className="glass-control flex h-[42px] items-center gap-2 rounded-full py-1 pr-2 pl-1.5">
-                      <span aria-hidden className="num flex size-7 items-center justify-center rounded-full bg-accent-soft text-caption font-semibold text-accent">
+                      <span aria-hidden className="num flex size-7 items-center justify-center rounded-full bg-accent-soft text-caption font-semibold text-accent-ink">
                         {i + 1}
                       </span>
                       <span className={edit ? 'text-meta font-semibold' : 'pr-2 text-meta font-semibold'}>{p}</span>

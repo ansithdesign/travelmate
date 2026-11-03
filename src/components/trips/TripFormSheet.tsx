@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { CaretDown, Check, MapPin, UploadSimple } from '@phosphor-icons/react'
 import { COVER_LIBRARY } from '../../data/photos'
 import { DESTINATIONS } from '../../data/destinations'
+import { searchPlaces, type Place } from '../../services/places'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
 import type { CurrencyCode, Photo, Trip } from '../../types'
@@ -194,13 +195,47 @@ function DestinationPicker({ value, onChange, error }: { value: string; onChange
   const listId = `${id}-list`
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
+  const [remote, setRemote] = useState<Place[]>([])
+  const [status, setStatus] = useState<'idle' | 'loading' | 'offline'>('idle')
   const blurTimer = useRef<number | undefined>(undefined)
   const q = value.trim().toLowerCase()
-  const matches = useMemo(
-    () => (q ? DESTINATIONS.filter((d) => d.name.toLowerCase().includes(q) || d.region.toLowerCase().includes(q)) : DESTINATIONS).slice(0, 6),
-    [q],
-  )
-  const exact = DESTINATIONS.some((d) => d.name.toLowerCase() === q)
+
+  // Cities from anywhere: ask the worldwide search shortly after typing stops.
+  useEffect(() => {
+    if (q.length < 2) {
+      setRemote([])
+      setStatus('idle')
+      return
+    }
+    const ctl = new AbortController()
+    setStatus('loading')
+    const t = window.setTimeout(() => {
+      searchPlaces(q, ctl.signal)
+        .then((r) => {
+          setRemote(r)
+          setStatus('idle')
+        })
+        .catch((e) => {
+          if ((e as Error).name === 'AbortError') return
+          setRemote([])
+          setStatus('offline')
+        })
+    }, 250)
+    return () => {
+      window.clearTimeout(t)
+      ctl.abort()
+    }
+  }, [q])
+
+  const matches = useMemo<Place[]>(() => {
+    const local = (q ? DESTINATIONS.filter((d) => d.name.toLowerCase().includes(q) || d.region.toLowerCase().includes(q)) : DESTINATIONS).slice(0, q ? 4 : 6)
+    const seen = new Set(local.map((d) => d.name.toLowerCase()))
+    const extra = remote.filter((r) => !seen.has(r.name.toLowerCase()) || !local.some((l) => l.region === r.region && l.name.toLowerCase() === r.name.toLowerCase()))
+    const merged = [...local]
+    for (const r of extra) if (!merged.some((m) => m.name === r.name && m.region === r.region)) merged.push(r)
+    return merged.slice(0, 8)
+  }, [q, remote])
+  const exact = matches.some((d) => d.name.toLowerCase() === q) && !remote.length
 
   function pick(i: number) {
     const d = matches[i]
@@ -221,7 +256,7 @@ function DestinationPicker({ value, onChange, error }: { value: string; onChange
           aria-autocomplete="list"
           aria-activedescendant={open && matches[active] ? `${listId}-${active}` : undefined}
           autoComplete="off"
-          placeholder="Search a city or region"
+          placeholder="Search any city in the world"
           className="pl-10"
           invalid={!!error}
           value={value}
@@ -251,11 +286,11 @@ function DestinationPicker({ value, onChange, error }: { value: string; onChange
             }
           }}
         />
-        {open && matches.length > 0 && !exact ? (
-          <ul id={listId} role="listbox" className="glass-bar absolute inset-x-0 top-[calc(100%+8px)] z-10 overflow-hidden rounded-[20px] p-1.5 [animation:pop_240ms_var(--ease-glide)]">
+        {open && (matches.length > 0 || status !== 'idle') && !exact ? (
+          <ul id={listId} role="listbox" className="glass-bar absolute inset-x-0 top-[calc(100%+8px)] z-10 max-h-[320px] overflow-y-auto rounded-[20px] p-1.5 [animation:pop_240ms_var(--ease-glide)]">
             {matches.map((d, i) => (
               <li
-                key={d.name}
+                key={`${d.name}-${d.region}`}
                 id={`${listId}-${i}`}
                 role="option"
                 aria-selected={i === active}
@@ -266,10 +301,15 @@ function DestinationPicker({ value, onChange, error }: { value: string; onChange
                 onMouseEnter={() => setActive(i)}
                 className={cx('flex cursor-pointer items-baseline justify-between gap-3 rounded-[14px] px-3.5 py-3', i === active && 'bg-accent-soft')}
               >
-                <span className="font-medium">{d.name}</span>
-                <span className="text-meta text-ink-3">{d.region}</span>
+                <span className="min-w-0 truncate font-medium">{d.name}</span>
+                <span className="max-w-[55%] shrink-0 truncate text-meta text-ink-3">{d.region}</span>
               </li>
             ))}
+            {status !== 'idle' ? (
+              <li role="presentation" className="px-3.5 py-2.5 text-caption text-ink-3">
+                {status === 'loading' ? 'Searching cities worldwide...' : 'Offline: showing popular places. You can still type any place.'}
+              </li>
+            ) : null}
           </ul>
         ) : null}
       </div>

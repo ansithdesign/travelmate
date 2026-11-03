@@ -2,14 +2,13 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CaretRight, CheckCircle, Plus } from '@phosphor-icons/react'
 import { phaseLabel } from '../components/trips/status'
-import { BalanceList, TripGlance } from '../components/trips/TripSections'
+import { CategoryIcon } from '../components/icons/CategoryIcon'
 import { ExpenseDetailSheet } from '../components/expenses/ExpenseDetailSheet'
 import { ExpenseRow } from '../components/expenses/ExpenseRow'
 import { BrandMark } from '../components/shared/BrandMark'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
 import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
-import { Segmented } from '../components/ui/Controls'
 import { ScrollRow } from '../components/ui/ScrollRow'
 import { Cover } from '../components/ui/Cover'
 import { Figure } from '../components/ui/Money'
@@ -17,32 +16,29 @@ import { useToast } from '../components/ui/Toast'
 import { useAllTripViews } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
-import type { Expense, Person } from '../types'
+import type { CategoryId, Expense } from '../types'
 import { cx } from '../utils/cx'
-import { fmt, formatRange } from '../utils/dates'
+import { fmt } from '../utils/dates'
 import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
 
-type Panel = 'activity' | 'balances' | 'plans'
-
-/** Spend per day for the most recent days that have expenses, oldest first. */
-function spendByDay(expenses: Expense[]) {
-  const map = new Map<string, number>()
-  for (const e of expenses) {
-    const d = e.date.slice(0, 10)
-    map.set(d, (map.get(d) ?? 0) + e.amount)
-  }
-  return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-12)
-}
+/** The categories offered on Home for one-tap adding. */
+const QUICK: { id: CategoryId; label: string }[] = [
+  { id: 'food', label: 'Food' },
+  { id: 'cabs', label: 'Cabs' },
+  { id: 'drinks', label: 'Drinks' },
+  { id: 'activities', label: 'Activities' },
+  { id: 'groceries', label: 'Groceries' },
+  { id: 'stay', label: 'Stay' },
+]
 
 export function Home() {
   const views = useAllTripViews()
-  const { me, person, saveTrip } = useStore()
+  const { me, saveTrip } = useStore()
   const { openTrip, openExpense } = useUI()
   const navigate = useNavigate()
   const toast = useToast()
   const [picked, setPicked] = useState<string | null>(null)
-  const [panel, setPanel] = useState<Panel>('activity')
   const [open, setOpen] = useState<Expense | null>(null)
   const { data } = useStore()
 
@@ -55,13 +51,12 @@ export function Home() {
   if (views.length === 0) return <FirstRun />
 
   const view = ordered.find((v) => v.trip.id === picked) ?? ordered[0]
-  const { trip, status, ledger, expenses, transfers, settled } = view
+  const { trip, status, ledger, expenses, settled } = view
   const cur = trip.currency
   const myNet = ledger.net[me.id] ?? 0
-  const members = trip.members.map(person).filter(Boolean) as Person[]
-  const bars = spendByDay(expenses)
-  const peak = Math.max(1, ...bars.map(([, v]) => v))
-  const peakDay = bars.find(([, v]) => v === peak)
+  const todayIso = new Date().toISOString().slice(0, 10)
+  const next = trip.itinerary.find((d) => d.date >= todayIso) ?? trip.itinerary[0]
+  const others = ordered.filter((v) => v.trip.id !== trip.id)
 
   return (
     <>
@@ -81,7 +76,7 @@ export function Home() {
               The selected trip's ring turns gold and its name gets an underline. */}
           <ScrollRow role="tablist" aria-label="Your trips" className="-mx-6 mt-7 flex gap-5 px-6 pt-3 pb-1 lg:mx-0 lg:px-0">
             <button type="button" onClick={() => openTrip()} className="press shrink-0 text-center" aria-label="Plan a new trip">
-              <span className="flex size-[72px] items-center justify-center rounded-full bg-white/20 text-white">
+              <span className="flex size-[72px] items-center justify-center rounded-full bg-[rgba(8,18,48,0.34)] text-white">
                 <Plus size={26} weight="bold" aria-hidden />
               </span>
               <span className="mt-2 block text-caption font-medium text-ink-3">New</span>
@@ -116,7 +111,7 @@ export function Home() {
               <span className="truncate">
                 {trip.name} · {phaseLabel(trip, status)}
               </span>
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-white">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[rgba(8,18,48,0.4)] text-white">
                 <CaretRight size={12} weight="bold" aria-hidden />
               </span>
             </Link>
@@ -127,24 +122,30 @@ export function Home() {
               </span>
               {trip.budget ? <span className="text-caption font-medium text-ink-3">{Math.round((ledger.total / trip.budget) * 100)}% of budget</span> : null}
             </div>
-            {bars.length > 1 ? (
-              <div className="mt-6 max-w-[420px]">
-                <div className="flex h-[64px] items-end gap-[5px]" role="img" aria-label={`Spend by day, biggest day ${formatMoney(peak, { currency: cur })}`}>
-                  {bars.map(([d, v]) => {
-                    // Square-root scale so one big day does not flatten every other day
-                    const h = 22 + 78 * Math.sqrt(v / peak)
-                    return <span key={d} className="max-w-[22px] flex-1 rounded-[7px]" style={{ height: `${h}%`, background: v === peak ? '#fff' : 'rgba(255,255,255,0.38)' }} />
-                  })}
-                </div>
-                {peakDay ? <p className="num mt-2 text-caption text-ink-3">Biggest day: {fmt.dayMonth(peakDay[0])}, {formatMoney(peak, { currency: cur })}</p> : null}
-              </div>
-            ) : null}
           </div>
         </div>
+
+        {/* Add in one tap: category icons that open the expense form with that category chosen */}
+        <section aria-labelledby="quick-add" className="panel mt-7 rounded-[30px] p-5">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 id="quick-add" className="text-heading">
+              Add in one tap
+            </h2>
+            <span className="text-caption text-ink-3">then type the amount</span>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-x-2 gap-y-4">
+            {QUICK.map((c) => (
+              <button key={c.id} type="button" onClick={() => openExpense({ tripId: trip.id, category: c.id })} className="press flex flex-col items-center gap-1.5 rounded-[18px] py-1 text-center">
+                <CategoryIcon id={c.id} size={46} />
+                <span className="text-[13px] font-medium text-ink-2">{c.label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
       </SkyHero>
 
       <ContentSheet>
-        <SheetBody className="pt-8">
+        <SheetBody className="pt-4">
           {status.phase === 'ended' ? (
             <div className="panel mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[28px] p-5">
               <p className="min-w-0 flex-1 text-meta text-ink-2">{trip.name} ended {status.days === 1 ? 'yesterday' : `${status.days} days ago`}. Mark it complete to keep it as a journal.</p>
@@ -163,52 +164,61 @@ export function Home() {
             </div>
           ) : null}
 
-          <div className="mx-auto max-w-[680px]">
-            <Segmented<Panel>
-              label="Trip details"
-              value={panel}
-              onChange={setPanel}
-              options={[
-                { value: 'activity', label: 'Activity' },
-                { value: 'balances', label: 'Balances' },
-                { value: 'plans', label: 'Plans' },
-              ]}
-            />
+          <div className="mx-auto flex max-w-[680px] flex-col gap-9">
+            {next ? (
+              <Link to={`/trips/${trip.id}/details`} className="panel-strong press flex items-center gap-4 rounded-[28px] p-4">
+                <Cover photo={trip.cover} seed={1} className="size-14 shrink-0 rounded-[16px]" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-caption font-medium text-ink-3">Up next · {fmt.long(next.date)}</span>
+                  <span className="mt-0.5 line-clamp-2 text-[15px] leading-snug font-semibold">{next.plan}</span>
+                </span>
+                <CaretRight size={16} weight="bold" className="shrink-0 text-faint" aria-hidden />
+              </Link>
+            ) : null}
 
-            <div className="mt-5">
-              {panel === 'activity' ? (
-                expenses.length ? (
-                  <ul className="panel-strong rows overflow-hidden rounded-[28px]">
-                    {expenses.slice(0, 4).map((e) => (
-                      <li key={e.id}>
-                        <ExpenseRow expense={e} currency={cur} settled={settled} onOpen={() => setOpen(e)} />
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="panel rounded-[28px] p-6 text-body text-ink-3">No expenses yet. Add the first one when someone pays for something.</p>
-                )
-              ) : null}
-              {panel === 'balances' ? (
-                <>
-                  <BalanceList view={view} members={members} />
-                  <p className="mt-3 px-1 text-caption text-ink-3">{settled ? 'Everyone is settled up.' : `${transfers.length} ${transfers.length === 1 ? 'payment settles' : 'payments settle'} everyone.`}</p>
-                </>
-              ) : null}
-              {panel === 'plans' ? <TripGlance view={view} /> : null}
-            </div>
+            <section aria-labelledby="just-in">
+              <div className="flex min-h-11 items-center justify-between gap-3 px-0.5">
+                <h2 id="just-in" className="text-title">
+                  Just in
+                </h2>
+                {expenses.length ? (
+                  <Link to={`/trips/${trip.id}/expenses`} className="inline-flex h-10 items-center gap-1 text-[14px] font-semibold text-accent-ink">
+                    See all {expenses.length} <CaretRight size={14} weight="bold" aria-hidden />
+                  </Link>
+                ) : null}
+              </div>
+              {expenses.length ? (
+                <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
+                  {expenses.slice(0, 3).map((e) => (
+                    <li key={e.id}>
+                      <ExpenseRow expense={e} currency={cur} settled={settled} onOpen={() => setOpen(e)} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="panel mt-3 rounded-[28px] p-6 text-body text-ink-3">Nothing yet. Tap a category above when someone pays for something.</p>
+              )}
+            </section>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button size="lg" icon={Plus} onClick={() => openExpense({ tripId: trip.id })} disabled={data.trips.length === 0}>
-                Add expense
-              </Button>
-              <Button size="lg" variant="secondary" onClick={() => navigate(`/trips/${trip.id}/settle`)}>
-                Settle up
-              </Button>
-            </div>
-            <p className="num mt-5 text-center text-caption text-ink-3">
-              {formatRange(trip.startDate, trip.endDate)} · {members.length} {members.length === 1 ? 'traveller' : 'travellers'}
-            </p>
+            {others.length ? (
+              <section aria-labelledby="other-trips">
+                <h2 id="other-trips" className="px-0.5 text-meta font-semibold text-ink-3">
+                  Other trips
+                </h2>
+                <ScrollRow className="-mx-6 mt-3 flex gap-2.5 px-6 pb-1">
+                  {others.map((v) => {
+                    const n = v.ledger.net[me.id] ?? 0
+                    const note = v.status.phase === 'completed' && v.settled ? 'settled' : n < 0 ? `owe ${formatMoney(-n, { currency: v.trip.currency, round: true })}` : n > 0 ? `owed ${formatMoney(n, { currency: v.trip.currency, round: true })}` : phaseLabel(v.trip, v.status)
+                    return (
+                      <Link key={v.trip.id} to={`/trips/${v.trip.id}`} className="glass-control press inline-flex h-12 shrink-0 items-center rounded-full px-5 text-[14px] font-medium whitespace-nowrap">
+                        {v.trip.name.split(/[ ,]/)[0]} · {note}
+                      </Link>
+                    )
+                  })}
+                  <span aria-hidden className="w-6 shrink-0" />
+                </ScrollRow>
+              </section>
+            ) : null}
           </div>
         </SheetBody>
       </ContentSheet>

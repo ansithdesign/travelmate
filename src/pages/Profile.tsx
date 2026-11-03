@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { ArrowCounterClockwise, DownloadSimple, Trash, type Icon } from '@phosphor-icons/react'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
 import { Segmented } from '../components/ui/Controls'
+import { SkyPickerSheet } from '../components/profile/SkyPickerSheet'
+import { skyThemeById } from '../data/skyThemes'
 import { Button } from '../components/ui/Button'
 import { InputField } from '../components/ui/Field'
 import { ConfirmDialog } from '../components/ui/Sheet'
@@ -15,7 +17,9 @@ import { formatMoney } from '../utils/money'
 
 export function Profile() {
   const { me, updateMe, data, resetDemo, clearAll } = useStore()
-  const { choice, setChoice } = useSky()
+  const { choice, setChoice, lightSky } = useSky()
+  const lightTheme = skyThemeById(lightSky)
+  const [skyOpen, setSkyOpen] = useState(false)
   const views = useAllTripViews()
   const toast = useToast()
   const [name, setName] = useState(me.name)
@@ -111,6 +115,19 @@ export function Profile() {
               {choice === 'auto' ? 'Follows your device.' : `Always ${SKY_LABEL[choice as SkyPhase].toLowerCase()}.`}
             </p>
             <Segmented label="Appearance" value={choice} onChange={setChoice} options={skyOptions} />
+
+            {/* The light sky: shown as a row, changed through a preview sheet */}
+            <div className="panel-strong mt-5 flex items-center gap-4 rounded-[24px] p-4">
+              <span className="block size-14 shrink-0 rounded-[16px] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)]" style={{ background: `linear-gradient(180deg, ${lightTheme.c[0]}, ${lightTheme.c[1]} 55%, ${lightTheme.c[2]})` }} aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="text-[12px] font-semibold text-ink-3">Light sky</p>
+                <p className="truncate text-heading">{lightTheme.name}</p>
+                <p className="text-caption text-ink-3">Used in the light theme</p>
+              </div>
+              <Button size="sm" variant="secondary" onClick={() => setSkyOpen(true)}>
+                Change
+              </Button>
+            </div>
           </section>
 
           <section aria-labelledby="account" className="mt-14">
@@ -151,6 +168,8 @@ export function Profile() {
           <p className="mt-10 px-0.5 text-caption text-ink-3">Cover photos from Unsplash. Receipt scanning and invitations are simulated in this version.</p>
         </SheetBody>
       </ContentSheet>
+
+      <SkyPickerSheet open={skyOpen} onClose={() => setSkyOpen(false)} />
 
       <ConfirmDialog
         open={confirm === 'reset'}

@@ -45,7 +45,7 @@ function Overview({ view }: { view: TripView }) {
       {/* The trip photo runs behind the header and title, and fades into the page */}
       <div aria-hidden className="absolute inset-x-0 top-0 h-[470px] lg:inset-x-auto lg:right-0 lg:left-0" style={{ WebkitMaskImage: 'linear-gradient(180deg, #000 52%, transparent 100%)', maskImage: 'linear-gradient(180deg, #000 52%, transparent 100%)' }}>
         <Cover photo={trip.cover} eager className="size-full" />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,40,0.55)_0%,rgba(8,20,40,0.08)_40%,transparent_70%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,40,0.78)_0%,rgba(8,20,40,0.64)_42%,rgba(8,20,40,0.2)_68%,transparent_86%)]" />
       </div>
 
       <NavHeader title={<span className="sr-only">{trip.name}</span>} back="/" actions={<Menu items={items} label="Trip actions" tone="plain" />} />
@@ -54,14 +54,14 @@ function Overview({ view }: { view: TripView }) {
           {trip.name}
           <Dot />
         </h1>
-        <p className="mt-1 text-meta text-white/90 [text-shadow:0_1px_10px_rgba(8,20,40,0.5)]">
+        <p className="mt-1 text-meta font-medium text-white [text-shadow:0_1px_10px_rgba(8,20,40,0.6)]">
           {trip.destination} · <span className="whitespace-nowrap">{formatRange(trip.startDate, trip.endDate)}</span>
         </p>
       </SkyHero>
 
       {/* The money sits on a frosted card that overlaps the photo */}
       <SkyHero className="mt-[96px]">
-        <section aria-labelledby="money" className="panel rounded-[28px] p-6">
+        <section aria-labelledby="money" className="panel-strong rounded-[28px] p-6 [background:color-mix(in_srgb,var(--haze)_95%,transparent)]">
           <h2 id="money" className="text-meta font-medium text-ink-3">
             {expenses.length ? 'Group has spent' : 'Nothing spent yet'}
           </h2>

@@ -64,8 +64,8 @@ function SettleBody({ view }: { view: TripView }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="min-w-0">
-        <h2 className="on-sky px-0.5 pt-4 text-display">{settled && !stamping ? 'All square' : `${tickets.length} ${tickets.length === 1 ? 'payment' : 'payments'} left`}</h2>
-        <p className="on-sky mt-2 px-0.5 text-body">
+        <h2 className="px-0.5 pt-2 text-display">{settled && !stamping ? 'All square' : `${tickets.length} ${tickets.length === 1 ? 'payment' : 'payments'} left`}</h2>
+        <p className="mt-2 px-0.5 text-body text-ink-3">
           {settled && !stamping ? 'Every balance on this trip is zero.' : gross > transfers.length && payments.length === 0 ? `Netted down from ${gross} debts.` : 'The fewest payments that settle everyone.'}
         </p>
 

@@ -52,7 +52,7 @@ export function Expenses() {
               return (
                 <button key={b.id} type="button" aria-pressed={on} aria-label={`${categoryById[b.id].label}, ${formatMoney(b.total)}`} onClick={() => setCat(on ? null : b.id)} className="press shrink-0 text-center">
                   <span
-                    className={cx('flex items-center justify-center rounded-full bg-white/20 transition-[background-color,box-shadow] duration-300', on && 'bg-white/35 shadow-[0_0_0_3px_#fff]')}
+                    className={cx('flex items-center justify-center rounded-full bg-[rgba(8,18,48,0.34)] transition-[background-color,box-shadow] duration-300', on && 'bg-[rgba(8,18,48,0.5)] shadow-[0_0_0_3px_#fff]')}
                     style={{ width: size, height: size }}
                   >
                     <CategoryIcon id={b.id} size={Math.round(size * 0.74)} />
@@ -81,7 +81,7 @@ export function Expenses() {
             type="button"
             aria-pressed={tripId === 'all'}
             onClick={() => setTripId('all')}
-            className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full px-4 text-[14px] font-medium', tripId === 'all' ? 'bg-white text-[#14224a]' : 'bg-white/20 text-white')}
+            className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full px-4 text-[14px] font-medium', tripId === 'all' ? 'bg-white text-[#14224a]' : 'bg-[rgba(8,18,48,0.5)] text-white')}
           >
             All trips <span className="num opacity-80">{data.expenses.length}</span>
           </button>
@@ -91,7 +91,7 @@ export function Expenses() {
               type="button"
               aria-pressed={tripId === v.trip.id}
               onClick={() => setTripId(v.trip.id)}
-              className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-[14px] font-medium', tripId === v.trip.id ? 'bg-white text-[#14224a]' : 'bg-white/20 text-white')}
+              className={cx('press flex h-[42px] shrink-0 items-center gap-2 rounded-full pr-4 pl-1.5 text-[14px] font-medium', tripId === v.trip.id ? 'bg-white text-[#14224a]' : 'bg-[rgba(8,18,48,0.5)] text-white')}
             >
               <PhotoCard photo={v.trip.cover} seed={i + 1} radius={999} className="size-7" />
               {v.trip.name}

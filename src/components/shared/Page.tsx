@@ -14,9 +14,12 @@ export function SkyHero({ children, className }: { children: ReactNode; classNam
  */
 export function ContentSheet({ children, className }: { children: ReactNode; className?: string; wide?: boolean }) {
   const { pathname } = useLocation()
+  // A full-width haze surface that fades in from the sky, so body text never sits on the coloured sky.
   return (
-    <div key={pathname} className={cx('relative mx-auto w-full max-w-[1080px] [animation:rise_420ms_var(--ease-out-expo)_both]', className)}>
-      {children}
+    <div className="relative w-full bg-[linear-gradient(180deg,transparent_0,var(--haze)_44px)] pt-5">
+      <div key={pathname} className={cx('relative mx-auto w-full max-w-[1080px] [animation:rise_420ms_var(--ease-out-expo)_both]', className)}>
+        {children}
+      </div>
     </div>
   )
 }

@@ -204,3 +204,15 @@ First run uses the full twilight sky (`.tone-ink`) with white type, a white prim
 - **Home rail:** selecting a trip turns its ring gold and underlines its name (no scaling, nothing shifts); tapping the selected cover, or the headline chevron, opens the trip.
 - **Trip photo:** fades into the page with a mask instead of a hard edge.
 - **Settle:** a chart panel (progress and who is ahead or behind) above compact payment rows.
+
+## Home (final)
+
+Top: "Trips." and your avatar, the round trip rail (gold ring on the selected trip), the selected trip's name with an open arrow, the big total, a status chip and budget percentage. Then, blending with the lower sky, an **Add in one tap** card of six category icons. Below, on haze: **Up next** (the next day of the trip plan), **Just in** (three latest expenses with See all), and **Other trips** as a scrolling row of chips.
+
+## Contrast rules
+
+- Text on the sky is white with a soft shadow and sits only on the sky band, which carries a scrim computed per sky.
+- Body text never sits on the sky: the content area is a full-width haze surface that fades in from the sky.
+- Placeholders use the muted ink colour, not the faint one.
+- Controls on the sky use dark glass (`rgba(8,18,48,0.5 to 0.66)`); selected chips are white with dark text.
+- Avatar fills are dark enough for white initials at 4.5:1.

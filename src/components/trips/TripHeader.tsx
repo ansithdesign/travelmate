@@ -30,7 +30,7 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
           className={({ isActive }) =>
             cx(
               'press flex h-9 shrink-0 items-center rounded-full px-4 text-[14px] font-medium whitespace-nowrap',
-              isActive ? 'bg-white font-semibold text-[#14224a] shadow-[0_8px_18px_-10px_rgba(8,20,60,0.5)]' : 'bg-white/18 text-white/90 hover:bg-white/25',
+              isActive ? 'bg-white font-semibold text-[#14224a] shadow-[0_0_0_1px_rgba(13,27,42,0.14),0_8px_18px_-10px_rgba(8,20,60,0.55)]' : 'bg-[rgba(8,18,48,0.66)] text-white hover:bg-[rgba(8,18,48,0.76)]',
             )
           }
         >
