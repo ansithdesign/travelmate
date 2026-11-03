@@ -241,7 +241,7 @@ export function ConfirmDialog({
               'press h-12 rounded-full font-semibold text-white',
               tone === 'danger'
                 ? 'bg-[linear-gradient(180deg,#f2566a,#d02c42)] shadow-[0_10px_24px_-12px_rgb(214_54_74/0.7)]'
-                : 'bg-[linear-gradient(180deg,#4f8dff,#2563eb)] shadow-[0_10px_24px_-12px_rgb(37_99_235/0.7)]',
+                : 'luminous',
             )}
           >
             {confirmLabel}

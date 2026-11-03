@@ -273,7 +273,7 @@ function Itinerary({ view }: { view: TripView }) {
               className={cx(
                 'press flex h-[68px] w-[56px] shrink-0 flex-col items-center justify-center rounded-[22px] transition-colors',
                 on
-                  ? 'bg-[linear-gradient(180deg,#4f8dff,#2563eb)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_10px_22px_-10px_rgb(37_99_235/0.8)]'
+                  ? 'luminous'
                   : 'bg-panel-strong text-ink ring-line hover:bg-well',
               )}
             >

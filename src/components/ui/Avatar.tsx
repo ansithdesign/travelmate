@@ -69,7 +69,7 @@ export function AvatarStack({
 }) {
   const shown = people.slice(0, max)
   const extra = people.length - shown.length
-  const overlap = -Math.round(size * 0.14)
+  const overlap = -Math.round(size * 0.1)
   return (
     <span className={cx('flex items-center', className)} aria-label={people.map((p) => p.name).join(', ')} role="img">
       {shown.map((p, i) => (

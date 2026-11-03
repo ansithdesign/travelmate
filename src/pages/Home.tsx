@@ -10,7 +10,8 @@ import { useAllTripViews, type TripView } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
 import { useToast } from '../components/ui/Toast'
-import { greeting, parseDate, tripLength } from '../utils/dates'
+import { parseDate, tripLength } from '../utils/dates'
+import { useSky } from '../store/sky'
 import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
 import { cx } from '../utils/cx'
@@ -20,6 +21,9 @@ export function Home() {
   const { me, saveTrip } = useStore()
   const { openTrip, openExpense } = useUI()
   const toast = useToast()
+  const { phase } = useSky()
+  // The greeting agrees with the sky on screen.
+  const greeting = { dawn: 'Good morning', day: new Date().getHours() < 12 ? 'Good morning' : 'Good afternoon', golden: 'Good evening', night: 'Good evening' }[phase]
 
   if (views.length === 0) return <FirstRun />
 
@@ -44,7 +48,7 @@ export function Home() {
         </header>
 
         <h1 className="text-sky mt-8 text-hero lg:mt-2">
-          {greeting()},<br className="sm:hidden" /> {firstName(me.name)}
+          {greeting},<br className="sm:hidden" /> {firstName(me.name)}
         </h1>
         <YearLine views={views} />
 

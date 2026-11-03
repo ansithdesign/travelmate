@@ -48,7 +48,7 @@ export function FeaturedTrip({ view, seed = 0 }: { view: TripView; seed?: number
           <div className="mt-4 h-px w-12 bg-white/40" />
           <h3 className="text-sky mt-4 text-title">{trip.name}</h3>
           <p className="text-sky-2 mt-0.5 text-meta">{formatRange(trip.startDate, trip.endDate)}</p>
-          <AvatarStack people={members} size={28} className="mt-3" ringClass="ring-white/70" />
+          <AvatarStack people={members} size={30} className="mt-3" ringClass="ring-white/60" />
         </div>
       </div>
       <div className="glass-control mt-6 flex items-center justify-between gap-3 rounded-full py-2.5 pr-3 pl-5 text-meta text-white">

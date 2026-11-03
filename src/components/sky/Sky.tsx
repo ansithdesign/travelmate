@@ -144,7 +144,7 @@ function useWide() {
 
 /**
  * Sun or moon. Phones have controls and titles across the whole top edge, so the
- * disc sits just above the frame and only its rim and glow show. Desktop keeps the disc
+ * disc sits above the frame and only its glow spills into the sky. Desktop keeps the disc
  * whole in the open sky right of centre, clear of the header actions.
  */
 function Luminary({ phase }: { phase: SkyPhase }) {
@@ -157,10 +157,10 @@ function Luminary({ phase }: { phase: SkyPhase }) {
         night: { x: '71%', y: '7.5%', size: 44, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
       }
     : {
-        dawn: { x: '58%', y: '-4.6%', size: 76, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
-        day: { x: '58%', y: '-4.8%', size: 84, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
-        golden: { x: '58%', y: '-4.4%', size: 80, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
-        night: { x: '58%', y: '-2.4%', size: 46, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
+        dawn: { x: '58%', y: '-9%', size: 76, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
+        day: { x: '58%', y: '-9.5%', size: 84, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
+        golden: { x: '58%', y: '-9%', size: 80, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
+        night: { x: '58%', y: '-6%', size: 46, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
       }
   const p = pos[phase]
   return (

@@ -19,7 +19,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const variants: Record<Variant, string> = {
   // Luminous sky-blue pill with a lit top edge
   primary:
-    'text-white bg-[linear-gradient(180deg,#4f8dff_0%,#2563eb_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_1px_2px_rgb(23_73_196/0.3),0_10px_24px_-10px_rgb(37_99_235/0.7)] hover:brightness-[1.06] disabled:opacity-45 disabled:shadow-none',
+    'luminous hover:brightness-[1.06] disabled:opacity-45 disabled:shadow-none',
   secondary: 'bg-panel-strong text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong),0_1px_2px_rgb(var(--t-shadow)/0.06)] hover:bg-panel disabled:text-ink-3',
   ghost: 'text-ink hover:bg-well disabled:text-ink-3',
   quiet: 'text-accent hover:bg-accent-soft disabled:text-ink-3',

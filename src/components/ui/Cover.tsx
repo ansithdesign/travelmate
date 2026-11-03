@@ -2,13 +2,21 @@ import { useState } from 'react'
 import type { Photo } from '../../types'
 import { cx } from '../../utils/cx'
 import { CloudShape } from '../sky/Sky'
+import { useSky, type SkyPhase } from '../../store/sky'
 
-const SKIES = [
-  'linear-gradient(180deg,#2f78e6 0%,#7ab6f6 60%,#d5ebff 100%)',
-  'linear-gradient(180deg,#5c5fc6 0%,#d590b4 60%,#ffc89a 100%)',
-  'linear-gradient(180deg,#1f63d6 0%,#5aa0f0 55%,#bfe0ff 100%)',
-  'linear-gradient(180deg,#4b66bd 0%,#c79ad0 60%,#ffd9b8 100%)',
-]
+// What you see through the window follows the sky you are under.
+const SKIES: Record<SkyPhase, string[]> = {
+  dawn: ['linear-gradient(180deg,#5168c2 0%,#b495d2 55%,#ffd2b4 100%)', 'linear-gradient(180deg,#6576cc 0%,#d6a0c6 60%,#ffe0c4 100%)'],
+  day: ['linear-gradient(180deg,#2f78e6 0%,#7ab6f6 60%,#d5ebff 100%)', 'linear-gradient(180deg,#1f63d6 0%,#5aa0f0 55%,#bfe0ff 100%)'],
+  golden: ['linear-gradient(180deg,#4a54bd 0%,#c486bf 55%,#ffb98a 100%)', 'linear-gradient(180deg,#5c5fc6 0%,#e0909f 60%,#ffc89a 100%)'],
+  night: ['linear-gradient(180deg,#060b26 0%,#142056 65%,#2a336f 100%)', 'linear-gradient(180deg,#0a1132 0%,#1b2560 60%,#3a3a78 100%)'],
+}
+const CLOUD: Record<SkyPhase, [string, string, number]> = {
+  dawn: ['#fff6f4', '#e6c3d6', 0.95],
+  day: ['#ffffff', '#cfe0f5', 1],
+  golden: ['#fff0e8', '#e6a7b4', 0.95],
+  night: ['#6a73a6', '#2b3468', 0.55],
+}
 
 /**
  * A photo with a sky fallback. If the image is missing or fails, you see what a
@@ -32,12 +40,15 @@ export function Cover({
 }) {
   const [failed, setFailed] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const { phase } = useSky()
   const show = !!photo?.src && !failed
   // Derive the fallback sky from the photo id so each window shows its own clouds.
   let h = seed * 7919
   for (const c of photo?.id ?? '') h = (h * 31 + c.charCodeAt(0)) >>> 0
   const r = (n: number) => ((h >>> (n * 3)) % 1000) / 1000
-  const skyIdx = (h + seed) % SKIES.length
+  const skies = SKIES[phase]
+  const skyIdx = (h + seed) % skies.length
+  const [ct, cb, co] = CLOUD[phase]
   const a = { top: 8 + r(1) * 30, left: -18 + r(2) * 30, w: 120 + r(3) * 70, v: h % 3 }
   const b = { bottom: 4 + r(4) * 26, right: -26 + r(5) * 28, w: 150 + r(6) * 80, v: (h >>> 2) % 3 }
 
@@ -46,13 +57,22 @@ export function Cover({
       <div
         aria-hidden
         className={cx('absolute inset-0 transition-opacity duration-700', show && loaded ? 'opacity-0' : 'opacity-100')}
-        style={{ background: SKIES[skyIdx] }}
+        style={{ background: skies[skyIdx] }}
       >
-        <div className="absolute" style={{ top: `${a.top}%`, left: `${a.left}%`, animation: `bob ${6 + r(7) * 4}s ease-in-out ${-r(8) * 6}s infinite` }}>
-          <CloudShape width={a.w} variant={a.v} />
+        {phase === 'night'
+          ? Array.from({ length: 14 }, (_, i) => (
+              <span
+                key={i}
+                className="absolute size-[2px] rounded-full bg-white"
+                style={{ left: `${(r(i + 11) * 100 + i * 37) % 100}%`, top: `${(r(i + 3) * 70 + i * 13) % 70}%`, animation: `twinkle ${2 + (i % 4)}s ease-in-out ${-i * 0.7}s infinite` }}
+              />
+            ))
+          : null}
+        <div className="absolute" style={{ opacity: co, top: `${a.top}%`, left: `${a.left}%`, animation: `bob ${6 + r(7) * 4}s ease-in-out ${-r(8) * 6}s infinite` }}>
+          <CloudShape width={a.w} variant={a.v} top={ct} belly={cb} />
         </div>
-        <div className="absolute opacity-85" style={{ bottom: `${b.bottom}%`, right: `${b.right}%`, animation: `bob ${8 + r(9) * 4}s ease-in-out ${-r(10) * 6}s infinite` }}>
-          <CloudShape width={b.w} variant={b.v} />
+        <div className="absolute" style={{ opacity: co * 0.85, bottom: `${b.bottom}%`, right: `${b.right}%`, animation: `bob ${8 + r(9) * 4}s ease-in-out ${-r(10) * 6}s infinite` }}>
+          <CloudShape width={b.w} variant={b.v} top={ct} belly={cb} />
         </div>
       </div>
       {show ? (

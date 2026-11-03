@@ -190,7 +190,7 @@ function JournalBody({ view }: { view: TripView }) {
                   {trip.journal.places.map((p, i) => (
                     <li key={p + i} className="group relative flex min-h-10 items-center justify-between gap-3 py-1.5">
                       {i === 0 || i === trip.journal.places.length - 1 ? (
-                        <span aria-hidden className="absolute top-1/2 -left-[39px] flex size-7 -translate-y-1/2 items-center justify-center rounded-full bg-[linear-gradient(180deg,#4f8dff,#2563eb)] text-white shadow-[0_4px_12px_-4px_rgb(37_99_235/0.8)]">
+                        <span aria-hidden className="absolute top-1/2 -left-[39px] flex size-7 -translate-y-1/2 items-center justify-center rounded-full luminous">
                           {i === 0 ? <AirplaneTakeoff size={15} weight="fill" /> : <AirplaneLanding size={15} weight="fill" />}
                         </span>
                       ) : (

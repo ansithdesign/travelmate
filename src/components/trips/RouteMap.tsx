@@ -105,7 +105,7 @@ function Badge({ x, y, icon }: { x: number; y: number; icon: 'takeoff' | 'landin
   return (
     <span
       aria-hidden
-      className="absolute flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[linear-gradient(180deg,#4f8dff,#2563eb)] text-white shadow-[0_6px_14px_-6px_rgb(37_99_235/0.9),inset_0_1px_0_rgb(255_255_255/0.35)]"
+      className="absolute flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full luminous"
       style={{ left: x, top: y }}
     >
       {icon === 'takeoff' ? <AirplaneTakeoff size={17} weight="fill" /> : <AirplaneLanding size={17} weight="fill" />}

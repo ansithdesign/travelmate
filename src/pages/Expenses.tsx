@@ -35,13 +35,13 @@ export function Expenses() {
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="glass rounded-[24px] px-4 py-3.5">
+          <div className="glass-control rounded-[24px] px-4 py-3.5">
             <p className="text-sky-2 text-caption font-semibold">You are owed</p>
-            <p className="text-sky num mt-0.5 text-title">{formatMoney(owedToMe)}</p>
+            <p className="text-sky num mt-0.5 text-title">{owedToMe ? formatMoney(owedToMe) : 'Nothing'}</p>
           </div>
-          <div className="glass rounded-[24px] px-4 py-3.5">
+          <div className="glass-control rounded-[24px] px-4 py-3.5">
             <p className="text-sky-2 text-caption font-semibold">You owe</p>
-            <p className="text-sky num mt-0.5 text-title">{formatMoney(iOwe)}</p>
+            <p className="text-sky num mt-0.5 text-title">{iOwe ? formatMoney(iOwe) : 'All clear'}</p>
           </div>
         </div>
 

@@ -56,7 +56,7 @@ function Overview({ view }: { view: TripView }) {
               {trip.destination} · <span className="whitespace-nowrap">{formatRange(trip.startDate, trip.endDate)}</span>
             </p>
             <Link to={`/trips/${trip.id}/people`} className="mt-2.5 inline-flex items-center gap-2 rounded-full py-0.5 pr-2 hover:bg-white/10">
-              <AvatarStack people={members} size={26} max={5} />
+              <AvatarStack people={members} size={28} max={5} />
               <span className="text-sky-2 text-caption font-semibold">
                 {phaseLabel(trip, status)}
                 {trip.invites.length ? ` · ${trip.invites.length} invited` : ''}
@@ -79,7 +79,7 @@ function Overview({ view }: { view: TripView }) {
                 <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
                   <div>
                     <p className="text-meta font-medium text-ink-2">Group has spent</p>
-                    <Figure value={ledger.total} currency={cur} className="mt-1" />
+                    <Figure value={ledger.total} currency={cur} animate className="mt-1" />
                   </div>
                   <div className="sm:pb-1 sm:text-right">
                     <p className={cx('num text-heading', myNet > 0 ? 'text-gain' : myNet < 0 ? 'text-loss' : 'text-ink-3')}>

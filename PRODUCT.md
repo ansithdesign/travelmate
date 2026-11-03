@@ -10,7 +10,7 @@ web
 
 ## Stack
 
-Delegated: React, TypeScript, Vite, Tailwind CSS, Lucide icons, localStorage persistence behind a repository layer so a backend can replace it later. Chosen because the repo was empty and the brief named this stack as the default.
+Delegated: React, TypeScript, Vite, Tailwind CSS, Phosphor icons plus authored SVG icons, localStorage persistence behind a repository layer so a backend can replace it later. Chosen because the repo was empty and the brief named this stack as the default.
 
 ## Users
 

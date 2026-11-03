@@ -73,8 +73,8 @@ export function FlightPath({ spent, budget, className, currency }: { spent: Pais
       >
         <defs>
           <linearGradient id={`${u}t`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor={over ? '#ff8a8a' : '#60a5fa'} />
-            <stop offset="1" stopColor={over ? '#e5484d' : '#2563eb'} />
+            <stop offset="0" stopColor={over ? 'var(--color-loss)' : 'var(--color-accent)'} stopOpacity="0.55" />
+            <stop offset="1" stopColor={over ? 'var(--color-loss)' : 'var(--color-accent)'} />
           </linearGradient>
         </defs>
         {/* Planned route */}
@@ -90,11 +90,11 @@ export function FlightPath({ spent, budget, className, currency }: { spent: Pais
           strokeDasharray={`${len * p} ${len}`}
         />
         {/* Origin */}
-        <circle cx="18" cy="78" r="5" className="fill-panel-strong" stroke="currentColor" strokeWidth="2" style={{ color: over ? '#e5484d' : '#2563eb' }} />
+        <circle cx="18" cy="78" r="5" className="fill-panel-strong" stroke="currentColor" strokeWidth="2" style={{ color: over ? 'var(--color-loss)' : 'var(--color-accent)' }} />
         {/* Destination pin */}
         <g transform="translate(302 78)">
-          <circle r="11" fill={over ? 'rgb(229 72 77 / 0.15)' : 'rgb(37 99 235 / 0.12)'} />
-          <path d="M0 -9c-3.6 0-6.2 2.7-6.2 6 0 4.4 6.2 9.6 6.2 9.6s6.2-5.2 6.2-9.6c0-3.3-2.6-6-6.2-6z" fill={over ? '#e5484d' : '#ff8a5c'} />
+          <circle r="11" fill={over ? 'var(--color-loss-soft)' : 'var(--color-accent-soft)'} />
+          <path d="M0 -9c-3.6 0-6.2 2.7-6.2 6 0 4.4 6.2 9.6 6.2 9.6s6.2-5.2 6.2-9.6c0-3.3-2.6-6-6.2-6z" fill={over ? 'var(--color-loss)' : '#ff8a5c'} />
           <circle cy="-3" r="2.2" fill="#fff" />
         </g>
         {/* Spent tag rides above the plane */}
@@ -104,8 +104,8 @@ export function FlightPath({ spent, budget, className, currency }: { spent: Pais
           const x = Math.min(Math.max(pt.x, w / 2 + 2), 320 - w / 2 - 2)
           return (
             <g transform={`translate(${x} ${pt.y - 30})`}>
-              <rect x={-w / 2} y={-11} width={w} height={22} rx={11} fill={over ? '#e5484d' : '#2563eb'} />
-              <text textAnchor="middle" y={4} fontSize="11.5" fontWeight="600" fill="#fff" className="num">
+              <rect x={-w / 2} y={-11} width={w} height={22} rx={11} fill={over ? 'var(--color-loss)' : 'var(--color-accent)'} />
+              <text textAnchor="middle" y={4} fontSize="11.5" fontWeight="600" className="num fill-ink-inverse">
                 {label}
               </text>
             </g>
@@ -116,7 +116,7 @@ export function FlightPath({ spent, budget, className, currency }: { spent: Pais
           <circle r="13" className="fill-panel-strong" style={{ filter: 'drop-shadow(0 4px 8px rgb(12 23 54 / 0.25))' }} />
           <path
             d="M7.2 0c0-.8-.7-1.4-1.6-1.4H1.6L-2.8-7.4h-2l2 6H-6l-1.6-2H-9l1 3.4L-9 3.4h1.4L-6 1.4h3.2l-2 6h2L1.6 1.4h4c.9 0 1.6-.6 1.6-1.4z"
-            fill={over ? '#e5484d' : '#2563eb'}
+            fill={over ? 'var(--color-loss)' : 'var(--color-accent)'}
           />
         </g>
       </svg>

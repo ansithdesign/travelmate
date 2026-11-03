@@ -145,7 +145,7 @@ function SideRail({ pathname }: { pathname: string }) {
           type="button"
           disabled={data.trips.length === 0}
           onClick={() => openExpense({ tripId: tripMatch?.params.tripId })}
-          className="press flex h-11 items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#5b96ff,#2563eb)] text-meta font-semibold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_10px_24px_-10px_rgb(37_99_235/0.8)] disabled:opacity-50"
+          className="luminous press flex h-11 items-center justify-center gap-2 rounded-full text-meta font-semibold disabled:opacity-50"
         >
           <Plus size={17} weight="bold" aria-hidden />
           Add expense

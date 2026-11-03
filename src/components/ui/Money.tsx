@@ -61,7 +61,7 @@ export function Figure({
   value,
   className,
   currency,
-  animate = true,
+  animate = false,
   size = 'lg',
 }: {
   value: Paise

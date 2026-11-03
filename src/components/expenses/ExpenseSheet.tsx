@@ -243,27 +243,33 @@ export function ExpenseSheet() {
             </label>
             <div className={cx('flex w-full items-start justify-center rounded-[28px] px-4 pt-4 pb-3 transition-shadow', submitted && errors.amount ? 'bg-loss-soft' : 'bg-well focus-within:bg-accent-soft')}>
               <span className="mt-3 mr-1 text-[28px] font-light text-ink-3">{currencySymbol(currency).trim()}</span>
+  {/* Mirror sizes the field to its digits so the symbol sits right beside the number */}
+              <span className="inline-grid max-w-[calc(100%-40px)]">
+                <span aria-hidden className="num invisible col-start-1 row-start-1 overflow-hidden pr-1 text-[60px] leading-[68px] font-extralight tracking-[-0.05em] whitespace-pre">
+                  {draft.amount || '0'}
+                </span>
               <input
-                ref={amountRef}
-                id="exp-amount"
-                data-autofocus
-                inputMode="decimal"
-                autoComplete="off"
-                placeholder="0"
-                value={draft.amount}
-                size={Math.max(1, draft.amount.length || 1)}
-                onChange={(e) => {
-                  const v = e.target.value
-                  if (/^[\d,]*\.?\d{0,2}$/.test(v)) set('amount', v)
-                }}
-                onBlur={() => {
-                  // Only fill exact amounts if none have been typed yet, never overwrite the person's numbers.
-                  const typed = Object.values(draft.inputs).some((x) => (parseMoney(x) ?? 0) > 0)
-                  if (draft.method === 'exact' && !typed) setDraft((d) => ({ ...d, inputs: seedInputs('exact', d.participants) }))
-                }}
-                aria-invalid={submitted && !!errors.amount}
-                className="num max-w-full min-w-[1ch] bg-transparent text-center text-[60px] leading-[68px] font-extralight tracking-[-0.05em] text-ink caret-accent outline-none placeholder:text-ink/20"
-              />
+                  ref={amountRef}
+                  id="exp-amount"
+                  size={1}
+                  data-autofocus
+                  inputMode="decimal"
+                  autoComplete="off"
+                  placeholder="0"
+                  value={draft.amount}
+                  onChange={(e) => {
+                    const v = e.target.value
+                    if (/^[\d,]*\.?\d{0,2}$/.test(v)) set('amount', v)
+                  }}
+                  onBlur={() => {
+                    // Only fill exact amounts if none have been typed yet, never overwrite the person's numbers.
+                    const typed = Object.values(draft.inputs).some((x) => (parseMoney(x) ?? 0) > 0)
+                    if (draft.method === 'exact' && !typed) setDraft((d) => ({ ...d, inputs: seedInputs('exact', d.participants) }))
+                  }}
+                  aria-invalid={submitted && !!errors.amount}
+                  className="num col-start-1 row-start-1 w-full min-w-0 bg-transparent text-left text-[60px] leading-[68px] font-extralight tracking-[-0.05em] text-ink caret-accent outline-none placeholder:text-ink/25"
+                />
+              </span>
             </div>
             {submitted && errors.amount ? <p className="-mt-2 text-meta text-loss">{errors.amount}</p> : null}
             <TextInput
@@ -356,7 +362,7 @@ export function ExpenseSheet() {
                       <span
                         className={cx(
                           'flex size-6 shrink-0 items-center justify-center rounded-full transition-all duration-300 ease-[var(--ease-glide)]',
-                          on ? 'scale-100 bg-[linear-gradient(180deg,#4f8dff,#2563eb)] text-white shadow-[0_4px_10px_-4px_rgb(37_99_235/0.8)]' : 'scale-90 shadow-[inset_0_0_0_2px_var(--color-line-strong)]',
+                          on ? 'luminous scale-100' : 'scale-90 shadow-[inset_0_0_0_2px_var(--color-line-strong)]',
                         )}
                       >
                         {on ? <Check size={13} weight="bold" aria-hidden /> : null}

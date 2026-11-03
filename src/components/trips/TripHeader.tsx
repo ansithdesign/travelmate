@@ -21,14 +21,14 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
   // Keep the current section visible when the strip scrolls on narrow screens.
   useEffect(() => {
     const el = ref.current?.querySelector<HTMLElement>('[aria-current="page"]')
-    if (el && ref.current) ref.current.scrollTo({ left: el.offsetLeft - ref.current.clientWidth / 2 + el.clientWidth / 2 })
+    if (el && ref.current) ref.current.scrollTo({ left: Math.max(0, el.offsetLeft - 20) })
   }, [trip.id])
   return (
     <nav
       ref={ref}
       aria-label="Trip sections"
       className={cx(
-        'no-scrollbar glass-control flex w-fit max-w-full gap-1 overflow-x-auto rounded-full p-1 max-sm:[mask-image:linear-gradient(90deg,transparent_0,#000_14px,#000_calc(100%-22px),transparent)]',
+        'no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:w-fit sm:max-w-full sm:gap-1 sm:rounded-full sm:p-1 sm:px-1 sm:[background:linear-gradient(180deg,rgb(255_255_255/0.12),rgb(255_255_255/0.03)),rgb(8_22_76/0.5)] sm:shadow-[inset_0_1px_0_rgb(255_255_255/0.32),inset_0_0_0_1px_rgb(255_255_255/0.16)] sm:backdrop-blur-[18px]',
         className,
       )}
     >
@@ -40,7 +40,7 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
           className={({ isActive }) =>
             cx(
               'press flex h-9 shrink-0 items-center rounded-full px-4 text-meta font-semibold',
-              isActive ? 'bg-white text-[#0c1736] shadow-[0_6px_16px_-8px_rgb(8_20_60/0.5)]' : 'text-sky-2 hover:bg-white/15',
+              isActive ? 'bg-white text-[#0c1736] shadow-[0_6px_16px_-8px_rgb(8_20_60/0.5)]' : 'glass-control text-white sm:bg-none sm:shadow-none sm:backdrop-blur-none sm:[background:transparent] hover:bg-white/15',
             )
           }
         >

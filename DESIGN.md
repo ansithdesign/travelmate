@@ -207,7 +207,7 @@ Density is calm and phone-first: one primary figure per view, set large and ligh
 A sky-derived palette: navy ink on the light phases, moonlit ink at night, one luminous blue for action, and green/coral/amber reserved for money meaning.
 
 ### Primary
-- **Luminous Sky Blue** (accent): primary buttons, active tab, focus ring, caret, selection tint, the flight-path trail. It deepens to a periwinkle (accent-golden) at golden hour and lifts to a pale moonlit blue (accent-night) at night. Primary pills render it as a lit gradient (`#4f8dff` to `#2563eb`) with a bright top edge.
+- **Luminous Sky Blue** (accent): primary buttons, active tab, focus ring, caret, selection tint, the flight-path trail. It deepens to a periwinkle (accent-golden) at golden hour and lifts to a pale moonlit blue (accent-night) at night. Primary pills render it through one shared `.luminous` material: a lit gradient (`#4f8dff` to `#2563eb`, brighter at night) with a bright top edge. Never re-type the gradient inline.
 - **Deep Sky Blue** (accent-ink): accent used as text on light glass where contrast needs it.
 
 ### Secondary
@@ -336,7 +336,7 @@ A finished trip's places drawn as a winding flight route that snakes left to rig
 - **Clouds:** volumetric cumulus drift across in 130 to 280s linear loops and lift at 0.18 of scroll (parallax, capped at 1200px).
 - **Sheet rise:** the content sheet rises 18px and fades in over 640ms (expo) on every navigation; this is the only page transition.
 - **Modal sheet:** slides up (phones) or in from the right (768px+) in 520ms on the glide curve; drags down to dismiss.
-- **Count-up:** figures count from the previous value with an exponential ease (1100ms; countdown 1400ms).
+- **Count-up:** reserved for the two headline moments, the trip's group spend on the overview and the home countdown (1100ms / 1400ms, exponential ease). Figures in sheets, tables and summaries are static, so no one ever reads an amount mid-count.
 - **Plane flight, shade drop, PAID stamp, route draw-in** as described above.
 - All motion collapses under `prefers-reduced-motion`; count-ups and the plane jump straight to their values.
 
@@ -347,7 +347,9 @@ Easing: **expo** `cubic-bezier(0.16, 1, 0.3, 1)` for arrivals; **glide** `cubic-
 ### Do:
 - **Do** set type placed directly on the sky with the sky text styles (white with an atmospheric shadow; 92% white for secondary), so it holds when a cloud drifts behind it.
 - **Do** put pill controls and strips on the sky in the glass-control material, so white labels keep 4.5:1 in every phase; use the white pill for the one primary action on the sky.
-- **Do** keep the luminary clear of controls and titles: on phones the sun or moon sits just above the top edge so only its rim and glow show; from 1024px it is shown whole in the open sky at the top right.
+- **Do** keep the luminary clear of controls and titles: on phones the sun or moon sits above the top edge so only its glow spills into the sky; from 1024px it is shown whole in the open sky right of centre (x 70%).
+- **Do** let windows show the sky you are under: the cabin-window fallback follows the phase (sunset tones at golden hour, a starry night sky at night), varied per trip.
+- **Do** match words to the sky: the home greeting follows the phase, not the raw clock.
 - **Do** read every UI colour from the phase tokens and check new surfaces in all four phases, night included.
 - **Do** frame trip imagery in the cabin Window and rely on its sky fallback rather than a placeholder or broken image.
 - **Do** word every balance ("You owe", "You get back", "All square") and set amounts in tabular figures.
@@ -355,7 +357,7 @@ Easing: **expo** `cubic-bezier(0.16, 1, 0.3, 1)` for arrivals; **glide** `cubic-
 
 ### Don't:
 - **Don't** use em dashes in copy.
-- **Don't** use emoji or plain line-icon sets as UI icons; categories and navigation use the authored dimensional set.
+- **Don't** use emoji as icons, and don't substitute a thin line-icon set for categories or navigation; those use the authored dimensional set.
 - **Don't** place navy ink or unshadowed white text directly on the sky.
 - **Don't** add decorative gradient blobs; colour comes from the sky.
 - **Don't** lay content on a flat opaque white page; working content sits on the frosted sheet.
