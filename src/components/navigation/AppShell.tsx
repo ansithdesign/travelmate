@@ -27,7 +27,7 @@ export function AppShell() {
       <Sky soft={soft} />
       <div className="min-h-dvh lg:pl-[296px]">
         <SideRail pathname={pathname} />
-        <main className="min-w-0 pb-[calc(124px+env(safe-area-inset-bottom))] lg:pt-2 lg:pb-10">
+        <main className="flex min-h-dvh min-w-0 flex-col pb-[calc(124px+env(safe-area-inset-bottom))] lg:pt-2 lg:pb-10">
           <ErrorBoundary resetKey={pathname}>
             <Outlet />
           </ErrorBoundary>

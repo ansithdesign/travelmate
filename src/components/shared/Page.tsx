@@ -17,14 +17,14 @@ export function ContentSheet({ children, className }: { children: ReactNode; cla
   // A full-width haze surface that fades in from the sky, so body text never sits on the coloured sky.
   return (
     <div
-      className="pointer-events-none relative -mt-16 w-full pt-[84px]"
+      className="pointer-events-none relative -mt-16 flex w-full flex-1 flex-col pt-[84px]"
       style={{
         // An eased ramp, so the sky melts into the page with no visible band
         background:
           'linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--haze) 6%, transparent) 20px, color-mix(in srgb, var(--haze) 20%, transparent) 44px, color-mix(in srgb, var(--haze) 45%, transparent) 70px, color-mix(in srgb, var(--haze) 72%, transparent) 98px, color-mix(in srgb, var(--haze) 92%, transparent) 124px, var(--haze) 150px)',
       }}
     >
-      <div key={pathname} className={cx('pointer-events-auto relative mx-auto w-full max-w-[1080px] [animation:rise_420ms_var(--ease-out-expo)_both]', className)}>
+      <div key={pathname} className={cx('pointer-events-auto relative mx-auto flex w-full max-w-[1080px] flex-1 flex-col [animation:rise_420ms_var(--ease-out-expo)_both]', className)}>
         {children}
       </div>
     </div>
@@ -32,7 +32,7 @@ export function ContentSheet({ children, className }: { children: ReactNode; cla
 }
 
 export function SheetBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx('px-6 pt-4 pb-12 lg:px-10', className)}>{children}</div>
+  return <div className={cx('flex flex-1 flex-col px-6 pt-4 pb-12 lg:px-10', className)}>{children}</div>
 }
 
 /** The signature blue full stop that ends a page title. */

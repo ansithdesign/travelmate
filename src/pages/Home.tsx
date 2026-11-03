@@ -111,7 +111,7 @@ export function Home() {
 
           {/* The selected trip's numbers sit straight on the sky */}
           <div className="mt-7">
-            <Link to={`/trips/${trip.id}`} className="press -ml-1 inline-flex items-center gap-2.5 rounded-full py-1 pr-2 pl-1 text-meta leading-none font-semibold text-ink-3 hover:text-ink">
+            <Link to={`/trips/${trip.id}`} className="press -ml-1 flex w-fit max-w-full items-center gap-2.5 rounded-full py-1 pr-2 pl-1 text-meta leading-none font-semibold text-ink-3 hover:text-ink">
               <span className="truncate leading-5">
                 {trip.name} · {phaseLabel(trip, status)}
               </span>

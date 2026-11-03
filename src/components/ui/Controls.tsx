@@ -94,7 +94,7 @@ export function Chip({
 
 export function EmptyState({ title, body, action, art }: { title: string; body: ReactNode; action?: ReactNode; art?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center gap-3 px-4 py-8 text-center">
+    <div className="my-auto flex flex-col items-center gap-3 px-4 py-8 text-center">
       {art}
       <h3 className="text-title">{title}</h3>
       <p className="-mt-1.5 max-w-[34ch] text-body text-ink-3">{body}</p>
