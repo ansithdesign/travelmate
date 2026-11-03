@@ -191,7 +191,7 @@ components:
 
 **Creative North Star: "A Living, Painted Sky"**
 
-The whole app sits under a full-bleed sky whose gradient, sun or moon, clouds and stars follow local time through four phases: dawn, day, golden and night. The phase is set on the root element (`html[data-sky]`) and every ink, glass and accent token re-resolves from it. The sky is the ground; working content rises over it on frosted glass sheets, and the things worth looking at (trips) are framed as aircraft cabin windows.
+The whole app sits under a full-bleed sky whose gradient, sun or moon, clouds and stars follow local time through four phases: dawn, day, golden and night. The phase is set on the root element (`html[data-sky]`) and every ink, glass and accent token re-resolves from it.
 
 Density is calm and phone-first: one primary figure per view, set large and light, with money always tabular and always worded ("You owe", "You get back"). Depth is glass over sky, never flat white. Colour comes from the sky itself; the only saturated UI colour is the luminous blue of primary actions plus gain, loss and sun tones for meaning.
 
