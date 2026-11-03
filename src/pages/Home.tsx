@@ -29,11 +29,7 @@ const QUICK: { id: CategoryId; label: string }[] = [
   { id: 'groceries', label: 'Groceries' },
   { id: 'stay', label: 'Stay' },
   { id: 'activities', label: 'Activities' },
-  { id: 'sightseeing', label: 'Sights' },
   { id: 'shopping', label: 'Shopping' },
-  { id: 'flights', label: 'Flights' },
-  { id: 'fuel', label: 'Fuel' },
-  { id: 'health', label: 'Health' },
   { id: 'other', label: 'Other' },
 ]
 
