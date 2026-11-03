@@ -124,7 +124,7 @@ Rule: one title, one secondary line. If a row needs a third line, it is a captio
 
 `shadow-soft` is `0 1px 2px` at 3% plus `0 10px 30px -14px` at 14%: wide and faint. Dividers are 1px at 6% ink.
 | Sheet, dialog | haze, float shadow |
-| Tab bar | haze 70%, blur 24, hairline top |
+| Tab dock | solid 88%, blur 24, float shadow |
 | Popover menu | solid 88%, float shadow |
 
 ## Components
@@ -157,7 +157,7 @@ Strong glass, 42px, medium 14px label. Selected is midnight.
 Haze, radius 34 (sheet) or 30 (dialog), grabber 38 x 5, 21px bold title, a plain close icon. Backdrop `rgba(8,20,40,0.32)` with a 3px blur.
 
 ### Tab bar
-Full width, haze material. Three tabs (Trips, Expenses, Profile), 25px icons, regular when idle and fill when active, active label in accent. Add expense is a 54px midnight button floating bottom right, hidden on Profile.
+A floating glass dock, 68px tall, pill shaped, centred above the bottom edge. The current tab expands into an accent-soft pill with its icon (fill) and label; other tabs are 48px regular icons. Add expense is a 52px midnight circle built into the middle of the dock, so it never covers content. Tapping the current tab scrolls to the top. Pages reserve 112px at the bottom.
 
 ### Key moments
 First run uses the full twilight sky (`.tone-ink`) with white type, a white primary button and a translucent secondary.
