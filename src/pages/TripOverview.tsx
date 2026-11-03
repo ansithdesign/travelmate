@@ -11,7 +11,7 @@ import { ExpenseDetailSheet } from '../components/expenses/ExpenseDetailSheet'
 import { ContentSheet, Dot, NavHeader, SheetBody, SkyHero } from '../components/shared/Page'
 import { AvatarStack } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
-import { PhotoCard } from '../components/ui/Cover'
+import { Cover } from '../components/ui/Cover'
 import { Menu } from '../components/ui/Menu'
 import { Figure } from '../components/ui/Money'
 import { useTripView, type TripView } from '../hooks/useTrip'
@@ -41,43 +41,46 @@ function Overview({ view }: { view: TripView }) {
   const myNet = ledger.net[me.id] ?? 0
 
   return (
-    <>
-      <NavHeader title={<span className="sr-only">{trip.name}</span>} back="/" actions={<Menu items={items} label="Trip actions" tone="plain" />} />
-      <SkyHero className="pt-2 pb-2">
-        <div className="on-sky">
-        <div className="flex items-center gap-4">
-          <PhotoCard photo={trip.cover} eager radius={18} className="size-[64px] shrink-0 sm:size-[76px]" />
-          <div className="min-w-0">
-            <h1 className="text-hero">
-              {trip.name}
-              <Dot />
-            </h1>
-            <p className="mt-1 text-meta text-ink-3">
-              {trip.destination} · <span className="whitespace-nowrap">{formatRange(trip.startDate, trip.endDate)}</span>
-            </p>
-          </div>
-        </div>
+    <div className="relative">
+      {/* The trip photo runs behind the header and the title */}
+      <div aria-hidden className="absolute inset-x-0 top-0 h-[420px] overflow-hidden rounded-b-[34px] lg:left-[296px] lg:inset-x-auto lg:right-0 lg:rounded-b-[40px]" style={{ left: 0 }}>
+        <Cover photo={trip.cover} eager className="size-full" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,20,40,0.55)_0%,rgba(8,20,40,0.05)_38%,rgba(8,20,40,0.65)_100%)]" />
+      </div>
 
-        {/* The hero figure sits straight on the sky */}
-        <div className="mt-8">
-          <p className="text-meta font-medium text-ink-3">{expenses.length ? 'Group has spent' : 'Nothing spent yet'}</p>
-          <Figure value={ledger.total} currency={cur} animate size="xl" className="mt-1.5" />
+      <NavHeader title={<span className="sr-only">{trip.name}</span>} back="/" actions={<Menu items={items} label="Trip actions" tone="plain" />} />
+      <SkyHero className="on-sky pt-[84px] pb-0">
+        <h1 className="text-hero [text-shadow:0_2px_18px_rgba(8,20,40,0.45)]">
+          {trip.name}
+          <Dot />
+        </h1>
+        <p className="mt-1 text-meta text-white/90 [text-shadow:0_1px_10px_rgba(8,20,40,0.5)]">
+          {trip.destination} · <span className="whitespace-nowrap">{formatRange(trip.startDate, trip.endDate)}</span>
+        </p>
+      </SkyHero>
+
+      {/* The money sits on a frosted card that overlaps the photo */}
+      <SkyHero className="mt-[78px]">
+        <section aria-labelledby="money" className="panel rounded-[28px] p-6">
+          <h2 id="money" className="text-meta font-medium text-ink-3">
+            {expenses.length ? 'Group has spent' : 'Nothing spent yet'}
+          </h2>
+          <Figure value={ledger.total} currency={cur} animate size="lg" className="mt-1.5" />
           <div className="mt-4 flex flex-wrap items-center gap-2.5">
             <span className={cx('level num', myNet > 0 ? 'ok' : myNet < 0 ? 'act' : 'quiet')}>
               {myNet > 0 ? `You get back ${formatMoney(myNet, { currency: cur })}` : myNet < 0 ? `You owe ${formatMoney(-myNet, { currency: cur })}` : 'You are all square'}
             </span>
-            <Link to={`/trips/${trip.id}/people`} className="press inline-flex items-center gap-2 rounded-full py-0.5 pr-2.5 pl-0.5 hover:bg-well">
-              <AvatarStack people={members} size={24} max={4} />
-              <span className="text-caption font-medium text-ink-3">
-                {members.length} {members.length === 1 ? 'traveller' : 'travellers'}
-                {trip.invites.length ? `, ${trip.invites.length} invited` : ''}
-              </span>
-            </Link>
           </div>
-        </div>
-        </div>
-        {trip.budget ? <BudgetBar spent={ledger.total} budget={trip.budget} currency={cur} className="mt-10 max-w-[560px]" /> : null}
-        <TripTabs view={view} className="mt-8" />
+          {trip.budget ? <BudgetBar spent={ledger.total} budget={trip.budget} currency={cur} className="mt-6" /> : null}
+          <Link to={`/trips/${trip.id}/people`} className="press mt-5 inline-flex items-center gap-2 rounded-full py-0.5 pr-2.5 pl-0.5 hover:bg-well">
+            <AvatarStack people={members} size={28} max={4} />
+            <span className="text-caption font-medium text-ink-3">
+              {members.length} {members.length === 1 ? 'traveller' : 'travellers'}
+              {trip.invites.length ? `, ${trip.invites.length} invited` : ''}
+            </span>
+          </Link>
+        </section>
+        <TripTabs view={view} className="mt-6" />
       </SkyHero>
 
       <ContentSheet>
@@ -118,7 +121,7 @@ function Overview({ view }: { view: TripView }) {
         </SheetBody>
       </ContentSheet>
       {dialogs}
-    </>
+    </div>
   )
 }
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ArrowsDownUp, MagnifyingGlass, SlidersHorizontal, X } from '@phosphor-icons/react'
 import { CATEGORIES } from '../../data/categories'
 import { useStore } from '../../store/store'
@@ -38,14 +38,27 @@ export function ExpenseList({
   trips,
   settledTrips,
   emptyAction,
+  category,
+  onCategory,
 }: {
   expenses: Expense[]
   trips: Trip[]
   settledTrips: Set<ID>
   emptyAction?: React.ReactNode
+  /** Controlled single-category filter, so a screen header can drive the list */
+  category?: CategoryId | null
+  onCategory?: (c: CategoryId | null) => void
 }) {
   const { person, data } = useStore()
-  const [f, setF] = useState<Filters>(EMPTY)
+  const [f, setF] = useState<Filters>(() => ({ ...EMPTY, categories: category ? [category] : [] }))
+  useEffect(() => {
+    if (category === undefined) return
+    setF((x) => (x.categories.length === (category ? 1 : 0) && (!category || x.categories[0] === category) ? x : { ...x, categories: category ? [category] : [] }))
+  }, [category])
+  useEffect(() => {
+    onCategory?.(f.categories.length === 1 ? f.categories[0] : null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [f.categories])
   const [open, setOpen] = useState<Expense | null>(null)
   const [sheet, setSheet] = useState(false)
   const multiTrip = trips.length > 1

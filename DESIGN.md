@@ -185,3 +185,11 @@ First run uses the full twilight sky (`.tone-ink`) with white type, a white prim
 - Use uppercase labels, monospace in the UI, or more than one bold weight per block.
 - Show colour without words for any balance.
 - Overlay text on photos beyond one small badge.
+
+## Screen heroes (owner picks)
+
+- **Home:** story rail of round trip covers (ring fills with budget). The selected trip is enlarged with a halo and a white bar under its name; a trip that is happening now carries a pulsing green LIVE badge. The selected trip's total and daily spend bars sit on the sky, with Activity, Balances and Plans below.
+- **Trip overview:** the trip photo runs full-bleed behind the header and title (white type); a frosted card with the total, your balance, budget and travellers overlaps its lower edge.
+- **Expenses:** category bubbles sized by spend (3D icons, amount underneath). Tapping a bubble filters the list; tapping again clears it. A status chip and expense count sit below.
+- **Profile:** a navy passport cover (gold emblem, name, trips and days) with up to three stamps for the places visited.
+- **Scrollbars:** hidden everywhere; scrolling still works.

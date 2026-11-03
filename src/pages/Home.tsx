@@ -93,10 +93,17 @@ export function Home() {
               const ratio = v.trip.budget ? Math.min(1, v.ledger.total / v.trip.budget) : v.status.phase === 'completed' ? 1 : 0.12
               return (
                 <button key={v.trip.id} type="button" role="tab" aria-selected={on} onClick={() => setPicked(v.trip.id)} className="press shrink-0 text-center">
-                  <span className="block size-[72px] rounded-full p-[3px]" style={{ background: `conic-gradient(#fff ${ratio * 360}deg, rgba(255,255,255,0.3) 0)` }}>
+                  <span className={cx('relative block size-[72px] rounded-full p-[3px] transition-transform duration-300 ease-[var(--ease-out-expo)]', on && 'scale-[1.08] shadow-[0_0_0_4px_rgba(255,255,255,0.28)]')} style={{ background: `conic-gradient(#fff ${ratio * 360}deg, rgba(255,255,255,0.3) 0)` }}>
                     <Cover photo={v.trip.cover} seed={i + 1} className="size-full rounded-full border-[3px] border-[var(--sky-1)]" />
+                    {v.status.phase === 'ongoing' ? (
+                      <span className="absolute -top-1 -right-2 flex items-center gap-1 rounded-full bg-[#1f9d63] px-2 py-[3px] text-[10px] leading-none font-bold tracking-wide text-white shadow-[0_2px_8px_rgba(8,60,30,0.4)]">
+                        <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-white" />
+                        LIVE
+                      </span>
+                    ) : null}
                   </span>
                   <span className={cx('mt-2 block max-w-[76px] truncate text-caption', on ? 'font-bold text-ink' : 'font-medium text-ink-3')}>{v.trip.name.split(/[ ,]/)[0]}</span>
+                  <span aria-hidden className={cx('mx-auto mt-1 block h-[3px] rounded-full bg-white transition-all duration-300', on ? 'w-5 opacity-100' : 'w-0 opacity-0')} />
                 </button>
               )
             })}

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { ArrowCounterClockwise, DownloadSimple, Trash, type Icon } from '@phosphor-icons/react'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
 import { Segmented } from '../components/ui/Controls'
-import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { InputField } from '../components/ui/Field'
 import { ConfirmDialog } from '../components/ui/Sheet'
@@ -28,7 +27,15 @@ export function Profile() {
   const done = views.filter((v) => v.status.phase === 'completed')
   const days = done.reduce((a, v) => a + tripLength(v.trip.startDate, v.trip.endDate), 0)
   const shareInr = views.filter((v) => v.trip.currency === 'INR').reduce((a, v) => a + (v.ledger.share[me.id] ?? 0), 0)
-  const places = new Set(views.map((v) => v.trip.destination)).size
+  // One stamp per place, newest first, up to four
+  const stamps = (() => {
+    const seen = new Set<string>()
+    return [...views]
+      .sort((a, b) => b.trip.startDate.localeCompare(a.trip.startDate))
+      .filter((v) => (seen.has(v.trip.destination) ? false : (seen.add(v.trip.destination), true)))
+      .slice(0, 3)
+      .map((v) => ({ place: v.trip.destination, when: new Date(v.trip.startDate).toLocaleString('en-IN', { month: 'short', year: 'numeric' }).toUpperCase() }))
+  })()
 
   function exportData() {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
@@ -54,20 +61,40 @@ export function Profile() {
           Profile
           <Dot />
         </h1>
-        <div className="mt-8 flex items-center gap-4">
-          <Avatar person={me} size={60} />
-          <div className="min-w-0">
-            <p className="truncate text-title">{me.name}</p>
-            <p className="truncate text-meta text-ink-3">{me.email}</p>
+        <div className="mt-8 flex items-start gap-3 sm:gap-6">
+          {/* The passport cover */}
+          <div
+            className="relative w-[168px] shrink-0 -rotate-3 rounded-l-[12px] rounded-r-[22px] px-4 pt-5 pb-5 text-center text-[#e8c97a] shadow-[0_18px_30px_-12px_rgba(8,20,60,0.6),inset_6px_0_10px_rgba(0,0,0,0.25)]"
+            style={{ background: 'linear-gradient(160deg, #1c2f66, #0e1a40)', minHeight: 236 }}
+          >
+            <p className="text-[10px] font-bold tracking-[0.18em]">TRAVEL LOG</p>
+            <svg viewBox="0 0 60 60" width="64" height="64" className="mx-auto mt-5" aria-hidden>
+              <circle cx="30" cy="30" r="22" fill="none" stroke="#e8c97a" strokeWidth="2" />
+              <path d="M8 30h44M30 8c-9 8-9 36 0 44M30 8c9 8 9 36 0 44" fill="none" stroke="#e8c97a" strokeWidth="1.6" />
+            </svg>
+            <p className="mt-5 text-[18px] leading-[1.1] font-bold text-white">{me.name}</p>
+            <p className="mt-1 truncate text-[11px] text-[#e8c97a]/80">{me.email}</p>
+            <p className="num mt-4 text-[10px] font-bold tracking-[0.14em]">
+              {views.length} {views.length === 1 ? 'TRIP' : 'TRIPS'} · {days} {days === 1 ? 'DAY' : 'DAYS'}
+            </p>
           </div>
+          {/* Places stamped on the page beside it */}
+          <ul className="relative min-h-[236px] min-w-0 flex-1" aria-label="Places you have been">
+            {stamps.map((st, i) => (
+              <li key={st.place} className="absolute" style={{ left: [0, 34, 0][i], top: [4, 84, 164][i] }}>
+                <div
+                  className="flex size-[86px] flex-col items-center justify-center rounded-full border-[2.5px] border-white text-center text-[10px] leading-tight font-bold tracking-[0.06em] text-white"
+                  style={{ transform: `rotate(${[10, -12, 6, -8][i % 4]}deg)`, borderStyle: i === 0 ? 'dashed' : 'solid' }}
+                >
+                  <span className="max-w-[70px] truncate">{st.place.toUpperCase()}</span>
+                  <span className="num text-[11px]">{st.when}</span>
+                </div>
+              </li>
+            ))}
+            {stamps.length === 0 ? <li className="text-meta text-ink-3">Your places will be stamped here after your first trip.</li> : null}
+          </ul>
         </div>
-        {/* Stats are open: a hairline and a figure, no box */}
-        <div className="mt-8 grid max-w-[520px] grid-cols-3 gap-6">
-          <Stat value={String(views.length)} label={views.length === 1 ? 'Trip' : 'Trips'} />
-          <Stat value={String(days)} label="Days away" />
-          <Stat value={String(places)} label={places === 1 ? 'Place' : 'Places'} />
-        </div>
-        <p className="num mt-4 text-meta text-ink-3">
+        <p className="num mt-6 text-meta text-ink-3">
           Your share of everything: <span className="font-semibold text-ink">{formatMoney(shareInr, { round: true })}</span>
         </p>
       </SkyHero>
@@ -148,15 +175,6 @@ export function Profile() {
         }}
       />
     </>
-  )
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="hairline pt-3">
-      <p className="text-meta font-medium text-ink-3">{label}</p>
-      <p className="num mt-1 text-[26px] leading-8 font-[650] tracking-[-0.03em]">{value}</p>
-    </div>
   )
 }
 

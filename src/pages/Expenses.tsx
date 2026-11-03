@@ -7,6 +7,9 @@ import { PhotoCard } from '../components/ui/Cover'
 import { useAllTripViews } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
+import { CategoryIcon } from '../components/icons/CategoryIcon'
+import { categoryById } from '../data/categories'
+import type { CategoryId } from '../types'
 import { cx } from '../utils/cx'
 import { formatMoney } from '../utils/money'
 
@@ -15,6 +18,7 @@ export function Expenses() {
   const { data, me } = useStore()
   const { openExpense } = useUI()
   const [tripId, setTripId] = useState<string>('all')
+  const [cat, setCat] = useState<CategoryId | null>(null)
   const sorted = useMemo(() => [...views].sort((a, b) => b.trip.startDate.localeCompare(a.trip.startDate)), [views])
   const scope = tripId === 'all' ? sorted : sorted.filter((v) => v.trip.id === tripId)
   const expenses = scope.flatMap((v) => v.expenses)
@@ -23,6 +27,11 @@ export function Expenses() {
   const inr = scope.filter((v) => v.trip.currency === 'INR')
   const owedToMe = inr.reduce((a, v) => a + Math.max(0, v.ledger.net[me.id] ?? 0), 0)
   const iOwe = inr.reduce((a, v) => a + Math.max(0, -(v.ledger.net[me.id] ?? 0)), 0)
+  const bubbles = useMemo(() => {
+    const t = new Map<CategoryId, number>()
+    for (const e of expenses) t.set(e.category, (t.get(e.category) ?? 0) + e.amount)
+    return [...t.entries()].map(([id, total]) => ({ id, total })).sort((a, b) => b.total - a.total).slice(0, 7)
+  }, [expenses])
 
   return (
     <>
@@ -33,16 +42,35 @@ export function Expenses() {
           <Dot />
         </h1>
 
-        {/* Stats are open: a hairline and a figure, no box */}
-        <div className="mt-8 grid max-w-[520px] grid-cols-2 gap-6">
-          <div className="hairline pt-3">
-            <p className="text-meta font-medium text-ink-3">You are owed</p>
-            <p className={cx('num mt-1 text-[26px] leading-8 font-[650] tracking-[-0.03em]', owedToMe ? 'text-gain' : 'text-ink')}>{owedToMe ? formatMoney(owedToMe) : 'Nothing'}</p>
+        {/* Where the money went: each category is a bubble sized by spend. Tap one to filter. */}
+        {bubbles.length ? (
+          <div className="no-scrollbar -mx-6 mt-8 flex items-end gap-3 overflow-x-auto px-6 pt-1 pb-1" role="group" aria-label="Spend by category">
+            {bubbles.map((b) => {
+              const size = Math.round(54 + 44 * Math.sqrt(b.total / bubbles[0].total))
+              const on = cat === b.id
+              return (
+                <button key={b.id} type="button" aria-pressed={on} aria-label={`${categoryById[b.id].label}, ${formatMoney(b.total)}`} onClick={() => setCat(on ? null : b.id)} className="press shrink-0 text-center">
+                  <span
+                    className={cx('flex items-center justify-center rounded-full bg-white/20 transition-[background-color,box-shadow] duration-300', on && 'bg-white/35 shadow-[0_0_0_3px_#fff]')}
+                    style={{ width: size, height: size }}
+                  >
+                    <CategoryIcon id={b.id} size={Math.round(size * 0.74)} />
+                  </span>
+                  <span className={cx('num mt-1.5 block text-caption', on ? 'font-bold' : 'font-medium text-ink-3')}>{formatMoney(b.total, { round: true })}</span>
+                </button>
+              )
+            })}
           </div>
-          <div className="hairline pt-3">
-            <p className="text-meta font-medium text-ink-3">You owe</p>
-            <p className={cx('num mt-1 text-[26px] leading-8 font-[650] tracking-[-0.03em]', iOwe ? 'text-loss' : 'text-ink')}>{iOwe ? formatMoney(iOwe) : 'All clear'}</p>
-          </div>
+        ) : null}
+
+        <div className="mt-5 flex flex-wrap items-center gap-2.5">
+          <span className={cx('level num', iOwe ? 'act' : owedToMe ? 'ok' : 'quiet')}>
+            {iOwe ? `You owe ${formatMoney(iOwe)}` : owedToMe ? `You are owed ${formatMoney(owedToMe)}` : 'All clear'}
+          </span>
+          {iOwe && owedToMe ? <span className="level ok num">You are owed {formatMoney(owedToMe)}</span> : null}
+          <span className="num text-caption font-medium text-ink-3">
+            {expenses.length} {expenses.length === 1 ? 'expense' : 'expenses'}
+          </span>
         </div>
 
         </div>
@@ -75,6 +103,8 @@ export function Expenses() {
         <SheetBody className="lg:max-w-[820px]">
           <ExpenseList
             key={tripId}
+            category={cat}
+            onCategory={setCat}
             expenses={expenses}
             trips={scope.map((v) => v.trip)}
             settledTrips={settled}
