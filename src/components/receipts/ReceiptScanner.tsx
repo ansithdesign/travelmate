@@ -219,7 +219,7 @@ export function ReceiptScanner({
 
       {stage === 'camera' || stage === 'reading' ? (
         <div className="mt-5">
-          <div className="relative flex aspect-[3/4] max-h-[56dvh] w-full items-center justify-center overflow-hidden rounded-[24px] bg-[radial-gradient(120%_80%_at_50%_0%,#1b2a5c_0%,#0b1433_70%)]">
+          <div className="relative flex aspect-[3/4] max-h-[56dvh] w-full items-center justify-center overflow-hidden rounded-[28px] bg-[radial-gradient(120%_80%_at_50%_0%,#1b2a5c_0%,#0b1433_70%)]">
             <div className={cx('w-[64%] max-w-[260px] transition-transform duration-500', stage === 'reading' ? 'scale-[1.04]' : 'rotate-[-2deg]')}>
               <ReceiptPaper receipt={sample} compact />
             </div>
@@ -267,7 +267,7 @@ export function ReceiptScanner({
 
       {stage === 'review' ? (
         <div className="mt-5 grid gap-6 md:grid-cols-1">
-          <div className="flex justify-center rounded-[24px] bg-well p-4">
+          <div className="flex justify-center rounded-[28px] bg-well p-4">
             {source === 'upload' && image ? (
               <img src={image} alt="Uploaded receipt" className="max-h-[300px] rounded-[6px] object-contain shadow-[0_8px_20px_-10px_rgb(var(--t-shadow)/0.4)]" />
             ) : (

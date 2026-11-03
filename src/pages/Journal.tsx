@@ -101,7 +101,7 @@ function JournalBody({ view }: { view: TripView }) {
               {photos.slice(0, 5).map((p, i) => (
                 <figure
                   key={p.id + i}
-                  className={`group relative w-[82%] shrink-0 snap-center overflow-hidden rounded-[24px] sm:w-auto ${mosaicCell(i, Math.min(photos.length, 5))}`}
+                  className={`group relative w-[82%] shrink-0 snap-center overflow-hidden rounded-[28px] sm:w-auto ${mosaicCell(i, Math.min(photos.length, 5))}`}
                 >
                   <Cover photo={p} seed={i} showCredit className="aspect-[4/3] h-full w-full sm:aspect-auto" />
                   {edit && trip.journal.photos.some((x) => x.id === p.id) ? (

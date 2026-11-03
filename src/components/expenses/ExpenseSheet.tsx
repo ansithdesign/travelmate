@@ -251,7 +251,7 @@ export function ExpenseSheet() {
             <label className="sr-only" htmlFor="exp-amount">
               Amount
             </label>
-            <div className={cx('flex w-full items-start justify-center rounded-[24px] px-4 pt-5 pb-4 transition-shadow', submitted && errors.amount ? 'bg-loss-soft' : 'panel-strong focus-within:shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--accent)_55%,transparent),0_0_0_4px_var(--accent-soft)]')}>
+            <div className={cx('flex w-full items-start justify-center rounded-[28px] px-4 pt-5 pb-4 transition-shadow', submitted && errors.amount ? 'bg-loss-soft' : 'panel-strong focus-within:shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--accent)_55%,transparent),0_0_0_4px_var(--accent-soft)]')}>
               <span className="mt-2.5 mr-1 text-[28px] font-semibold text-ink-3">{currencySymbol(currency).trim()}</span>
   {/* Mirror sizes the field to its digits so the symbol sits right beside the number */}
               <span className="inline-grid max-w-[calc(100%-40px)]">
@@ -351,7 +351,7 @@ export function ExpenseSheet() {
               </button>
             </div>
             <Segmented label="Split method" value={draft.method} onChange={changeMethod} options={METHODS} />
-            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
               {members.map((m) => {
                 const on = draft.participants.includes(m.id)
                 const share = split.shares[m.id] ?? 0

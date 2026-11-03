@@ -68,11 +68,13 @@ function TabBar({ pathname }: { pathname: string }) {
                   to={to}
                   aria-current={on ? 'page' : undefined}
                   className={cx(
-                    'flex min-h-12 flex-col items-center justify-start gap-[3px] pt-[3px] text-[10.5px] transition-colors duration-200',
+                    'flex min-h-12 flex-col items-center justify-start gap-[2px] pt-[1px] text-[10.5px] transition-colors duration-200',
                     on ? 'font-semibold text-accent' : 'font-medium text-ink-3 hover:text-ink-2',
                   )}
                 >
-                  <I size={25} weight={on ? 'fill' : 'regular'} aria-hidden className="my-[3px]" />
+                  <span className={cx('flex h-[30px] w-[54px] items-center justify-center rounded-full transition-colors duration-300', on && 'bg-accent-soft')}>
+                    <I size={24} weight={on ? 'fill' : 'regular'} aria-hidden />
+                  </span>
                   {label}
                 </NavLink>
               </li>
@@ -103,7 +105,7 @@ function SideRail({ pathname }: { pathname: string }) {
         <BrandMark size={32} />
         <div>
           <p className="text-[17px] leading-5 font-semibold tracking-[-0.02em]">TripMate</p>
-          <p className="text-caption text-ink-3">{SKY_LABEL[phase]}</p>
+          <p className="text-caption text-ink-3">{SKY_LABEL[phase]} theme</p>
         </div>
       </div>
       <nav aria-label="Primary" className="px-3">

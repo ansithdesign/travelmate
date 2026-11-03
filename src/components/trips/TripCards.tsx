@@ -92,7 +92,7 @@ export function PastTripCard({ view, seed = 0 }: { view: TripView; seed?: number
   const { trip, ledger } = view
   const myNet = ledger.net[me.id] ?? 0
   return (
-    <Link to={`/trips/${trip.id}`} className="panel group flex gap-5 rounded-[24px] p-3 pr-5 transition-transform duration-200 active:scale-[0.985]">
+    <Link to={`/trips/${trip.id}`} className="panel group flex gap-5 rounded-[28px] p-3 pr-5 transition-transform duration-200 active:scale-[0.985]">
       <PhotoCard photo={trip.cover} seed={seed} radius={18} className="aspect-[4/5] w-[120px] shrink-0" />
       <div className="flex min-w-0 flex-1 flex-col py-2">
         <p className="text-heading">{trip.name}</p>

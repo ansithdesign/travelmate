@@ -177,7 +177,7 @@ export function ExpenseList({
                   {singleCurrency ? <span className="num text-ink-3">{formatMoney(dayTotal, { currency: singleCurrency })}</span> : null}
                 </h3>
               ) : null}
-              <ul className="panel-strong rows overflow-hidden rounded-[24px]">
+              <ul className="panel-strong rows overflow-hidden rounded-[28px]">
                 {g.items.map((e) => (
                   <li key={e.id}>
                     <ExpenseRow

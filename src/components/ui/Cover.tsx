@@ -6,15 +6,11 @@ import { useSky, type SkyPhase } from '../../store/sky'
 
 // What you see through the window follows the sky you are under.
 const SKIES: Record<SkyPhase, string[]> = {
-  dawn: ['linear-gradient(180deg,#6fa6e3 0%,#b9d3f0 55%,#f7d7c0 100%)', 'linear-gradient(180deg,#7aaee6 0%,#c5daf2 60%,#fbe2cf 100%)'],
   day: ['linear-gradient(180deg,#3f95e6 0%,#8cc6f3 60%,#d6ebfa 100%)', 'linear-gradient(180deg,#4a9be6 0%,#a6d3f6 60%,#e2f0fb 100%)'],
-  golden: ['linear-gradient(180deg,#646fcf 0%,#b79ad8 55%,#f4bfb0 100%)', 'linear-gradient(180deg,#6f78d3 0%,#c3a6dc 60%,#f6c9b8 100%)'],
   night: ['linear-gradient(180deg,#070f26 0%,#0e1d42 60%,#15295a 100%)', 'linear-gradient(180deg,#0a1430 0%,#13244f 60%,#1d3266 100%)'],
 }
 const CLOUD: Record<SkyPhase, [string, string, number]> = {
-  dawn: ['#fff6f4', '#e6c3d6', 0.95],
   day: ['#ffffff', '#cfe0f5', 1],
-  golden: ['#fff0e8', '#e6a7b4', 0.95],
   night: ['#6a73a6', '#2b3468', 0.55],
 }
 

@@ -66,7 +66,7 @@ function SettleBody({ view }: { view: TripView }) {
         </p>
 
         {settled && !stamping ? (
-          <div className="panel mt-5 flex items-center gap-4 rounded-[24px] p-6">
+          <div className="panel mt-5 flex items-center gap-4 rounded-[28px] p-6">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
               <SealCheck size={28} weight="duotone" aria-hidden />
             </span>
@@ -104,7 +104,7 @@ function SettleBody({ view }: { view: TripView }) {
             Payment history
           </h2>
           {(
-            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
               {payments.map((p) => (
                 <li key={p.id} className="flex min-h-[68px] items-center gap-4 py-3 pr-3 pl-5">
                   <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
@@ -141,7 +141,7 @@ function SettleBody({ view }: { view: TripView }) {
       </div>
 
       <aside className="min-w-0">
-        <details className="panel group rounded-[24px] p-6" open={typeof window !== 'undefined' && window.innerWidth >= 1024}>
+        <details className="panel group rounded-[28px] p-6" open={typeof window !== 'undefined' && window.innerWidth >= 1024}>
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
             <span>
               <span className="block text-heading">How it adds up</span>
@@ -254,7 +254,7 @@ function Ticket({
   return (
     <div
       className={cx(
-        'panel relative flex items-center gap-3.5 overflow-hidden rounded-[24px] p-4 transition-[opacity,transform] duration-500',
+        'panel relative flex items-center gap-3.5 overflow-hidden rounded-[28px] p-4 transition-[opacity,transform] duration-500',
         mine && 'bg-panel-strong shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--accent)_35%,transparent),var(--shadow-soft)]',
         stamped && 'pointer-events-none',
       )}

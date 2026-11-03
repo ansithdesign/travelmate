@@ -8,7 +8,7 @@ import { InputField } from '../components/ui/Field'
 import { ConfirmDialog } from '../components/ui/Sheet'
 import { useToast } from '../components/ui/Toast'
 import { useAllTripViews } from '../hooks/useTrip'
-import { phaseForHour, SKY_LABEL, useSky, type SkyChoice, type SkyPhase } from '../store/sky'
+import { SKY_LABEL, useSky, type SkyChoice, type SkyPhase } from '../store/sky'
 import { useStore } from '../store/store'
 import { cx } from '../utils/cx'
 import { tripLength } from '../utils/dates'
@@ -43,7 +43,8 @@ export function Profile() {
 
   const skyOptions: { value: SkyChoice; label: string }[] = [
     { value: 'auto', label: 'Auto' },
-    ...(['dawn', 'day', 'golden', 'night'] as SkyPhase[]).map((p) => ({ value: p as SkyChoice, label: SKY_LABEL[p] })),
+    { value: 'day', label: 'Light' },
+    { value: 'night', label: 'Dark' },
   ]
 
   return (
@@ -72,12 +73,12 @@ export function Profile() {
         <SheetBody className="lg:max-w-[760px]">
           <section aria-labelledby="sky">
             <h2 id="sky" className="flex min-h-11 items-center px-0.5 text-title">
-              Sky
+              Appearance
             </h2>
             <p className="mb-3 px-0.5 text-meta text-ink-3">
-              {choice === 'auto' ? `Follows the time of day. It is ${SKY_LABEL[phaseForHour(new Date().getHours())].toLowerCase()} now.` : `Pinned to ${SKY_LABEL[choice as SkyPhase].toLowerCase()}.`}
+              {choice === 'auto' ? 'Follows your device.' : `Always ${SKY_LABEL[choice as SkyPhase].toLowerCase()}.`}
             </p>
-            <Segmented label="Sky" value={choice} onChange={setChoice} options={skyOptions} />
+            <Segmented label="Appearance" value={choice} onChange={setChoice} options={skyOptions} />
           </section>
 
           <section aria-labelledby="account" className="mt-14">
@@ -108,7 +109,7 @@ export function Profile() {
               Your data
             </h2>
             <p className="max-w-[56ch] px-0.5 text-meta text-ink-3">Everything is stored in this browser on this device. Nothing is sent to a server in this version.</p>
-            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
               <DataRow icon={DownloadSimple} title="Export as JSON" body="Trips, expenses and payments." action={<Button size="sm" variant="secondary" onClick={exportData}>Export</Button>} />
               <DataRow icon={ArrowCounterClockwise} title="Restore sample trips" body="Replaces your data with Kashmir, Goa and Bengaluru." action={<Button size="sm" variant="secondary" onClick={() => setConfirm('reset')}>Restore</Button>} />
               <DataRow icon={Trash} title="Start fresh" body="Delete every trip and expense." danger action={<Button size="sm" variant="danger" onClick={() => setConfirm('clear')}>Delete all</Button>} />

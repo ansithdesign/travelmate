@@ -11,7 +11,6 @@ import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
 import { useToast } from '../components/ui/Toast'
 import { parseDate, tripLength } from '../utils/dates'
-import { useSky } from '../store/sky'
 import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
 import { cx } from '../utils/cx'
@@ -21,9 +20,8 @@ export function Home() {
   const { me, saveTrip } = useStore()
   const { openTrip } = useUI()
   const toast = useToast()
-  const { phase } = useSky()
-  // The greeting agrees with the sky on screen.
-  const greeting = { dawn: 'Good morning', day: new Date().getHours() < 12 ? 'Good morning' : 'Good afternoon', golden: 'Good evening', night: 'Good evening' }[phase]
+  const h = new Date().getHours()
+  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
 
   if (views.length === 0) return <FirstRun />
 
@@ -110,7 +108,7 @@ export function Home() {
                 <h2 id="coming-up" className="flex min-h-11 items-center px-0.5 text-title">
                   Also coming up
                 </h2>
-                <div className="panel-strong rows mt-3 flex flex-col overflow-hidden rounded-[24px]">
+                <div className="panel-strong rows mt-3 flex flex-col overflow-hidden rounded-[28px]">
                   {active.slice(1).map((v, i) => (
                     <TripRow key={v.trip.id} view={v} seed={i + 2} />
                   ))}
@@ -187,7 +185,7 @@ function OutstandingSummary({ views }: { views: TripView[] }) {
       <h2 id="to-settle" className="flex min-h-11 items-center px-0.5 text-title">
         To settle
       </h2>
-      <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+      <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
         {rows.map((r, i) => (
           <li key={i}>
             <Link to={`/trips/${r.trip.id}/settle`} className="group flex min-h-[68px] items-center gap-4 px-5 py-3.5 hover:bg-well active:bg-well">

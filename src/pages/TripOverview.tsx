@@ -121,7 +121,7 @@ function BalanceList({ view, members }: { view: TripView; members: Person[] }) {
   const { ledger, trip } = view
   const sorted = [...members].sort((a, b) => (ledger.net[b.id] ?? 0) - (ledger.net[a.id] ?? 0))
   return (
-    <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+    <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
       {sorted.map((m) => {
         const net = ledger.net[m.id] ?? 0
         return (
@@ -165,7 +165,7 @@ function RecentActivity({ view }: { view: TripView }) {
         ) : null}
       </div>
       {feed.length === 0 ? (
-        <div className="panel mt-2 flex flex-col items-center rounded-[24px] px-5 py-8 text-center">
+        <div className="panel mt-2 flex flex-col items-center rounded-[28px] px-5 py-8 text-center">
           <SkyArt size={96} />
           <p className="mt-3 max-w-[30ch] text-body text-ink-2">Add the first expense when someone pays for something. TripMate works out who owes whom.</p>
           <Button className="mt-4" icon={Plus} onClick={() => openExpense({ tripId: trip.id })}>
@@ -173,7 +173,7 @@ function RecentActivity({ view }: { view: TripView }) {
           </Button>
         </div>
       ) : (
-        <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+        <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
           {feed.map((it) =>
             it.kind === 'expense' ? (
               <li key={it.e.id}>
@@ -225,7 +225,7 @@ function WhereItWent({ view }: { view: TripView }) {
       <h2 id="where" className="flex min-h-11 items-center px-0.5 text-title">
         Where it went
       </h2>
-      <div className="panel mt-2 rounded-[24px] p-6">
+      <div className="panel mt-2 rounded-[28px] p-6">
         <div className="flex items-center gap-5">
           <svg viewBox="0 0 120 120" className="size-[112px] shrink-0 -rotate-90" aria-hidden>
             <circle cx="60" cy="60" r={R} fill="none" className="stroke-well" strokeWidth="14" />
@@ -276,7 +276,7 @@ function TripGlance({ view }: { view: TripView }) {
       {!nextDay && !stay && !travel ? (
         <p className="mt-2 text-body text-ink-2">Keep bookings, addresses and a day plan here so nobody digs through chats.</p>
       ) : (
-        <div className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+        <div className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
           {travel ? <GlanceRow icon={AirplaneTilt} title={travel.title} meta={travel.reference ?? travel.subtitle} /> : null}
           {stay ? <GlanceRow icon={Bed} title={stay.title} meta={stay.subtitle} /> : null}
           {nextDay ? (

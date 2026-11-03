@@ -6,7 +6,7 @@
   lives on the haze in borderless frosted glass. Hero figures sit straight on
   the sky with no container. Primary actions are midnight pills; the accent
   marks selection and data, never a filled primary button.
-  Phase tokens (dawn = morning, day, golden = evening, night) live on <html data-sky>.
+  Two themes live on <html data-sky>: day (light) and night (dark).
 */
 
 @theme {
@@ -57,7 +57,7 @@
      Few weights (400, 500, 600, one 700 title), tight tracking on big sizes,
      a clear step between title, body and the muted secondary line. */
   /* Large title on the sky */
-  --text-hero: 2rem;
+  --text-hero: 2.125rem;
   --text-hero--line-height: 1.1;
   --text-hero--letter-spacing: -0.025em;
   --text-hero--font-weight: 700;
@@ -87,9 +87,7 @@
 
 /* ── Phase tokens ─────────────────────────────────────────────── */
 :root,
-:root[data-sky='day'],
-:root[data-sky='dawn'],
-:root[data-sky='golden'] {
+:root[data-sky='day'] {
   --ink: #0d1b2a;
   --ink-2: #2a3c52;
   --ink-3: #4a5d74;
@@ -97,16 +95,17 @@
   --faint: #8d9cae;
   --on-ink: #ffffff;
   --midnight: #0f2238;
-  --sky-1: #6fb6ef;
-  --sky-2: #a6d3f6;
-  --sky-3: #d6ebfa;
-  --haze: #eef5fb;
-  --sun: rgba(255, 255, 255, 0.85);
-  --sun-x: 82%;
-  --cloud-a: 0.62;
+  --sky-1: #74b7f0;
+  --sky-2: #bcdcf6;
+  --sky-3: #fbe7d9;
+  --haze: #f3f6fb;
+  --sun: rgba(255, 238, 205, 0.95);
+  --sun-x: 80%;
+  --cloud-a: 0.66;
   --glass: rgba(255, 255, 255, 0.6);
   --glass-strong: rgba(255, 255, 255, 0.82);
   --glass-edge: rgba(255, 255, 255, 0.5);
+  --sheen: rgba(255, 255, 255, 0.45);
   --solid: #ffffff;
   --line: rgba(13, 27, 42, 0.07);
   --fill: rgba(13, 27, 42, 0.05);
@@ -136,24 +135,6 @@
   --t-shadow: 13 27 42;
   color-scheme: light;
 }
-:root[data-sky='dawn'] {
-  --sky-1: #8ec0f0;
-  --sky-2: #cfe1f4;
-  --sky-3: #fbe2cf;
-  --haze: #f5f4f2;
-  --sun: rgba(255, 220, 170, 0.95);
-  --sun-x: 18%;
-  --cloud-a: 0.55;
-}
-:root[data-sky='golden'] {
-  --sky-1: #7c84d6;
-  --sky-2: #c3a6dc;
-  --sky-3: #f4bfb0;
-  --haze: #f3f0f7;
-  --sun: rgba(255, 196, 160, 0.75);
-  --sun-x: 24%;
-  --cloud-a: 0.42;
-}
 :root[data-sky='night'] {
   --ink: #eef4fb;
   --ink-2: #c9d6e6;
@@ -172,6 +153,7 @@
   --glass: rgba(255, 255, 255, 0.07);
   --glass-strong: rgba(255, 255, 255, 0.1);
   --glass-edge: rgba(255, 255, 255, 0.05);
+  --sheen: rgba(255, 255, 255, 0.04);
   --solid: #111f3f;
   --line: rgba(255, 255, 255, 0.08);
   --fill: rgba(255, 255, 255, 0.07);
@@ -216,6 +198,7 @@
     -moz-osx-font-smoothing: grayscale;
     caret-color: var(--color-accent);
     min-height: 100dvh;
+    overflow-x: clip;
   }
   ::selection {
     background: var(--accent-bright);
@@ -273,6 +256,19 @@
       radial-gradient(220px 180px at var(--sun-x) 40px, var(--sun), transparent 70%),
       linear-gradient(180deg, var(--sky-2) 0px, var(--sky-3) 170px, var(--haze) 360px);
   }
+  /* A soft sun that breathes, sitting where the sun glow is */
+  .sky-layer::before {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: calc(var(--sun-x) - 70px);
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, var(--sun), transparent);
+    filter: blur(14px);
+    animation: sun-breathe 9s ease-in-out infinite;
+  }
   .sky-layer .cloud {
     position: absolute;
     display: block;
@@ -299,14 +295,14 @@
 
   /* ── Surfaces: frosted glass, no borders ─────────────────── */
   .panel {
-    background: var(--glass);
+    background: linear-gradient(180deg, var(--sheen), transparent 55%), var(--glass);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
     backdrop-filter: blur(20px) saturate(1.4);
     box-shadow: inset 0 1px 1px var(--glass-edge), var(--shadow-soft);
   }
   /* Lists and grouped rows: the stronger glass */
   .panel-strong {
-    background: var(--glass-strong);
+    background: linear-gradient(180deg, var(--sheen), transparent 55%), var(--glass-strong);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
     backdrop-filter: blur(20px) saturate(1.4);
     box-shadow: inset 0 1px 1px var(--glass-edge), var(--shadow-soft);
@@ -326,6 +322,14 @@
     pointer-events: none;
     z-index: 1;
   }
+  /* Rows settle in one after another, then stay put */
+  .rows > * {
+    animation: rise 480ms var(--ease-out-expo) both;
+  }
+  .rows > *:nth-child(2) { animation-delay: 40ms; }
+  .rows > *:nth-child(3) { animation-delay: 80ms; }
+  .rows > *:nth-child(4) { animation-delay: 120ms; }
+  .rows > *:nth-child(n + 5) { animation-delay: 160ms; }
   .rows.flat > * + *::before {
     left: 20px;
   }
@@ -350,7 +354,7 @@
   /* The primary action material: a midnight pill. White at night. */
   .luminous {
     color: #fff;
-    background: var(--midnight);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--midnight) 90%, white), var(--midnight));
     box-shadow: 0 8px 20px -12px rgba(15, 34, 56, 0.45);
   }
   :root[data-sky='night'] .luminous {
@@ -475,6 +479,10 @@
 @keyframes toast-in {
   from { transform: translateY(40px); opacity: 0; }
   to { transform: none; opacity: 1; }
+}
+@keyframes sun-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.12); opacity: 1; }
 }
 @keyframes cloud-drift {
   from { transform: translateX(-24px); }

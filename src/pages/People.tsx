@@ -91,7 +91,7 @@ function PeopleBody({ view }: { view: TripView }) {
       <h2 className="px-0.5 pt-2 text-display">People</h2>
       <p className="mt-1.5 px-0.5 text-body text-ink-3">Everyone on the trip can add expenses and is in every split by default.</p>
 
-      <section aria-labelledby="invite-link" className="panel mt-5 rounded-[24px] p-6">
+      <section aria-labelledby="invite-link" className="panel mt-5 rounded-[28px] p-6">
         <h2 id="invite-link" className="flex items-center gap-2.5 text-heading">
           <span className="flex size-9 items-center justify-center rounded-full bg-accent-soft text-accent">
             <LinkSimple size={19} weight="duotone" aria-hidden />
@@ -116,7 +116,7 @@ function PeopleBody({ view }: { view: TripView }) {
         <h2 id="members" className="flex min-h-11 items-center px-0.5 text-title">
           On this trip <span className="num ml-1.5 font-medium text-ink-3">{members.length}</span>
         </h2>
-        <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+        <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
           {members.map((m) => {
             const paid = ledger.paid[m.id] ?? 0
             const share = ledger.share[m.id] ?? 0
@@ -147,7 +147,7 @@ function PeopleBody({ view }: { view: TripView }) {
           Waiting to join <span className="num ml-1.5 font-medium text-ink-3">{trip.invites.length}</span>
         </h2>
         {(
-          <ul className="panel-strong rows mt-3 overflow-hidden rounded-[24px]">
+          <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
             {trip.invites.map((inv) => (
               <li key={inv.id} className="flex flex-wrap items-center gap-x-3.5 gap-y-2 px-4 py-2.5">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-aware-tint text-aware-ink">

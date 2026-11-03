@@ -12,14 +12,11 @@ colors:
   accent-ink: "#0f56b5"
   accent-soft: "rgba(23, 105, 214, 0.12)"
   accent-bright: "#8fc6fb"
-  haze-day: "#eef5fb"
-  haze-morning: "#f5f4f2"
-  haze-evening: "#f3f0f7"
-  haze-night: "#0a1430"
-  sky-day: ["#6fb6ef", "#a6d3f6", "#d6ebfa"]
-  sky-morning: ["#8ec0f0", "#cfe1f4", "#fbe2cf"]
-  sky-evening: ["#7c84d6", "#c3a6dc", "#f4bfb0"]
-  sky-night: ["#070f26", "#0e1d42", "#15295a"]
+  haze-light: "#f3f6fb"
+  haze-dark: "#0a1430"
+  sky-light: ["#74b7f0", "#bcdcf6", "#fbe7d9"]
+  sky-dark: ["#070f26", "#0e1d42", "#15295a"]
+  sun-light: "rgba(255, 238, 205, 0.95)"
   glass: "rgba(255, 255, 255, 0.56)"
   glass-strong: "rgba(255, 255, 255, 0.8)"
   glass-edge: "rgba(255, 255, 255, 0.9)"
@@ -80,7 +77,7 @@ TripMate uses the owner's **Under the Sky** system from Finbook, with an Airbnb-
 - **Modules are borderless frosted glass.** 20px blur, a barely-there 1px inner light and a wide, faint shadow. No borders, no hard edge lines. Edges come from light, not lines.
 - **Airbnb calm.** Few weights, one clear step from title to body to a muted secondary line. Photos lead, words sit underneath. Sections are separated by space, not by rules or more boxes.
 
-The sky follows the time of day: morning, day, evening, night (auto by clock, or pinned in Profile). Internally the phases are `dawn`, `day`, `golden`, `night` on `html[data-sky]`.
+There are exactly two themes. **Light** is a clear blue sky that melts into a warm peach horizon, with a soft glowing sun and drifting clouds. **Dark** is a deep midnight sky with a few stars. Auto follows the device; Profile can pin either. Internally `html[data-sky]` is `day` (light) or `night` (dark).
 
 ## Colors
 

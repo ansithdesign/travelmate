@@ -69,7 +69,7 @@ function DetailsBody({ view }: { view: TripView }) {
               <h2 id={`k-${kind}`} className="flex min-h-11 items-center px-0.5 text-title">
                 {label}
               </h2>
-              <ul className="panel-strong rows flat mt-3 overflow-hidden rounded-[24px]">
+              <ul className="panel-strong rows flat mt-3 overflow-hidden rounded-[28px]">
                 {items.map((it) => (
                   <InfoRow key={it.id} item={it} onEdit={() => setEditing(it)} onDelete={() => setDeleting(it)} />
                 ))}
@@ -286,7 +286,7 @@ function Itinerary({ view }: { view: TripView }) {
           )
         })}
       </div>
-      <div className="panel mt-3 rounded-[24px] p-6" role="tabpanel">
+      <div className="panel mt-3 rounded-[28px] p-6" role="tabpanel">
         <p className="text-heading">{fmt.long(active)}</p>
         <TextArea
           aria-label={`Plan for ${fmt.long(active)}`}

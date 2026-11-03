@@ -32,7 +32,7 @@ export function Avatar({
         width: size,
         height: size,
         fontSize: Math.max(10, Math.round(size * 0.36)),
-        background: fill,
+        background: `linear-gradient(160deg, color-mix(in srgb, ${fill} 80%, white), ${fill})`,
         ...style,
       }}
       className={cx(

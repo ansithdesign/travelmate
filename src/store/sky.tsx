@@ -1,35 +1,33 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 
-export type SkyPhase = 'dawn' | 'day' | 'golden' | 'night'
+/** Two themes: a light sky ("day") and a dark one ("night"). */
+export type SkyPhase = 'day' | 'night'
 export type SkyChoice = SkyPhase | 'auto'
 
-export const SKY_LABEL: Record<SkyPhase, string> = {
-  dawn: 'Morning',
-  day: 'Day',
-  golden: 'Evening',
-  night: 'Night',
-}
-
-/** Local time decides the sky: 5 to 8 morning, 8 to 16 day, 16 to 19 evening, otherwise night. */
-export function phaseForHour(h: number): SkyPhase {
-  if (h >= 5 && h < 8) return 'dawn'
-  if (h >= 8 && h < 16) return 'day'
-  if (h >= 16 && h < 19) return 'golden'
-  return 'night'
-}
+export const SKY_LABEL: Record<SkyPhase, string> = { day: 'Light', night: 'Dark' }
 
 const KEY = 'tripmate:sky'
+const VALID = ['day', 'night', 'auto']
+const ALIAS: Record<string, SkyChoice> = { light: 'day', dark: 'night', dawn: 'day', golden: 'day' }
 
 function readChoice(): SkyChoice {
   try {
     const q = new URLSearchParams(window.location.search).get('sky')
-    if (q && ['dawn', 'day', 'golden', 'night', 'auto'].includes(q)) return q as SkyChoice
+    if (q) return ALIAS[q] ?? (VALID.includes(q) ? (q as SkyChoice) : 'auto')
     const v = localStorage.getItem(KEY)
-    if (v && ['dawn', 'day', 'golden', 'night', 'auto'].includes(v)) return v as SkyChoice
+    if (v) return ALIAS[v] ?? (VALID.includes(v) ? (v as SkyChoice) : 'auto')
   } catch {
     /* storage blocked: fall through */
   }
   return 'auto'
+}
+
+function systemPhase(): SkyPhase {
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day'
+  } catch {
+    return 'day'
+  }
 }
 
 interface SkyState {
@@ -42,20 +40,23 @@ const SkyContext = createContext<SkyState | null>(null)
 
 export function SkyProvider({ children }: { children: ReactNode }) {
   const [choice, setChoiceState] = useState<SkyChoice>(readChoice)
-  const [hour, setHour] = useState(() => new Date().getHours())
+  const [system, setSystem] = useState<SkyPhase>(systemPhase)
 
-  // Re-check the clock every minute so an open app moves into evening on its own.
+  // Follow the device when the choice is Auto.
   useEffect(() => {
-    const t = window.setInterval(() => setHour(new Date().getHours()), 60_000)
-    return () => window.clearInterval(t)
+    const mq = window.matchMedia?.('(prefers-color-scheme: dark)')
+    if (!mq) return
+    const on = () => setSystem(mq.matches ? 'night' : 'day')
+    mq.addEventListener?.('change', on)
+    return () => mq.removeEventListener?.('change', on)
   }, [])
 
-  const phase = choice === 'auto' ? phaseForHour(hour) : choice
+  const phase = choice === 'auto' ? system : choice
 
   useEffect(() => {
     document.documentElement.dataset.sky = phase
     const meta = document.querySelector('meta[name="theme-color"]')
-    meta?.setAttribute('content', { dawn: '#8ec0f0', day: '#6fb6ef', golden: '#7c84d6', night: '#070f26' }[phase])
+    meta?.setAttribute('content', { day: '#78b8ee', night: '#070f26' }[phase])
   }, [phase])
 
   const value = useMemo<SkyState>(

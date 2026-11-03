@@ -108,7 +108,7 @@ export function ExpenseDetailSheet({ expense, onClose }: { expense: Expense | nu
         {e.receipt ? (
           <>
             <h3 className="mt-6 mb-2 text-meta font-medium text-ink-2">Receipt</h3>
-            <div className="flex flex-col gap-4 rounded-[24px] bg-well p-4 sm:flex-row sm:items-start">
+            <div className="flex flex-col gap-4 rounded-[28px] bg-well p-4 sm:flex-row sm:items-start">
               <div className="mx-auto w-[180px] shrink-0">
                 {e.receipt.image ? (
                   <img src={e.receipt.image} alt={`Receipt from ${e.receipt.merchant || 'merchant'}`} className="w-full rounded-[6px] shadow-[0_8px_20px_-10px_rgb(var(--t-shadow)/0.4)]" />
