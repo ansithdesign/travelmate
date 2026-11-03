@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useMatch } from 'react-router-dom'
-import { House, Plus, Receipt, UserCircle, type Icon } from '@phosphor-icons/react'
+import { Coins, House, Plus, Receipt, UserCircle, type Icon } from '@phosphor-icons/react'
+import type { CategoryId } from '../../types'
+import { CategoryIcon } from '../icons/CategoryIcon'
 import { useAllTripViews } from '../../hooks/useTrip'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
@@ -27,7 +30,7 @@ export function AppShell() {
       <Sky soft={soft} />
       <div className="min-h-dvh lg:pl-[296px]">
         <SideRail pathname={pathname} />
-        <main className="min-w-0 pb-[calc(112px+env(safe-area-inset-bottom))] lg:pt-2 lg:pb-10">
+        <main className="min-w-0 pb-[calc(124px+env(safe-area-inset-bottom))] lg:pt-2 lg:pb-10">
           <ErrorBoundary resetKey={pathname}>
             <Outlet />
           </ErrorBoundary>
@@ -38,54 +41,110 @@ export function AppShell() {
   )
 }
 
+const ARC: { id: CategoryId; label: string; angle: number }[] = [
+  { id: 'food', label: 'Food', angle: -70 },
+  { id: 'cabs', label: 'Cabs', angle: -35 },
+  { id: 'drinks', label: 'Drinks', angle: 0 },
+  { id: 'stay', label: 'Stay', angle: 35 },
+  { id: 'activities', label: 'Activities', angle: 70 },
+]
+
 /**
- * A floating glass dock of three tabs: the current one expands into a pill with
- * its label, the others stay as quiet icons. Add expense is its own floating
- * button beside the dock. Tapping the current tab scrolls to the top.
+ * A bar with four tabs and a raised Add button in the middle. Tapping Add fans
+ * the most common categories out in an arc: tap one and the expense form opens
+ * with it chosen. Tapping the current tab scrolls to the top.
  */
 function TabBar({ pathname }: { pathname: string }) {
   const { openExpense } = useUI()
   const { data } = useStore()
+  const views = useAllTripViews()
   const tripMatch = useMatch('/trips/:tripId/*')
-  const active = NAV.findIndex((n) => n.match(pathname))
+  const [fan, setFan] = useState(false)
+  const tripId = tripMatch?.params.tripId
+  const settleTrip = tripId ?? views.find((v) => v.status.phase !== 'completed')?.trip.id ?? views[0]?.trip.id
+  const settleTo = settleTrip ? `/trips/${settleTrip}/settle` : '/'
+  const onSettle = pathname.endsWith('/settle')
 
-  const tab = ({ to, label, icon: I }: (typeof NAV)[number], i: number) => {
-    const on = i === active
-    return (
-      <NavLink
-        key={to}
-        to={to}
-        aria-label={label}
-        aria-current={on ? 'page' : undefined}
-        onClick={() => {
-          if (on) window.scrollTo({ top: 0, behavior: 'smooth' })
-        }}
-        className={cx(
-          'press flex h-12 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent/40 text-[14px] font-semibold transition-[background-color,color,padding] duration-300 ease-[var(--ease-out-expo)]',
-          on ? 'bg-accent-soft pr-4 pl-3 text-accent-ink max-[359px]:px-0 max-[359px]:w-11' : 'w-11 text-ink-3 hover:text-ink',
-        )}
-      >
-        <I size={24} weight={on ? 'fill' : 'regular'} aria-hidden className="shrink-0" />
-        <span className={cx('overflow-hidden whitespace-nowrap transition-[max-width,margin,opacity] duration-300 ease-[var(--ease-out-expo)]', on ? 'ml-2 max-w-[84px] opacity-100 max-[359px]:hidden' : 'ml-0 max-w-0 opacity-0')}>{label}</span>
-      </NavLink>
-    )
-  }
+  useEffect(() => setFan(false), [pathname])
+  useEffect(() => {
+    if (!fan) return
+    const k = (e: KeyboardEvent) => e.key === 'Escape' && setFan(false)
+    window.addEventListener('keydown', k)
+    return () => window.removeEventListener('keydown', k)
+  }, [fan])
+
+  const items = [
+    { to: '/', label: 'Trips', icon: House, on: !onSettle && (pathname === '/' || pathname.startsWith('/trips')) },
+    { to: '/expenses', label: 'Expenses', icon: Receipt, on: pathname.startsWith('/expenses') },
+    null,
+    { to: settleTo, label: 'Settle', icon: Coins, on: onSettle },
+    { to: '/profile', label: 'Profile', icon: UserCircle, on: pathname.startsWith('/profile') },
+  ]
 
   return (
-    <div className="safe-bottom pointer-events-none fixed inset-x-0 bottom-0 z-40 flex items-end justify-between gap-3 px-4 pb-3 lg:hidden">
-      <nav aria-label="Primary" className="glass-bar pointer-events-auto flex h-16 min-w-0 items-center gap-0.5 rounded-full p-2">
-        {NAV.map((n, i) => tab(n, i))}
+    <div className="lg:hidden">
+      {fan ? (
+        <>
+          <button type="button" aria-label="Close" onClick={() => setFan(false)} className="fixed inset-0 z-40 bg-[rgba(8,20,40,0.42)] backdrop-blur-[3px] [animation:fade-in_200ms_ease-out_both]" />
+          <p className="pointer-events-none fixed inset-x-0 bottom-[calc(330px+env(safe-area-inset-bottom))] z-50 text-center text-[14px] font-semibold text-white [animation:fade-in_300ms_ease-out_both]">Pick a category, then type the amount</p>
+          {ARC.map((c, i) => {
+            const r = 168
+            const rad = (c.angle * Math.PI) / 180
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => {
+                  setFan(false)
+                  openExpense({ tripId, category: c.id })
+                }}
+                className="fixed z-50 flex w-[72px] flex-col items-center text-center [animation:pop_360ms_var(--ease-out-expo)_both]"
+                style={{ left: `calc(50% + ${r * Math.sin(rad) - 36}px)`, bottom: `calc(${100 + r * Math.cos(rad) - 36}px + env(safe-area-inset-bottom))`, animationDelay: `${i * 35}ms` }}
+              >
+                <span className="flex size-[72px] items-center justify-center rounded-full bg-[var(--haze)] shadow-[var(--shadow-float)]">
+                  <CategoryIcon id={c.id} size={50} />
+                </span>
+                <span className="mt-1.5 text-caption font-semibold text-white">{c.label}</span>
+              </button>
+            )
+          })}
+        </>
+      ) : null}
+
+      <nav aria-label="Primary" className="tab-material safe-bottom fixed inset-x-0 bottom-0 z-40">
+        <ul className="mx-auto grid h-[84px] max-w-[520px] grid-cols-5 items-start px-2 pt-2">
+          {items.map((it, i) =>
+            it ? (
+              <li key={it.to + it.label}>
+                <NavLink
+                  to={it.to}
+                  aria-label={it.label}
+                  aria-current={it.on ? 'page' : undefined}
+                  onClick={() => it.on && window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className={cx('relative flex min-h-14 flex-col items-center gap-[3px] pt-2 text-[11px] outline-none transition-colors duration-200 focus-visible:text-accent', it.on ? 'font-semibold text-accent' : 'font-medium text-ink-3 hover:text-ink-2')}
+                >
+                  {it.on ? <span aria-hidden className="absolute top-[-8px] h-[3px] w-9 rounded-b-full bg-accent" /> : null}
+                  <it.icon size={24} weight={it.on ? 'fill' : 'regular'} aria-hidden />
+                  {it.label}
+                </NavLink>
+              </li>
+            ) : (
+              <li key={`gap-${i}`} aria-hidden />
+            ),
+          )}
+        </ul>
       </nav>
+
       <button
         type="button"
-        aria-label="Add expense"
+        aria-label={fan ? 'Close add menu' : 'Add expense'}
+        aria-expanded={fan}
         disabled={data.trips.length === 0}
-        onClick={() => openExpense({ tripId: tripMatch?.params.tripId })}
-        className="group press pointer-events-auto relative flex size-14 shrink-0 items-center justify-center rounded-full text-white min-[390px]:size-16 shadow-[0_14px_30px_-10px_rgba(15,34,56,0.55),0_2px_6px_rgba(15,34,56,0.18)] disabled:opacity-50"
-        style={{ background: 'radial-gradient(120% 120% at 30% 15%, #2d5f9a 0%, var(--midnight) 55%, #0a1626 100%)' }}
+        onClick={() => setFan((v) => !v)}
+        className="press fixed bottom-[calc(46px+env(safe-area-inset-bottom))] left-1/2 z-[60] flex size-[66px] -translate-x-1/2 items-center justify-center rounded-full shadow-[0_0_0_6px_var(--haze),0_14px_26px_-8px_rgba(15,34,56,0.55)] transition-[background-color,color] duration-200 disabled:opacity-50"
+        style={fan ? { background: 'var(--haze)', color: 'var(--ink)' } : { background: 'var(--midnight)', color: '#fff' }}
       >
-        <span aria-hidden className="absolute inset-[3px] rounded-full bg-[linear-gradient(180deg,rgba(255,255,255,0.16),transparent_55%)]" />
-        <Plus size={26} weight="bold" aria-hidden className="relative transition-transform duration-300 ease-[var(--ease-out-expo)] group-active:rotate-90" />
+        <Plus size={30} weight="bold" aria-hidden className={cx('transition-transform duration-300 ease-[var(--ease-out-expo)]', fan && 'rotate-45')} />
       </button>
     </div>
   )

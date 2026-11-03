@@ -107,6 +107,10 @@ export function ExpenseSheet() {
     if (!state.open) return
     const t = data.trips.find((x) => x.id === defaultTrip)
     const d = draftFor(t, me.id, editing)
+    if (state.category && !editing) {
+      d.category = state.category
+      d.categoryTouched = true
+    }
     setDraft(d)
     setSubmitted(false)
     // Most expenses are split equally between everyone: keep the split folded unless this one is different.
@@ -116,7 +120,7 @@ export function ExpenseSheet() {
     setShowMore(!!d.notes || !!d.receipt)
     setScanOpen(!!state.scan)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.open, state.expenseId, state.tripId])
+  }, [state.open, state.expenseId, state.tripId, state.category])
 
   const trip = data.trips.find((t) => t.id === draft.tripId)
   const currency = trip?.currency ?? 'INR'
