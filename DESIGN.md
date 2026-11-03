@@ -196,7 +196,7 @@ First run uses the full twilight sky (`.tone-ink`) with white type, a white prim
 
 ## Update: sky, dark theme, controls
 
-- **Light sky:** slightly deeper blue (`#2a4a96` to `#5a7fc8` to `#9db8e6`) with soft clouds and slow, drifting snow particles (canvas, ~50 soft dots, fading near the bottom of the band, paused when the tab is hidden, still for reduced motion).
+- **Light sky:** slightly deeper blue (`#1f3b82` to `#4668b4` to `#84a1d8`) with soft clouds and slow, drifting snow particles (canvas, ~50 soft dots, fading near the bottom of the band, paused when the tab is hidden, still for reduced motion).
 - **Dark theme:** deep purple with aurora ribbons (violet, magenta) and faint stardust. Surfaces are near-opaque (`glass` 82%, `glass-strong` 94%) with 14 to 24% white hairlines so cards and text keep contrast. Accent is lilac.
 - **Add button:** the one warm colour, a coral-to-rose gradient by day and pink-to-violet at night (`.cta`).
 - **Hierarchy:** badges (`.level`) carry state colour; selected chips are filled accent; unselected chips and secondary buttons are tinted, not white; the search field is accent-tinted; trip tabs on the sky are white when selected.
