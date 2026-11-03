@@ -42,54 +42,54 @@ colors:
   sky-night-horizon: "#2b2f6e"
 typography:
   hero:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.375rem"
     fontWeight: 600
     lineHeight: "2.625rem"
     letterSpacing: "-0.035em"
   display:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.875rem"
     fontWeight: 600
     lineHeight: "2.25rem"
     letterSpacing: "-0.03em"
   title:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.3125rem"
     fontWeight: 600
     lineHeight: "1.75rem"
     letterSpacing: "-0.02em"
   heading:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.0625rem"
     fontWeight: 600
     lineHeight: "1.5rem"
     letterSpacing: "-0.015em"
   body:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.9375rem"
     fontWeight: 400
     lineHeight: "1.375rem"
     fontFeature: "'ss01', 'cv11'"
   meta:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.8125rem"
     fontWeight: 400
     lineHeight: "1.125rem"
   caption:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.75rem"
     fontWeight: 400
     lineHeight: "1rem"
   figure:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "46px"
     fontWeight: 300
     lineHeight: "50px"
     letterSpacing: "-0.045em"
     fontFeature: "'tnum', 'ss01'"
   countdown:
-    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontFamily: "Figtree Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(84px, 24vw, 128px)"
     fontWeight: 200
     lineHeight: 0.95
@@ -231,8 +231,8 @@ A sky-derived palette: navy ink on the light phases, moonlit ink at night, one l
 
 ## Typography
 
-**Display Font:** Geist Variable (with ui-sans-serif, system-ui)
-**Body Font:** Geist Variable, stylistic sets ss01 and cv11 on
+**Display Font:** Figtree Variable (with ui-sans-serif, system-ui)
+**Body Font:** Figtree Variable, stylistic sets ss01 and cv11 on
 **Label/Mono Font:** Geist Mono Variable, only for codes and printed artefacts (receipts, booking references, invite links; never on interface labels).
 
 **Character:** One contemporary sans carrying semibold, tightly tracked headings against very light, oversized numerals, the way a weather app sets its figures.

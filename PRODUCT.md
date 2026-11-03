@@ -48,7 +48,7 @@ Replaces a mix of WhatsApp threads, Splitwise, spreadsheets, Maps and photo gall
 - Name: TripMate.
 - Sky theme, set by the owner on 2026-11-03: a living sky that follows the time of day (dawn, clear day, golden hour, night). Users can pin one sky in Profile.
 - The owner wants a premium, modern, expressive finish: glass surfaces, rich motion and creative, non-generic icons are in scope. Plain line-icon UI was explicitly rejected.
-- Contemporary sans-serif throughout (Geist), with Geist Mono only for codes and printed artefacts (receipts, boarding-pass codes).
+- Contemporary sans-serif throughout (Figtree), with Geist Mono only for codes and printed artefacts (receipts, boarding-pass codes).
 - No emoji as UI icons. No purple-blue "AI startup" gradient blobs as decoration; colour comes from the sky itself.
 - Copy never uses em dashes.
 
