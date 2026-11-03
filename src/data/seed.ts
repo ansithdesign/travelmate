@@ -69,9 +69,9 @@ export function createSeed(): AppData {
 
   const kExpenses: Expense[] = [
     { id: 'k-e1', tripId: 'kashmir', title: 'Return flights, 4 people', amount: 6240000, category: 'flights', paidBy: 'rohan', date: at(-18, 23, 12), split: equal(kashmir.members), createdAt: at(-18, 23, 12) },
-    { id: 'k-e2', tripId: 'kashmir', title: 'Houseboat advance, 3 nights', amount: 1800000, category: 'accommodation', paidBy: 'me', date: at(-12, 19, 40), split: equal(kashmir.members), notes: 'Balance ₹9,000 payable at check-in.', createdAt: at(-12, 19, 40) },
+    { id: 'k-e2', tripId: 'kashmir', title: 'Houseboat advance, 3 nights', amount: 1800000, category: 'stay', paidBy: 'me', date: at(-12, 19, 40), split: equal(kashmir.members), notes: 'Balance ₹9,000 payable at check-in.', createdAt: at(-12, 19, 40) },
     { id: 'k-e3', tripId: 'kashmir', title: 'Gulmarg Gondola tickets', amount: 760000, category: 'activities', paidBy: 'meera', date: at(-6, 13, 5), split: equal(kashmir.members), createdAt: at(-6, 13, 5) },
-    { id: 'k-e4', tripId: 'kashmir', title: 'Airport pickup, prepaid', amount: 120000, category: 'transport', paidBy: 'aditi', date: at(-2, 18, 30), split: equal(kashmir.members), createdAt: at(-2, 18, 30) },
+    { id: 'k-e4', tripId: 'kashmir', title: 'Airport pickup, prepaid', amount: 120000, category: 'cabs', paidBy: 'aditi', date: at(-2, 18, 30), split: equal(kashmir.members), createdAt: at(-2, 18, 30) },
   ]
 
   // ── Goa: completed, three travellers ───────────────────────────────
@@ -114,19 +114,19 @@ export function createSeed(): AppData {
   }
   const gm = goa.members
   const gExpenses: Expense[] = [
-    { id: 'g-e1', tripId: 'goa', title: 'Villa Saudade, 2 nights', amount: 1300000, category: 'accommodation', paidBy: 'me', date: at(gStart, 14, 10), split: equal(gm), createdAt: at(gStart, 14, 10) },
-    { id: 'g-e2', tripId: 'goa', title: 'Airport transfer from Mopa', amount: 85000, category: 'transport', paidBy: 'karthik', date: at(gStart, 11, 45), split: equal(gm), createdAt: at(gStart, 11, 45) },
-    { id: 'g-e3', tripId: 'goa', title: 'Groceries', amount: 64000, category: 'food', paidBy: 'me', date: at(gStart, 18, 3), split: equal(gm), createdAt: at(gStart, 18, 3),
+    { id: 'g-e1', tripId: 'goa', title: 'Villa Saudade, 2 nights', amount: 1300000, category: 'stay', paidBy: 'me', date: at(gStart, 14, 10), split: equal(gm), createdAt: at(gStart, 14, 10) },
+    { id: 'g-e2', tripId: 'goa', title: 'Airport transfer from Mopa', amount: 85000, category: 'cabs', paidBy: 'karthik', date: at(gStart, 11, 45), split: equal(gm), createdAt: at(gStart, 11, 45) },
+    { id: 'g-e3', tripId: 'goa', title: 'Groceries', amount: 64000, category: 'groceries', paidBy: 'me', date: at(gStart, 18, 3), split: equal(gm), createdAt: at(gStart, 18, 3),
       receipt: { id: 'r-g3', source: 'sample', sampleId: 'rcpt-mart', merchant: 'Daily Fresh Mart', date: d(gStart), total: 64000, items: [
         { id: 'l1', name: 'Bananas 1 dozen', amount: 7000 }, { id: 'l2', name: 'Bread loaf', amount: 5500 }, { id: 'l3', name: 'Amul butter 100 g', amount: 6200 },
         { id: 'l4', name: 'Mineral water 2 L x 4', amount: 16000 }, { id: 'l5', name: 'Chips and snacks', amount: 18500 }, { id: 'l6', name: 'Instant coffee', amount: 10800 } ] } },
-    { id: 'g-e4', tripId: 'goa', title: 'Scooter rental, 3 days', amount: 240000, category: 'transport', paidBy: 'meera', date: at(gStart + 1, 9, 20), split: equal(gm), createdAt: at(gStart + 1, 9, 20) },
+    { id: 'g-e4', tripId: 'goa', title: 'Scooter rental, 3 days', amount: 240000, category: 'rentals', paidBy: 'meera', date: at(gStart + 1, 9, 20), split: equal(gm), createdAt: at(gStart + 1, 9, 20) },
     { id: 'g-e5', tripId: 'goa', title: 'Parasailing at Calangute', amount: 180000, category: 'activities', paidBy: 'karthik', date: at(gStart + 1, 16, 0), split: equal(['me', 'karthik']), notes: 'Meera sat this one out.', createdAt: at(gStart + 1, 16, 0) },
     { id: 'g-e6', tripId: 'goa', title: 'Fish thali dinner', amount: 125000, category: 'food', paidBy: 'meera', date: at(gStart + 1, 21, 15), split: equal(gm), createdAt: at(gStart + 1, 21, 15) },
-    { id: 'g-e7', tripId: 'goa', title: 'Fuel', amount: 200000, category: 'transport', paidBy: 'karthik', date: at(gStart + 2, 10, 30), split: equal(gm), createdAt: at(gStart + 2, 10, 30) },
-    { id: 'g-e8', tripId: 'goa', title: 'Cove Cottages, 2 nights', amount: 650000, category: 'accommodation', paidBy: 'meera', date: at(gStart + 3, 15, 0), split: { method: 'shares', participants: gm, values: { me: 1, meera: 1, karthik: 2 } }, notes: 'Karthik took the single room, so two shares.', createdAt: at(gStart + 3, 15, 0) },
+    { id: 'g-e7', tripId: 'goa', title: 'Fuel', amount: 200000, category: 'fuel', paidBy: 'karthik', date: at(gStart + 2, 10, 30), split: equal(gm), createdAt: at(gStart + 2, 10, 30) },
+    { id: 'g-e8', tripId: 'goa', title: 'Cove Cottages, 2 nights', amount: 650000, category: 'stay', paidBy: 'meera', date: at(gStart + 3, 15, 0), split: { method: 'shares', participants: gm, values: { me: 1, meera: 1, karthik: 2 } }, notes: 'Karthik took the single room, so two shares.', createdAt: at(gStart + 3, 15, 0) },
     { id: 'g-e9', tripId: 'goa', title: 'Beach shack lunch, Palolem', amount: 198000, category: 'food', paidBy: 'me', date: at(gStart + 3, 13, 30), split: { method: 'exact', participants: gm, values: { me: 52000, meera: 61000, karthik: 85000 } }, createdAt: at(gStart + 3, 13, 30) },
-    { id: 'g-e10', tripId: 'goa', title: 'Cashew feni and spices', amount: 115000, category: 'shopping', paidBy: 'meera', date: at(gEnd, 12, 10), split: { method: 'percent', participants: ['meera', 'karthik'], values: { meera: 60, karthik: 40 } }, createdAt: at(gEnd, 12, 10) },
+    { id: 'g-e10', tripId: 'goa', title: 'Cashew feni and spices', amount: 115000, category: 'gifts', paidBy: 'meera', date: at(gEnd, 12, 10), split: { method: 'percent', participants: ['meera', 'karthik'], values: { meera: 60, karthik: 40 } }, createdAt: at(gEnd, 12, 10) },
     { id: 'g-e11', tripId: 'goa', title: 'Boat to Butterfly Beach', amount: 150000, category: 'activities', paidBy: 'me', date: at(gEnd, 9, 0), split: equal(gm), createdAt: at(gEnd, 9, 0) },
   ]
   const gLedger = buildLedger(gm, gExpenses)
@@ -163,12 +163,12 @@ export function createSeed(): AppData {
   }
   const bm = blr.members
   const bExpenses: Expense[] = [
-    { id: 'b-e1', tripId: 'bengaluru', title: 'Airport cab to Indiranagar', amount: 110000, category: 'transport', paidBy: 'nisha', date: at(bStart, 7, 40), split: equal(bm), createdAt: at(bStart, 7, 40) },
+    { id: 'b-e1', tripId: 'bengaluru', title: 'Airport cab to Indiranagar', amount: 110000, category: 'cabs', paidBy: 'nisha', date: at(bStart, 7, 40), split: equal(bm), createdAt: at(bStart, 7, 40) },
     { id: 'b-e2', tripId: 'bengaluru', title: 'Breakfast, Vidyarthi Bhavan', amount: 42000, category: 'food', paidBy: 'me', date: at(bStart, 9, 15), split: equal(bm), createdAt: at(bStart, 9, 15) },
     { id: 'b-e3', tripId: 'bengaluru', title: 'Books on Church Street', amount: 134000, category: 'shopping', paidBy: 'nisha', date: at(bStart, 15, 30), split: { method: 'exact', participants: bm, values: { me: 89000, nisha: 45000 } }, notes: 'Mostly mine, two of Nisha’s.', createdAt: at(bStart, 15, 30) },
     { id: 'b-e4', tripId: 'bengaluru', title: 'Dinner in Indiranagar', amount: 286000, category: 'food', paidBy: 'nisha', date: at(bStart, 21, 0), split: equal(bm), createdAt: at(bStart, 21, 0) },
-    { id: 'b-e5', tripId: 'bengaluru', title: 'Jasmine Homestay', amount: 420000, category: 'accommodation', paidBy: 'me', date: at(bStart, 12, 0), split: equal(bm), createdAt: at(bStart, 12, 0) },
-    { id: 'b-e6', tripId: 'bengaluru', title: 'Lalbagh entry and coffee', amount: 64000, category: 'activities', paidBy: 'me', date: at(bStart, 11, 10), split: equal(bm), createdAt: at(bStart, 11, 10) },
+    { id: 'b-e5', tripId: 'bengaluru', title: 'Jasmine Homestay', amount: 420000, category: 'stay', paidBy: 'me', date: at(bStart, 12, 0), split: equal(bm), createdAt: at(bStart, 12, 0) },
+    { id: 'b-e6', tripId: 'bengaluru', title: 'Lalbagh entry and coffee', amount: 64000, category: 'sightseeing', paidBy: 'me', date: at(bStart, 11, 10), split: equal(bm), createdAt: at(bStart, 11, 10) },
   ]
 
   return {

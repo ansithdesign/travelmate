@@ -1,4 +1,5 @@
-import type { AppData } from '../types'
+import { LEGACY_CATEGORY } from '../data/categories'
+import type { AppData, CategoryId } from '../types'
 
 /**
  * Persistence boundary. Everything the UI reads and writes goes through a repository
@@ -18,7 +19,9 @@ export const localRepository: Repository = {
       const raw = localStorage.getItem(KEY)
       if (!raw) return null
       const data = JSON.parse(raw) as AppData
-      return data?.version === 1 ? data : null
+      if (data?.version !== 1) return null
+      // Older saves used broader categories: carry them over to the current set.
+      return { ...data, expenses: data.expenses.map((e) => ({ ...e, category: (LEGACY_CATEGORY[e.category] ?? e.category) as CategoryId })) }
     } catch {
       return null
     }

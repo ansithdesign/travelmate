@@ -299,7 +299,7 @@ export function ExpenseSheet() {
 
           <fieldset>
             <legend className="mb-2.5 pl-1 text-meta font-semibold text-ink-2">Category</legend>
-            <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6 pb-1 md:mx-0 md:grid md:grid-cols-7 md:px-0">
+            <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6 pb-1 md:mx-0 md:grid md:grid-cols-5 md:px-0">
               {CATEGORIES.map((c) => {
                 const on = draft.category === c.id
                 return (

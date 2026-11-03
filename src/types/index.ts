@@ -14,12 +14,20 @@ export interface Person {
 }
 
 export type CategoryId =
-  | 'accommodation'
+  | 'stay'
   | 'food'
-  | 'transport'
+  | 'drinks'
+  | 'groceries'
+  | 'cabs'
+  | 'fuel'
+  | 'rentals'
+  | 'flights'
+  | 'sightseeing'
   | 'activities'
   | 'shopping'
-  | 'flights'
+  | 'gifts'
+  | 'health'
+  | 'admin'
   | 'other'
 
 export type SplitMethod = 'equal' | 'exact' | 'percent' | 'shares'

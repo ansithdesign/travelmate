@@ -141,7 +141,7 @@ Strong glass, radius 24, rows at least 68px with 20px side padding, a 36px accen
 The featured trip: photo at 4:3 (16:10 on wider screens), radius 20, one white pill badge top-left ("In 39 days"). Under the photo: trip name (heading), place and dates (meta), spend (meta with the amount in ink), and your balance on the right. Past trips: square photo, radius 16, three short lines underneath. Nothing overlays the photo except the badge.
 
 ### Category icons
-Soft 3D objects (bed, cloche, car, ticket, shopping bag, paper plane, sparkle) drawn as SVG: rounded forms lit from the top left, a gloss highlight and a gentle ground shadow, in the blue-led palette with warm accents. They sit on a faint plate in lists (36px) and the picker (46px); the selected category lifts onto an accent-soft pad with a soft ring. Everything else in the interface stays flat duotone line icons.
+Fifteen artwork icons supplied by the owner (stay, food, drinks, groceries, cabs, fuel, rentals, flights, sightseeing, activities, shopping, gifts, health, admin, other): soft clay-like 3D objects on transparent backgrounds, used exactly as drawn with no added shadow, plate or tint. They stand free in rows and the picker. The selected category lifts onto an accent-soft pad. Files live in `src/assets/categories/{id}.png` at 160px. Tours and Transit were deliberately left out. Everything else in the interface stays flat duotone line icons.
 
 ### Status chip (`.level`)
 11.5px / 650 pill with a 7px dot. `ok`, `act`, `aware`, `quiet`. Used for "You owe ₹4,300" under the hero figure and "Settled".
