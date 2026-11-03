@@ -716,3 +716,12 @@
   0% { transform: scale(0.88); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* Passport looks (markup comes from passportStyles.ts) */
+.p { position: relative; flex: none; }
+.p .lbl { font-size: 9px; font-weight: 700; letter-spacing: 0.2em; margin: 0; }
+.p .nm { font-weight: 700; line-height: 1.15; margin: 0; }
+.p .em { font-size: 10px; margin: 3px 0 0; opacity: 0.85; }
+.p .ft { font-size: 9px; font-weight: 700; letter-spacing: 0.13em; margin: 0; }
+.stp { width: 70px; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-weight: 700; font-size: 8px; letter-spacing: 0.05em; line-height: 1.2; flex: none; }
+.stp b { font-size: 9.5px; }

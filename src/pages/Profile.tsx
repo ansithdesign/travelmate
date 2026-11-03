@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { ArrowCounterClockwise, DownloadSimple, Trash, type Icon } from '@phosphor-icons/react'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
+import { PassportPickerSheet, PassportScene } from '../components/profile/PassportPickerSheet'
+import { usePassportLook } from '../store/passport'
 import { SkyPickerSheet, themeGradient } from '../components/profile/SkyPickerSheet'
 import { skyThemeById } from '../data/skyThemes'
 import { Button } from '../components/ui/Button'
@@ -11,6 +13,7 @@ import { useAllTripViews } from '../hooks/useTrip'
 import { useSky } from '../store/sky'
 import { useStore } from '../store/store'
 import { cx } from '../utils/cx'
+import { initials } from '../utils/id'
 import { tripLength } from '../utils/dates'
 import { formatMoney } from '../utils/money'
 
@@ -19,6 +22,8 @@ export function Profile() {
   const { phase, lightSky } = useSky()
   const lightTheme = skyThemeById(lightSky)
   const [skyOpen, setSkyOpen] = useState(false)
+  const [passOpen, setPassOpen] = useState(false)
+  const [look, setLook] = usePassportLook()
   const views = useAllTripViews()
   const toast = useToast()
   const [name, setName] = useState(me.name)
@@ -40,6 +45,14 @@ export function Profile() {
       .map((v) => ({ place: v.trip.destination, when: new Date(v.trip.startDate).toLocaleString('en-IN', { month: 'short', year: 'numeric' }).toUpperCase() }))
   })()
 
+  const info = {
+    name: me.name,
+    email: me.email ?? '',
+    ini: initials(me.name),
+    stats: `${views.length} ${views.length === 1 ? 'TRIP' : 'TRIPS'} · ${days} ${days === 1 ? 'DAY' : 'DAYS'}`,
+    stamps,
+  }
+
   function exportData() {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -58,41 +71,13 @@ export function Profile() {
           Profile
           <Dot />
         </h1>
-        <div className="mt-8 flex items-stretch gap-4 sm:gap-8">
-          {/* The passport cover */}
-          <div
-            className="flex w-[172px] shrink-0 flex-col items-center rounded-l-[12px] rounded-r-[22px] px-4 py-6 text-center text-[#e8c97a] shadow-[0_18px_30px_-12px_rgba(8,6,40,0.65),inset_6px_0_10px_rgba(0,0,0,0.25)]"
-            style={{ background: 'linear-gradient(160deg, #2a2072, #130c3a)' }}
-          >
-            <p className="text-[10px] font-bold tracking-[0.2em]">TRAVEL LOG</p>
-            <svg viewBox="0 0 60 60" width="62" height="62" className="mt-5" aria-hidden>
-              <circle cx="30" cy="30" r="22" fill="none" stroke="#e8c97a" strokeWidth="2" />
-              <path d="M8 30h44M30 8c-9 8-9 36 0 44M30 8c9 8 9 36 0 44" fill="none" stroke="#e8c97a" strokeWidth="1.6" />
-            </svg>
-            <p className="mt-5 text-[19px] leading-[1.15] font-bold text-white">{me.name}</p>
-            <p className="mt-1 max-w-full truncate text-[11px] text-[#e8c97a]/85">{me.email}</p>
-            <div className="mt-auto w-full border-t border-[#e8c97a]/30 pt-3">
-              <p className="num text-[10px] font-bold tracking-[0.14em]">
-                {views.length} {views.length === 1 ? 'TRIP' : 'TRIPS'} · {days} {days === 1 ? 'DAY' : 'DAYS'}
-              </p>
-            </div>
-          </div>
-          {/* Places stamped beside it, evenly spaced and centred */}
-          <ul className="flex min-w-0 flex-1 flex-col items-center justify-between gap-2" aria-label="Places you have been">
-            {stamps.map((st, i) => (
-              <li key={st.place}>
-                <div
-                  className="flex size-[80px] flex-col items-center justify-center rounded-full border-[2.5px] border-white/95 text-center text-[9px] leading-tight font-bold tracking-[0.06em] text-white"
-                  style={{ transform: `rotate(${[8, -7, 5][i % 3]}deg)`, borderStyle: i === 0 ? 'dashed' : 'solid' }}
-                >
-                  <span className="max-w-[68px] truncate">{st.place.toUpperCase()}</span>
-                  <span className="num text-[10.5px]">{st.when}</span>
-                </div>
-              </li>
-            ))}
-            {stamps.length === 0 ? <li className="self-center text-center text-meta text-ink-3">Your places will be stamped here after your first trip.</li> : null}
-          </ul>
+        <div className="mt-8">
+          <PassportScene look={look} info={info} />
+          {stamps.length === 0 ? <p className="mt-4 text-center text-meta text-ink-3">Your places will be stamped here after your first trip.</p> : null}
         </div>
+        <button type="button" onClick={() => setPassOpen(true)} className="glass-control press mt-5 inline-flex h-10 items-center rounded-full px-4 text-[14px] font-semibold">
+          Change passport
+        </button>
         <p className="num mt-6 text-meta text-ink-3">
           Your share of everything: <span className="font-semibold text-ink">{formatMoney(shareInr, { round: true })}</span>
         </p>
@@ -157,6 +142,7 @@ export function Profile() {
       </ContentSheet>
 
       <SkyPickerSheet open={skyOpen} onClose={() => setSkyOpen(false)} />
+      <PassportPickerSheet open={passOpen} onClose={() => setPassOpen(false)} look={look} info={info} onSave={setLook} />
 
       <ConfirmDialog
         open={confirm === 'reset'}
