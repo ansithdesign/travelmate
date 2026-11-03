@@ -80,7 +80,7 @@ function Overview({ view }: { view: TripView }) {
             </span>
           </Link>
         </section>
-        <TripTabs view={view} className="mt-6" />
+        <TripTabs view={view} tone="page" className="mt-6" />
       </SkyHero>
 
       <ContentSheet>

@@ -90,7 +90,7 @@ function JournalBody({ view }: { view: TripView }) {
             {trip.region && trip.region !== trip.destination ? `, ${trip.region}` : ''} · {formatRange(trip.startDate, trip.endDate)}
           </p>
         </header>
-        <TripTabs view={view} className="mt-6" />
+        <TripTabs view={view} tone="page" className="mt-6" />
       </SkyHero>
       <ContentSheet>
       <article className="px-5 pt-2 pb-12 sm:px-6 lg:px-10 lg:pt-4">

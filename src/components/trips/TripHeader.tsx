@@ -1,11 +1,11 @@
-import { NavLink } from 'react-router-dom'
-import { useEffect, useRef, type ReactNode } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import type { TripView } from '../../hooks/useTrip'
 import { cx } from '../../utils/cx'
 import { NavHeader } from '../shared/Page'
 
-/** Trip sections as a scrolling chip row. The current one is the selected midnight chip. */
-export function TripTabs({ view, className }: { view: TripView; className?: string }) {
+/** Trip sections as one glass track. A white thumb slides to the current section. */
+export function TripTabs({ view, className, tone = 'sky' }: { view: TripView; className?: string; tone?: 'sky' | 'page' }) {
   const { trip, status } = view
   const tabs = [
     { to: `/trips/${trip.id}`, label: 'Overview', end: true },
@@ -15,13 +15,32 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
     ...(status.phase === 'completed' ? [{ to: `/trips/${trip.id}/journal`, label: 'Journal' }] : []),
   ]
   const ref = useRef<HTMLElement>(null)
-  // Keep the current section visible when the row scrolls on narrow screens.
-  useEffect(() => {
-    const el = ref.current?.querySelector<HTMLElement>('[aria-current="page"]')
-    if (el && ref.current) ref.current.scrollTo({ left: Math.max(0, el.offsetLeft - ref.current.offsetLeft - (ref.current.clientWidth - el.clientWidth) / 2) })
-  }, [trip.id])
+  const { pathname } = useLocation()
+  const [thumb, setThumb] = useState<{ x: number; w: number } | null>(null)
+  useLayoutEffect(() => {
+    const measure = () => {
+      const el = ref.current?.querySelector<HTMLElement>('[aria-current="page"]')
+      setThumb(el ? { x: el.offsetLeft, w: el.offsetWidth } : null)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    if (ref.current) ro.observe(ref.current)
+    return () => ro.disconnect()
+  }, [pathname, tabs.length])
+  const many = tabs.length > 4
   return (
-    <nav ref={ref} aria-label="Trip sections" className={cx('no-scrollbar -mx-6 -my-3 flex gap-2.5 overflow-x-auto px-6 py-3 [mask-image:linear-gradient(90deg,#000_calc(100%-40px),transparent)] sm:mx-0 sm:px-0 sm:[mask-image:none]', className)}>
+    <nav
+      ref={ref}
+      aria-label="Trip sections"
+      className={cx('relative grid auto-cols-fr grid-flow-col rounded-full p-1', tone === 'sky' ? 'bg-[rgba(8,18,48,0.42)] [backdrop-filter:blur(18px)_saturate(1.4)]' : 'bg-well', className)}
+    >
+      {thumb ? (
+        <span
+          aria-hidden
+          className="absolute top-1 bottom-1 rounded-full bg-white shadow-[0_1px_2px_rgba(8,20,60,0.12),0_6px_16px_-8px_rgba(8,20,60,0.5)] transition-[left,width] duration-[420ms] ease-[var(--ease-out-expo)]"
+          style={{ left: thumb.x, width: thumb.w }}
+        />
+      ) : null}
       {tabs.map((t) => (
         <NavLink
           key={t.to}
@@ -29,8 +48,9 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
           end={t.end}
           className={({ isActive }) =>
             cx(
-              'press flex h-9 shrink-0 items-center rounded-full px-4 text-[14px] font-medium whitespace-nowrap',
-              isActive ? 'bg-white font-semibold text-[#14224a] shadow-[0_0_0_1px_rgba(13,27,42,0.14),0_8px_18px_-10px_rgba(8,20,60,0.55)]' : 'bg-[rgba(8,18,48,0.66)] text-white hover:bg-[rgba(8,18,48,0.76)]',
+              'relative z-[1] flex h-9 min-w-0 items-center justify-center rounded-full px-1 font-semibold whitespace-nowrap transition-colors duration-300',
+              many ? 'text-[12.5px]' : 'text-[13.5px]',
+              isActive ? 'text-[#14224a] [text-shadow:none]' : tone === 'sky' ? 'text-white/85 hover:text-white' : 'text-ink-2 hover:text-ink',
             )
           }
         >

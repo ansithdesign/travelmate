@@ -48,3 +48,13 @@ A running record of what was built and why, in order. Dates are 2026-11-03 onwar
 - Live city search needs internet access and could not be exercised from the build sandbox; it was tested against a simulated response.
 - Receipt scanning and invitations are simulated and labelled as such.
 - Motion (snow, aurora, shooting stars) was tuned in a headless browser, not on a physical device.
+
+## Modernisation pass
+
+- Trip sections are one glass track with a sliding white thumb, so all four (or five) fit without scrolling. On the page background it uses a light track.
+- The tab bar drops the accent line above the active tab. The active icon is filled and sits in a soft accent pill.
+- Card shadows are layered: a faint edge, a tight contact shadow and a soft long shadow.
+- Profile shows "Save details" only after something changes.
+- Other trips on Home carry a small cover photo.
+- The balance bars on Settle up sit on a faint track, so small amounts still read as a bar.
+- Plans has tickets and files with naming, rename, in-app preview, open and download.

@@ -108,10 +108,12 @@ export function Profile() {
             >
               <InputField label="Name" value={name} onChange={(e) => setName(e.target.value)} error={name.trim() ? undefined : 'Your name is shown to your group'} autoComplete="name" />
               <InputField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} error={emailValid ? undefined : 'That email does not look right'} autoComplete="email" />
-              <div>
+              <div className={cx('grid transition-[grid-template-rows,opacity] duration-300', dirty ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0')}>
+                <div className="overflow-hidden">
                 <Button type="submit" disabled={!dirty || !name.trim() || !emailValid}>
                   Save details
                 </Button>
+                </div>
               </div>
             </form>
           </section>

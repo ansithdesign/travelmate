@@ -203,7 +203,8 @@ export function Home() {
                     const n = v.ledger.net[me.id] ?? 0
                     const note = v.status.phase === 'completed' && v.settled ? 'settled' : n < 0 ? `owe ${formatMoney(-n, { currency: v.trip.currency, round: true })}` : n > 0 ? `owed ${formatMoney(n, { currency: v.trip.currency, round: true })}` : phaseLabel(v.trip, v.status)
                     return (
-                      <Link key={v.trip.id} to={`/trips/${v.trip.id}`} className="glass-control press inline-flex h-12 shrink-0 items-center rounded-full px-5 text-[14px] font-medium whitespace-nowrap">
+                      <Link key={v.trip.id} to={`/trips/${v.trip.id}`} className="glass-control press inline-flex h-12 shrink-0 items-center gap-2.5 rounded-full pr-5 pl-1.5 text-[14px] font-medium whitespace-nowrap">
+                        <Cover photo={v.trip.cover} seed={2} className="size-9 shrink-0 rounded-full" />
                         {v.trip.name.split(/[ ,]/)[0]} · {note}
                       </Link>
                     )

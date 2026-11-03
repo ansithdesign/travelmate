@@ -93,8 +93,9 @@ function SettleBody({ view }: { view: TripView }) {
                   <Avatar person={m} size={28} />
                   <span className="truncate text-[14px] font-semibold">{m.isYou ? 'You' : firstName(m.name)}</span>
                   <span aria-hidden className="relative h-2.5">
+                    <span className="absolute inset-0 rounded-full bg-well" />
                     <span className="absolute inset-y-[-3px] left-1/2 w-px bg-line-strong" />
-                    {net !== 0 ? <span className={cx('absolute inset-y-0 rounded-full', net > 0 ? 'left-1/2 bg-[var(--ok)]' : 'right-1/2 bg-[var(--act)]')} style={{ width: `${Math.max(w, 2)}%` }} /> : null}
+                    {net !== 0 ? <span className={cx('absolute inset-y-0 rounded-full', net > 0 ? 'left-1/2 rounded-l-none bg-[var(--ok)]' : 'right-1/2 rounded-r-none bg-[var(--act)]')} style={{ width: `${Math.max(w, 2)}%` }} /> : null}
                   </span>
                   <span className={cx('num w-[84px] text-right text-[13px] font-semibold', net > 0 ? 'text-gain' : net < 0 ? 'text-loss' : 'text-ink-3')}>
                     {net === 0 ? 'settled' : formatMoney(Math.abs(net), { currency: cur })}

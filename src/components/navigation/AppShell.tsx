@@ -72,10 +72,11 @@ function TabBar({ pathname }: { pathname: string }) {
                   aria-label={it.label}
                   aria-current={it.on ? 'page' : undefined}
                   onClick={() => it.on && window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className={cx('relative flex min-h-14 flex-col items-center gap-[3px] pt-2 text-[11px] outline-none transition-colors duration-200 focus-visible:text-accent', it.on ? 'font-semibold text-accent' : 'font-medium text-ink-3 hover:text-ink-2')}
+                  className={cx('relative flex min-h-14 flex-col items-center gap-[3px] pt-2 text-[11px] outline-none transition-colors duration-200 focus-visible:text-accent', it.on ? 'font-semibold text-ink' : 'font-medium text-ink-3 hover:text-ink-2')}
                 >
-                  {it.on ? <span aria-hidden className="absolute top-[-8px] h-[3px] w-9 rounded-b-full bg-accent" /> : null}
-                  <it.icon size={24} weight={it.on ? 'fill' : 'regular'} aria-hidden />
+                  <span className={cx('flex h-8 w-14 items-center justify-center rounded-full transition-colors duration-300', it.on ? 'bg-accent-soft text-accent' : '')}>
+                    <it.icon size={23} weight={it.on ? 'fill' : 'regular'} aria-hidden />
+                  </span>
                   {it.label}
                 </NavLink>
               </li>
