@@ -139,7 +139,7 @@ export function ExpenseList({
             placeholder={multiTrip ? 'Search expenses, people, trips' : 'Search expenses or people'}
             value={f.q}
             onChange={(e) => setF((x) => ({ ...x, q: e.target.value }))}
-            className="h-12 rounded-full bg-accent-soft pl-11 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--accent)_22%,transparent)] placeholder:text-ink-3"
+            className="h-12 rounded-full bg-[rgba(60,76,104,0.1)] pl-11 shadow-none placeholder:text-ink-3"
           />
         </div>
         <Button variant="secondary" size="lg" icon={SlidersHorizontal} onClick={() => setSheet(true)} aria-label="Filters and sort" className="relative h-12 px-4">
@@ -148,7 +148,7 @@ export function ExpenseList({
         </Button>
       </div>
 
-      <ScrollRow className="-mx-6 mt-3 flex gap-2 px-6 pb-1 lg:mx-0 lg:px-0">
+      <ScrollRow className="-mx-6 mt-3 flex gap-2 px-6 lg:mx-0 lg:px-0">
         <Chip active={f.categories.length === 0} onClick={() => setF((x) => ({ ...x, categories: [] }))}>
           All
         </Chip>

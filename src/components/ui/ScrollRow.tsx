@@ -28,7 +28,7 @@ export function ScrollRow({ className, children, ...rest }: HTMLAttributes<HTMLD
   return (
     <div
       ref={ref}
-      className={cx('no-scrollbar overflow-x-auto', className)}
+      className={cx('no-scrollbar -my-3 overflow-x-auto py-3', className)}
       style={more ? { WebkitMaskImage: 'linear-gradient(90deg, #000 calc(100% - 56px), transparent)', maskImage: 'linear-gradient(90deg, #000 calc(100% - 56px), transparent)' } : undefined}
       {...rest}
     >

@@ -104,7 +104,7 @@ export function SkyPickerSheet({ open, onClose }: { open: boolean; onClose: () =
         <span className={cx('level shrink-0', 'ok')}>Text: readable</span>
       </div>
 
-      <ScrollRow role="radiogroup" aria-label="Light skies" className="-mx-6 mt-5 flex gap-3.5 px-6 pb-2 md:-mx-6">
+      <ScrollRow role="radiogroup" aria-label="Light skies" className="-mx-6 mt-5 flex gap-3.5 px-6 md:-mx-6">
         {SKY_THEMES.map((t) => {
           const on = t.id === sel
           const cur = t.id === lightSky

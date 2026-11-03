@@ -18,7 +18,6 @@ import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
 import type { CategoryId, Expense } from '../types'
 import { cx } from '../utils/cx'
-import { fmt } from '../utils/dates'
 import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
 
@@ -27,9 +26,15 @@ const QUICK: { id: CategoryId; label: string }[] = [
   { id: 'food', label: 'Food' },
   { id: 'cabs', label: 'Cabs' },
   { id: 'drinks', label: 'Drinks' },
-  { id: 'activities', label: 'Activities' },
   { id: 'groceries', label: 'Groceries' },
   { id: 'stay', label: 'Stay' },
+  { id: 'activities', label: 'Activities' },
+  { id: 'sightseeing', label: 'Sights' },
+  { id: 'shopping', label: 'Shopping' },
+  { id: 'flights', label: 'Flights' },
+  { id: 'fuel', label: 'Fuel' },
+  { id: 'health', label: 'Health' },
+  { id: 'other', label: 'Other' },
 ]
 
 export function Home() {
@@ -54,8 +59,6 @@ export function Home() {
   const { trip, status, ledger, expenses, settled } = view
   const cur = trip.currency
   const myNet = ledger.net[me.id] ?? 0
-  const todayIso = new Date().toISOString().slice(0, 10)
-  const next = trip.itinerary.find((d) => d.date >= todayIso) ?? trip.itinerary[0]
   const others = ordered.filter((v) => v.trip.id !== trip.id)
 
   return (
@@ -68,13 +71,13 @@ export function Home() {
               <Dot />
             </h1>
             <Link to="/profile" aria-label="Profile" className="press rounded-full">
-              <Avatar person={me} size={40} />
+              <Avatar person={me} size={40} className="!bg-[rgba(8,18,48,0.4)] !bg-none" style={{ background: "rgba(8,18,48,0.4)" }} />
             </Link>
           </header>
 
           {/* Story rail: each trip is a round cover whose ring fills as the budget is used.
               The selected trip's ring turns gold and its name gets an underline. */}
-          <ScrollRow role="tablist" aria-label="Your trips" className="-mx-6 mt-7 flex gap-5 px-6 pt-3 pb-1 lg:mx-0 lg:px-0">
+          <ScrollRow role="tablist" aria-label="Your trips" className="-mx-6 mt-7 flex gap-5 px-6 lg:mx-0 lg:px-0">
             <button type="button" onClick={() => openTrip()} className="press shrink-0 text-center" aria-label="Plan a new trip">
               <span className="flex size-[72px] items-center justify-center rounded-full bg-[rgba(8,18,48,0.34)] text-white">
                 <Plus size={26} weight="bold" aria-hidden />
@@ -107,11 +110,11 @@ export function Home() {
 
           {/* The selected trip's numbers sit straight on the sky */}
           <div className="mt-7">
-            <Link to={`/trips/${trip.id}`} className="press -ml-1 inline-flex items-center gap-1 rounded-full py-1 pr-2 pl-1 text-meta font-semibold text-ink-3 hover:text-ink">
-              <span className="truncate">
+            <Link to={`/trips/${trip.id}`} className="press -ml-1 inline-flex items-center gap-2.5 rounded-full py-1 pr-2 pl-1 text-meta leading-none font-semibold text-ink-3 hover:text-ink">
+              <span className="truncate leading-5">
                 {trip.name} · {phaseLabel(trip, status)}
               </span>
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[rgba(8,18,48,0.4)] text-white">
+              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-white">
                 <CaretRight size={12} weight="bold" aria-hidden />
               </span>
             </Link>
@@ -133,11 +136,11 @@ export function Home() {
             </h2>
             <span className="text-caption text-ink-3">then type the amount</span>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-x-2 gap-y-4">
+          <div className="mt-4 grid grid-cols-4 gap-x-1 gap-y-4">
             {QUICK.map((c) => (
               <button key={c.id} type="button" onClick={() => openExpense({ tripId: trip.id, category: c.id })} className="press flex flex-col items-center gap-1.5 rounded-[18px] py-1 text-center">
-                <CategoryIcon id={c.id} size={46} />
-                <span className="text-[13px] font-medium text-ink-2">{c.label}</span>
+                <CategoryIcon id={c.id} size={44} />
+                <span className="text-[12px] font-medium text-ink-2">{c.label}</span>
               </button>
             ))}
           </div>
@@ -165,17 +168,6 @@ export function Home() {
           ) : null}
 
           <div className="mx-auto flex max-w-[680px] flex-col gap-9">
-            {next ? (
-              <Link to={`/trips/${trip.id}/details`} className="panel-strong press flex items-center gap-4 rounded-[28px] p-4">
-                <Cover photo={trip.cover} seed={1} className="size-14 shrink-0 rounded-[16px]" />
-                <span className="min-w-0 flex-1">
-                  <span className="block text-caption font-medium text-ink-3">Up next · {fmt.long(next.date)}</span>
-                  <span className="mt-0.5 line-clamp-2 text-[15px] leading-snug font-semibold">{next.plan}</span>
-                </span>
-                <CaretRight size={16} weight="bold" className="shrink-0 text-faint" aria-hidden />
-              </Link>
-            ) : null}
-
             <section aria-labelledby="just-in">
               <div className="flex min-h-11 items-center justify-between gap-3 px-0.5">
                 <h2 id="just-in" className="text-title">
@@ -205,7 +197,7 @@ export function Home() {
                 <h2 id="other-trips" className="px-0.5 text-meta font-semibold text-ink-3">
                   Other trips
                 </h2>
-                <ScrollRow className="-mx-6 mt-3 flex gap-2.5 px-6 pb-1">
+                <ScrollRow className="-mx-6 mt-3 flex gap-2.5 px-6">
                   {others.map((v) => {
                     const n = v.ledger.net[me.id] ?? 0
                     const note = v.status.phase === 'completed' && v.settled ? 'settled' : n < 0 ? `owe ${formatMoney(-n, { currency: v.trip.currency, round: true })}` : n > 0 ? `owed ${formatMoney(n, { currency: v.trip.currency, round: true })}` : phaseLabel(v.trip, v.status)

@@ -16,7 +16,14 @@ export function ContentSheet({ children, className }: { children: ReactNode; cla
   const { pathname } = useLocation()
   // A full-width haze surface that fades in from the sky, so body text never sits on the coloured sky.
   return (
-    <div className="relative w-full bg-[linear-gradient(180deg,transparent_0,var(--haze)_44px)] pt-5">
+    <div
+      className="relative -mt-16 w-full pt-[84px]"
+      style={{
+        // An eased ramp, so the sky melts into the page with no visible band
+        background:
+          'linear-gradient(180deg, transparent 0, color-mix(in srgb, var(--haze) 6%, transparent) 20px, color-mix(in srgb, var(--haze) 20%, transparent) 44px, color-mix(in srgb, var(--haze) 45%, transparent) 70px, color-mix(in srgb, var(--haze) 72%, transparent) 98px, color-mix(in srgb, var(--haze) 92%, transparent) 124px, var(--haze) 150px)',
+      }}
+    >
       <div key={pathname} className={cx('relative mx-auto w-full max-w-[1080px] [animation:rise_420ms_var(--ease-out-expo)_both]', className)}>
         {children}
       </div>

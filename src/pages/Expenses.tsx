@@ -45,7 +45,7 @@ export function Expenses() {
 
         {/* Where the money went: each category is a bubble sized by spend. Tap one to filter. */}
         {bubbles.length ? (
-          <ScrollRow className="-mx-6 mt-8 flex items-end gap-3 px-6 pt-1 pb-1" role="group" aria-label="Spend by category">
+          <ScrollRow className="-mx-6 mt-8 flex items-end gap-3 px-6" role="group" aria-label="Spend by category">
             {bubbles.map((b) => {
               const size = Math.round(54 + 44 * Math.sqrt(b.total / bubbles[0].total))
               const on = cat === b.id
@@ -76,7 +76,7 @@ export function Expenses() {
         </div>
 
         </div>
-        <ScrollRow className="-mx-6 mt-6 flex gap-2 px-6 py-1 sm:mx-0 sm:px-0" role="group" aria-label="Trip">
+        <ScrollRow className="-mx-6 mt-6 flex gap-2 px-6 sm:mx-0 sm:px-0" role="group" aria-label="Trip">
           <button
             type="button"
             aria-pressed={tripId === 'all'}
