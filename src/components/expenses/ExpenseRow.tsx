@@ -27,7 +27,6 @@ export function ExpenseRow({
   const myShare = shares[me.id] ?? 0
   const iPaid = expense.paidBy === me.id
   const position = iPaid ? expense.amount - myShare : -myShare
-  const n = expense.split.participants.length
 
   return (
     <button type="button" onClick={onOpen} className="group flex min-h-[68px] w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-well active:bg-well">
@@ -39,7 +38,7 @@ export function ExpenseRow({
         </span>
         <span className="mt-0.5 block truncate text-caption text-ink-3">
           {iPaid ? 'You' : firstName(payer?.name ?? 'Someone')} paid
-          {tripName ? ` · ${tripName}` : ` · ${n === 1 ? 'just them' : `split ${n} ways`}`}
+          {tripName ? ` · ${tripName}` : ''}
         </span>
       </span>
       <span className="shrink-0 pl-2 text-right">

@@ -1,39 +1,52 @@
 import type { Photo } from '../types'
 
 /**
- * Real Unsplash photographs (Unsplash License). IDs were confirmed through search;
- * the build environment could not download them, so they are hotlinked through
- * Unsplash's download endpoint and every <Cover> has a designed fallback.
+ * Cover photos supplied by the owner: twenty landscapes and places, bundled with the
+ * app so they always load. Every <Cover> still has a painted fallback behind the photo.
  */
-export function unsplash(id: string, width = 1200): string {
-  return `https://unsplash.com/photos/${id}/download?w=${width}`
-}
+const FILES = import.meta.glob('../assets/covers/*.webp', { eager: true, query: '?url', import: 'default' }) as Record<string, string>
+const src = (name: string) => FILES[`../assets/covers/${name}.webp`]
 
-const p = (id: string, alt: string, credit: string): Photo => ({ id: `us-${id}`, src: unsplash(id), alt, credit })
+const p = (name: string, alt: string): Photo => ({ id: `cv-${name}`, src: src(name), alt })
 
 export const PHOTOS = {
-  kashmirShikara: p('vlTihequ9yo', 'Shikaras carrying visitors across Dal Lake, Srinagar', 'Kabir van Wegen'),
-  kashmirHouseboats: p('72GwiojCwoI', 'Houseboats on Dal Lake below snow covered mountains', 'Unsplash'),
-  kashmirBoatIsland: p('hcRK-x_H21g', 'A shikara crossing Dal Lake near an island', 'Amit Jain'),
-  kashmirUmbrella: p('8jdUZzBU2yU', 'A boatman under an umbrella on Dal Lake', 'Unsplash'),
-  kashmirNigeen: p('SmDDOpLQ9nk', 'A boat on Nigeen Lake, Srinagar', 'Haziq Farooqi'),
-  goaKakolem: p('M5AR9jscKgM', 'Kakolem beach seen from the hillside, South Goa', 'Chirayu Sharma'),
-  goaPalolem: p('WSe6NAwwESA', 'Palm trees along Palolem beach', 'Kotagauni Srinivas'),
-  goaCloudy: p('nlxNKMpUHbY', 'A sandy cove ringed by palms on a cloudy day', 'Chirayu Sharma'),
-  goaSunset: p('I9qh1Q_tgfU', 'Sunset over the Arabian Sea with a palm in the foreground', 'Chirayu Sharma'),
-  blrVidhana: p('qI97C620KMg', 'Vidhana Soudha under a clear sky, Bengaluru', 'Arif Khan'),
-  blrCubbon: p('PfV40sukkN8', 'Trees and lawns in Cubbon Park, Bengaluru', 'Mohnish Landge'),
-  blrTree: p('nuIpe_EumH4', 'A large rain tree in a Bengaluru park', 'Nithin Purple'),
+  goaBeach: p('goa-beach', 'A palm-fringed beach at sunset'),
+  kashmirLake: p('kashmir-lake', 'Snow-covered peaks reflected in a still lake'),
+  munnarTea: p('munnar-tea', 'Tea estate hills in morning mist'),
+  keralaBackwaters: p('kerala-backwaters', 'A houseboat on glassy backwaters at dawn'),
+  westernGhatsFalls: p('western-ghats-falls', 'A waterfall in a deep green rainforest'),
+  tharDunes: p('thar-dunes', 'Desert dunes at sunset with a winding track'),
+  alpineMeadow: p('alpine-meadow', 'A wildflower meadow above misty ridgelines'),
+  andamanLagoon: p('andaman-lagoon', 'A turquoise lagoon with a wooden boat'),
+  pineForest: p('pine-forest', 'A forest path with beams of light'),
+  valleyDusk: p('valley-dusk', 'A mountain valley at blue hour with a lit village'),
+  hillFort: p('hill-fort', 'A hill fort at dusk'),
+  lakePalace: p('lake-palace', 'A lake palace reflected at sunrise'),
+  varanasiGhats: p('varanasi-ghats', 'Riverside ghats at dawn'),
+  rishikeshBridge: p('rishikesh-bridge', 'A suspension bridge over a turquoise river'),
+  hampiRuins: p('hampi-ruins', 'Ancient ruins among boulders in golden light'),
+  pondicherryStreet: p('pondicherry-street', 'A yellow colonial street with bougainvillaea'),
+  darjeelingTrain: p('darjeeling-train', 'A narrow-gauge train winding through green hills'),
+  coastRoad: p('coast-road', 'A cliffside coastal road by the sea'),
+  starryCamp: p('starry-camp', 'A glowing tent under the Milky Way'),
+  riceTerraces: p('rice-terraces', 'Rice terraces in soft morning light'),
 } satisfies Record<string, Photo>
 
-/** Covers offered in the trip form. */
-export const COVER_LIBRARY: Photo[] = [
-  PHOTOS.kashmirShikara,
-  PHOTOS.kashmirHouseboats,
-  PHOTOS.goaKakolem,
-  PHOTOS.goaPalolem,
-  PHOTOS.goaSunset,
-  PHOTOS.blrVidhana,
-  PHOTOS.blrCubbon,
-  PHOTOS.kashmirNigeen,
-]
+/** Covers offered in the trip form: all twenty. */
+export const COVER_LIBRARY: Photo[] = Object.values(PHOTOS)
+
+/** Trips saved before the bundled covers used Unsplash links. Carry them onto the closest new photo. */
+export const LEGACY_PHOTO: Record<string, Photo> = {
+  'us-vlTihequ9yo': PHOTOS.kashmirLake,
+  'us-72GwiojCwoI': PHOTOS.kashmirLake,
+  'us-hcRK-x_H21g': PHOTOS.kashmirLake,
+  'us-8jdUZzBU2yU': PHOTOS.valleyDusk,
+  'us-SmDDOpLQ9nk': PHOTOS.alpineMeadow,
+  'us-M5AR9jscKgM': PHOTOS.goaBeach,
+  'us-WSe6NAwwESA': PHOTOS.keralaBackwaters,
+  'us-nlxNKMpUHbY': PHOTOS.andamanLagoon,
+  'us-I9qh1Q_tgfU': PHOTOS.goaBeach,
+  'us-qI97C620KMg': PHOTOS.pineForest,
+  'us-PfV40sukkN8': PHOTOS.munnarTea,
+  'us-nuIpe_EumH4': PHOTOS.westernGhatsFalls,
+}

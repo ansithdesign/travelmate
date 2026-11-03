@@ -1,5 +1,6 @@
 import { LEGACY_CATEGORY } from '../data/categories'
-import type { AppData, CategoryId } from '../types'
+import { LEGACY_PHOTO } from '../data/photos'
+import type { AppData, CategoryId, Photo } from '../types'
 
 /**
  * Persistence boundary. Everything the UI reads and writes goes through a repository
@@ -21,7 +22,12 @@ export const localRepository: Repository = {
       const data = JSON.parse(raw) as AppData
       if (data?.version !== 1) return null
       // Older saves used broader categories: carry them over to the current set.
-      return { ...data, expenses: data.expenses.map((e) => ({ ...e, category: (LEGACY_CATEGORY[e.category] ?? e.category) as CategoryId })) }
+      const photo = <T extends Photo | undefined>(ph: T): T => ((ph && LEGACY_PHOTO[ph.id]) || ph) as unknown as T
+      return {
+        ...data,
+        expenses: data.expenses.map((e) => ({ ...e, category: (LEGACY_CATEGORY[e.category] ?? e.category) as CategoryId })),
+        trips: data.trips.map((t) => ({ ...t, cover: photo(t.cover), journal: { ...t.journal, photos: t.journal.photos.map((x) => photo(x)) } })),
+      }
     } catch {
       return null
     }

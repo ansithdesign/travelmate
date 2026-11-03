@@ -140,6 +140,9 @@ Strong glass, radius 24, rows at least 68px with 20px side padding, a 36px accen
 ### Photo cards (Airbnb listing style)
 The featured trip: photo at 4:3 (16:10 on wider screens), radius 20, one white pill badge top-left ("In 39 days"). Under the photo: trip name (heading), place and dates (meta), spend (meta with the amount in ink), and your balance on the right. Past trips: square photo, radius 16, three short lines underneath. Nothing overlays the photo except the badge.
 
+### Cover photos
+Twenty owner-supplied landscapes and places (beaches, mountains, tea hills, backwaters, forests, ruins, streets, camps), bundled in `src/assets/covers/*.webp`, so they load offline. They are offered in the trip form and used by the sample trips. The painted scene stays behind each photo as the loading fallback. Source tiles are about 294 x 449, so they read best at card size.
+
 ### Category icons
 Fifteen artwork icons supplied by the owner (stay, food, drinks, groceries, cabs, fuel, rentals, flights, sightseeing, activities, shopping, gifts, health, admin, other): soft clay-like 3D objects on transparent backgrounds, used exactly as drawn with no added shadow, plate or tint. They stand free in rows and the picker. The selected category lifts onto an accent-soft pad. Files live in `src/assets/categories/{id}.png` at 160px. Tours and Transit were deliberately left out. Everything else in the interface stays flat duotone line icons.
 

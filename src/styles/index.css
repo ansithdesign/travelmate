@@ -222,6 +222,10 @@
   h1, h2, h3 {
     text-wrap: balance;
   }
+  /* Fieldsets default to min-content width, which stretches a page sideways when they hold a scrolling row */
+  fieldset {
+    min-width: 0;
+  }
   input, textarea, select, button {
     font: inherit;
     color: inherit;
