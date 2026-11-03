@@ -65,7 +65,7 @@ export function Menu({ items, label = 'More actions', tone = 'plain' }: { items:
             }
             if (e.key === 'Tab') setOpen(false)
           }}
-          className="glass-bar absolute top-[calc(100%+8px)] right-0 z-40 min-w-[224px] origin-top-right overflow-hidden rounded-[22px] p-1.5 text-ink [animation:pop_260ms_var(--ease-glide)]"
+          className="glass-bar off-sky absolute top-[calc(100%+8px)] right-0 z-40 min-w-[224px] origin-top-right overflow-hidden rounded-[22px] p-1.5 text-ink [animation:pop_260ms_var(--ease-glide)]"
         >
           {items.map((it, i) => (
             <button

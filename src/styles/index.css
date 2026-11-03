@@ -549,6 +549,20 @@
     --color-loss: #ffc4bd;
     --color-accent: #ffffff;
   }
+  /* Popovers opened from sky controls read as normal surfaces, not as sky text */
+  .off-sky {
+    color: var(--ink);
+    text-shadow: none;
+    --color-ink: var(--ink);
+    --color-ink-2: var(--ink-2);
+    --color-ink-3: var(--muted);
+    --color-faint: var(--faint);
+    --color-well: var(--fill);
+    --color-line: var(--line);
+    --color-gain: var(--ok-ink);
+    --color-loss: var(--act-ink);
+    --color-accent: var(--accent);
+  }
   .on-sky .glass-control {
     background: rgba(8, 18, 48, 0.34);
     color: #fff;
