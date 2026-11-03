@@ -109,7 +109,7 @@ function SideRail({ pathname }: { pathname: string }) {
         <button
           type="button"
           onClick={() => openTrip()}
-          className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-amber text-meta font-semibold text-[#2b1d05] transition-colors hover:bg-[#d69728]"
+          className="flex h-10 items-center justify-center gap-2 rounded-[10px] bg-white text-meta font-semibold text-forest-900 transition-colors hover:bg-forest-50"
         >
           <Plus size={17} strokeWidth={2.2} aria-hidden />
           New trip

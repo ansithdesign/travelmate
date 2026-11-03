@@ -19,7 +19,7 @@ export function FeaturedTrip({ view }: { view: TripView }) {
   return (
     <Link
       to={`/trips/${trip.id}`}
-      className="group block overflow-hidden rounded-lg bg-surface shadow-[0_0_0_1px_var(--color-line)] transition-shadow duration-200 hover:shadow-[0_0_0_1px_var(--color-line),0_10px_28px_-16px_rgb(27_32_29/0.35)]"
+      className="group block overflow-hidden rounded-md bg-surface shadow-[0_0_0_1px_var(--color-line)] transition-shadow duration-200 hover:shadow-[0_0_0_1px_var(--color-line),0_10px_28px_-16px_rgb(27_32_29/0.35)]"
     >
       <div className="relative">
         <Cover photo={trip.cover} fallbackLabel={trip.destination} eager className="aspect-[4/3] sm:aspect-[16/9]" imgClassName="transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:scale-[1.02]" />
@@ -33,7 +33,7 @@ export function FeaturedTrip({ view }: { view: TripView }) {
               {trip.destination} · <span className="whitespace-nowrap">{formatRange(trip.startDate, trip.endDate)}</span>
             </p>
           </div>
-          <AvatarStack people={members} size={30} className="mt-1" />
+          <AvatarStack people={members} size={30} on="surface" className="mt-1" />
         </div>
         <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-line-soft pt-3.5 text-meta">
           <span className="text-ink-2">
@@ -62,10 +62,8 @@ export function TripRow({ view }: { view: TripView }) {
   const { trip, status, ledger } = view
   const myNet = ledger.net[me.id] ?? 0
   return (
-    <Link to={`/trips/${trip.id}`} className="group flex items-center gap-4 py-3.5">
-      <div className="relative shrink-0">
-        <Cover photo={trip.cover} fallbackLabel={trip.destination.slice(0, 1)} className="size-[68px] rounded-md" />
-      </div>
+    <Link to={`/trips/${trip.id}`} className="group flex items-center gap-3.5 py-3.5">
+      <TripMarker trip={trip} status={status} size="sm" className="shrink-0" />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="truncate text-heading group-hover:underline group-hover:decoration-line">{trip.name}</h3>
@@ -73,7 +71,7 @@ export function TripRow({ view }: { view: TripView }) {
         </div>
         <div className="mt-0.5 flex items-baseline justify-between gap-3 text-meta">
           <span className="truncate text-ink-2">
-            {formatRange(trip.startDate, trip.endDate)} · {trip.members.length} {trip.members.length === 1 ? 'traveller' : 'travellers'}
+            {formatRange(trip.startDate, trip.endDate)}
           </span>
           {status.phase === 'completed' || status.phase === 'ended' ? (
             myNet === 0 ? <span className="shrink-0 text-ink-3">Settled</span> : <BalanceLine net={myNet} currency={trip.currency} className="shrink-0" />
@@ -82,7 +80,6 @@ export function TripRow({ view }: { view: TripView }) {
           )}
         </div>
       </div>
-      <TripMarker trip={trip} status={status} size="sm" className="hidden sm:block" />
     </Link>
   )
 }

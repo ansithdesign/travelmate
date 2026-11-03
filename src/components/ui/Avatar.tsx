@@ -18,11 +18,11 @@ function tintFor(id: string) {
   return TINTS[h % TINTS.length]
 }
 
-export function Avatar({ person, size = 36, ring, className }: { person: Pick<Person, 'id' | 'name'>; size?: number; ring?: boolean; className?: string }) {
+export function Avatar({ person, size = 36, ring, className, style }: { person: Pick<Person, 'id' | 'name'>; size?: number; ring?: boolean; className?: string; style?: React.CSSProperties }) {
   return (
     <span
       aria-hidden
-      style={{ width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.36)) }}
+      style={{ width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.34)), ...style }}
       className={cx(
         'inline-flex shrink-0 items-center justify-center rounded-full font-semibold tracking-[0.01em]',
         tintFor(person.id),
@@ -35,18 +35,19 @@ export function Avatar({ person, size = 36, ring, className }: { person: Pick<Pe
   )
 }
 
-export function AvatarStack({ people, max = 4, size = 28, className }: { people: Person[]; max?: number; size?: number; className?: string }) {
+export function AvatarStack({ people, max = 4, size = 28, className, on = 'ground' }: { people: Person[]; max?: number; size?: number; className?: string; on?: 'ground' | 'surface' }) {
+  const ringColor = on === 'ground' ? 'ring-ground' : 'ring-surface'
   const shown = people.slice(0, max)
   const extra = people.length - shown.length
   return (
     <span className={cx('flex items-center', className)} aria-label={people.map((p) => p.name).join(', ')} role="img">
       {shown.map((p, i) => (
-        <Avatar key={p.id} person={p} size={size} ring className={i > 0 ? '-ml-2' : ''} />
+        <Avatar key={p.id} person={p} size={size} ring className={ringColor} style={i > 0 ? { marginLeft: -Math.round(size * 0.22) } : undefined} />
       ))}
       {extra > 0 ? (
         <span
-          style={{ width: size, height: size }}
-          className="-ml-2 inline-flex items-center justify-center rounded-full bg-sunken text-[11px] font-semibold text-ink-2 ring-2 ring-surface"
+          style={{ width: size, height: size, marginLeft: -Math.round(size * 0.22) }}
+          className={`inline-flex items-center justify-center rounded-full bg-sunken text-[11px] font-semibold text-ink-2 ring-2 ${ringColor}`}
         >
           +{extra}
         </span>

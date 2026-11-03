@@ -14,7 +14,9 @@ export function Cover({
   imgClassName,
   sizes,
   eager,
+  showCredit,
 }: {
+  showCredit?: boolean
   photo?: Photo
   fallbackLabel: string
   className?: string
@@ -60,6 +62,9 @@ export function Cover({
             imgClassName,
           )}
         />
+      ) : null}
+      {showCredit && loaded && !failed && photo?.credit ? (
+        <span className="absolute right-2 bottom-2 rounded-[6px] bg-black/45 px-1.5 py-0.5 text-[10px] text-white/90">{photo.credit}</span>
       ) : null}
     </div>
   )

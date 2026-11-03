@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, BedDouble, ChevronRight, CircleCheck, Plane, Plu
 import { categoryById, CATEGORIES } from '../data/categories'
 import { BudgetRoad } from '../components/trips/BudgetRoad'
 import { TripTabs } from '../components/trips/TripHeader'
-import { TripMarker, phaseLabel } from '../components/trips/TripMarker'
+import { TripMarker } from '../components/trips/TripMarker'
 import { useTripActions } from '../components/trips/useTripActions'
 import { Avatar, AvatarStack } from '../components/ui/Avatar'
 import { Button, IconButton } from '../components/ui/Button'
@@ -45,7 +45,7 @@ function Overview({ view }: { view: TripView }) {
       {/* Cover */}
       <div className="mx-auto max-w-[1080px] lg:px-8 lg:pt-8">
         <div className="relative">
-          <Cover photo={trip.cover} fallbackLabel={trip.destination} eager className="h-[260px] sm:h-[320px] lg:h-[340px] lg:rounded-xl" />
+          <Cover photo={trip.cover} fallbackLabel={trip.destination} eager className="h-[168px] sm:h-[300px] lg:h-[340px] lg:rounded-lg" />
           <div className="absolute inset-x-0 top-0 flex items-center justify-between p-3 lg:p-4">
             <IconButton icon={ArrowLeft} label="Back to trips" tone="onImage" onClick={() => navigate('/')} />
             <Menu items={items} label="Trip actions" tone="onImage" />
@@ -55,11 +55,10 @@ function Overview({ view }: { view: TripView }) {
       </div>
 
       {/* Title block */}
-      <div className="mx-auto max-w-[1080px] px-4 pt-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1080px] px-4 pt-9 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div className="min-w-0">
-            <p className="text-meta font-medium text-ink-2">{phaseLabel(status)}</p>
-            <h1 className="mt-1 text-display">{trip.name}</h1>
+            <h1 className="text-display">{trip.name}</h1>
             <p className="mt-1.5 text-body text-ink-2">
               {trip.destination}
               {trip.region && trip.region !== trip.destination ? `, ${trip.region}` : ''} · {formatRange(trip.startDate, trip.endDate)}
@@ -75,25 +74,25 @@ function Overview({ view }: { view: TripView }) {
         </div>
       </div>
 
-      <div className="sticky top-0 z-30 mt-5 border-b border-line bg-ground/95 backdrop-blur-[3px]">
+      <div className="sticky top-0 z-30 mt-4 border-b border-line bg-ground/95 backdrop-blur-[3px]">
         <TripTabs view={view} />
       </div>
 
-      <div className="mx-auto grid max-w-[1080px] gap-x-10 gap-y-10 px-4 pt-7 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
+      <div className="mx-auto grid max-w-[1080px] gap-x-10 gap-y-10 px-4 pt-5 sm:px-6 sm:pt-7 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
         <div className="min-w-0">
           {/* The money statement */}
-          <section aria-labelledby="money" className="rounded-lg bg-surface p-5 hairline sm:p-6">
+          <section aria-labelledby="money" className="rounded-md bg-surface p-4 hairline sm:p-6">
             <h2 id="money" className="sr-only">
               Money
             </h2>
-            <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+            <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-3">
               <div>
                 <p className="text-meta text-ink-2">Group has spent</p>
-                <Figure value={ledger.total} currency={cur} className="mt-1 block" />
+                <Figure value={ledger.total} currency={cur} className="mt-0.5 block text-[34px] leading-10 sm:text-figure" />
               </div>
               <div className="sm:text-right">
-                <p className="text-meta text-ink-2">Your position</p>
-                <p className={cx('num mt-1 text-title', myNet > 0 ? 'text-forest' : myNet < 0 ? 'text-brick' : 'text-ink-3')}>
+                <p className="hidden text-meta text-ink-2 sm:block">Your position</p>
+                <p className={cx('num text-heading sm:mt-1 sm:text-title', myNet > 0 ? 'text-forest' : myNet < 0 ? 'text-brick' : 'text-ink-3')}>
                   {myNet > 0 ? `You get back ${formatMoney(myNet, { currency: cur })}` : myNet < 0 ? `You owe ${formatMoney(-myNet, { currency: cur })}` : 'All square'}
                 </p>
                 <p className="num mt-0.5 text-meta text-ink-3">
@@ -101,9 +100,9 @@ function Overview({ view }: { view: TripView }) {
                 </p>
               </div>
             </div>
-            {trip.budget ? <BudgetRoad spent={ledger.total} budget={trip.budget} currency={cur} className="mt-6" /> : null}
+            {trip.budget ? <BudgetRoad spent={ledger.total} budget={trip.budget} currency={cur} className="mt-5" /> : null}
 
-            <div className="mt-6 border-t border-line-soft pt-4">
+            <div className="mt-1 border-t border-line-soft pt-3">
               <BalanceBars view={view} members={members} />
             </div>
 
@@ -163,9 +162,9 @@ function BalanceBars({ view, members }: { view: TripView; members: Person[] }) {
         const net = ledger.net[m.id] ?? 0
         const w = (Math.abs(net) / max) * 50
         return (
-          <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 py-2 sm:grid-cols-[180px_minmax(0,1fr)_150px]">
+          <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 py-1.5 sm:py-2 sm:grid-cols-[180px_minmax(0,1fr)_150px]">
             <span className="flex min-w-0 items-center gap-2.5">
-              <Avatar person={m} size={30} />
+              <Avatar person={m} size={28} />
               <span className="min-w-0">
                 <span className="block truncate text-body font-medium">{m.isYou ? 'You' : firstName(m.name)}</span>
                 <span className="num block truncate text-caption text-ink-3">paid {formatMoney(ledger.paid[m.id] ?? 0, { currency: trip.currency })}</span>

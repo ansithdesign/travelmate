@@ -71,33 +71,28 @@ function SettleBody({ view }: { view: TripView }) {
             </p>
           </div>
         ) : (
-          <ol className="mt-6 flex flex-col gap-3">
+          <ol className="mt-5 divide-y divide-line border-y border-line">
             {transfers.map((t) => {
               const from = person(t.from)!
               const to = person(t.to)!
               const mine = t.from === me.id || t.to === me.id
               return (
-                <li
-                  key={`${t.from}-${t.to}`}
-                  className={cx('rounded-lg bg-surface p-4 hairline sm:p-5', mine && 'shadow-[inset_0_0_0_1.5px_var(--color-forest-200)]')}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar person={from} size={40} />
-                    <ArrowRight size={18} className="shrink-0 text-ink-3" aria-hidden />
-                    <Avatar person={to} size={40} />
-                    <div className="ml-1 min-w-0 flex-1">
-                      <p className="truncate">
-                        <span className="font-medium">{name(t.from)}</span> <span className="text-ink-2">{t.from === me.id ? 'pay' : 'pays'}</span>{' '}
-                        <span className="font-medium">{t.to === me.id ? 'you' : name(t.to)}</span>
-                      </p>
-                      <p className="num text-title">{formatMoney(t.amount, { currency: cur })}</p>
-                    </div>
+                <li key={`${t.from}-${t.to}`} className="flex flex-wrap items-center gap-x-3 gap-y-3 py-4">
+                  <span className="flex shrink-0 items-center">
+                    <Avatar person={from} size={36} />
+                    <ArrowRight size={15} className="mx-1 text-ink-3" aria-hidden />
+                    <Avatar person={to} size={36} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-meta">
+                      <span className="font-medium text-ink">{name(t.from)}</span> <span className="text-ink-2">{t.from === me.id ? 'pay' : 'pays'}</span>{' '}
+                      <span className="font-medium text-ink">{t.to === me.id ? 'you' : name(t.to)}</span>
+                    </p>
+                    <p className="num text-title">{formatMoney(t.amount, { currency: cur })}</p>
                   </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button size="sm" variant={mine ? 'primary' : 'secondary'} icon={Check} onClick={() => setPending(t)}>
-                      Mark as paid
-                    </Button>
-                  </div>
+                  <Button size="sm" variant={mine ? 'primary' : 'ghost'} icon={Check} onClick={() => setPending(t)} className={mine ? '' : 'text-forest hover:bg-forest-50'}>
+                    Mark as paid
+                  </Button>
                   <span className="sr-only">
                     {from.name} pays {to.name} {formatMoney(t.amount, { currency: cur })}
                   </span>

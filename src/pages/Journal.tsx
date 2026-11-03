@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowRight, CircleCheck, ImagePlus, Pencil, Plus, X } from 'lucide-react'
+import { ArrowRight, Check, CircleCheck, ImagePlus, Pencil, Plus, X } from 'lucide-react'
 import { CATEGORIES } from '../data/categories'
 import { TripSubnav } from '../components/trips/TripHeader'
 import { useTripActions } from '../components/trips/useTripActions'
@@ -36,7 +36,7 @@ function JournalBody({ view }: { view: TripView }) {
   const cur = trip.currency
   const days = tripLength(trip.startDate, trip.endDate)
   const photos = trip.journal.photos.length ? trip.journal.photos : trip.cover ? [trip.cover] : []
-  const [editingNote, setEditingNote] = useState(false)
+  const [edit, setEdit] = useState(false)
   const [note, setNote] = useState(trip.journal.note)
   const [place, setPlace] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
@@ -54,7 +54,7 @@ function JournalBody({ view }: { view: TripView }) {
       <TripSubnav view={view} title="Journal" actions={<Menu items={items} label="Trip actions" />} />
       <article className="mx-auto max-w-[1080px] px-4 pt-6 pb-16 sm:px-6 lg:px-8 lg:pt-10">
         {/* Title */}
-        <header className="grid items-end gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
+        <header className="grid items-end gap-x-6 gap-y-4 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
           <Milestone tone="forest" cap={start.toLocaleString('en-IN', { month: 'short' })} value={start.getFullYear()} size="lg" label={`Travelled ${fmt.monthYear(trip.startDate)}`} />
           <div className="min-w-0">
             <h1 className="text-[clamp(2rem,5vw,2.75rem)] leading-[1.08] font-semibold tracking-[-0.035em]">{trip.name}</h1>
@@ -63,6 +63,22 @@ function JournalBody({ view }: { view: TripView }) {
               {trip.region && trip.region !== trip.destination ? `, ${trip.region}` : ''} · {formatRange(trip.startDate, trip.endDate)}
             </p>
           </div>
+          {edit ? (
+            <Button
+              icon={Check}
+              onClick={() => {
+                setJournal({ note: note.trim() })
+                setEdit(false)
+                toast.success('Journal saved')
+              }}
+            >
+              Done
+            </Button>
+          ) : (
+            <Button variant="secondary" icon={Pencil} onClick={() => (setNote(trip.journal.note), setEdit(true))}>
+              Edit journal
+            </Button>
+          )}
         </header>
 
         {/* Photos */}
@@ -74,14 +90,13 @@ function JournalBody({ view }: { view: TripView }) {
                   key={p.id + i}
                   className={`group relative w-[82%] shrink-0 snap-center overflow-hidden rounded-lg sm:w-auto ${mosaicCell(i, Math.min(photos.length, 5))}`}
                 >
-                  <Cover photo={p} fallbackLabel={trip.destination} className="aspect-[4/3] h-full w-full sm:aspect-auto" />
-                  {p.credit ? <figcaption className="absolute right-2 bottom-2 rounded-[6px] bg-black/45 px-1.5 py-0.5 text-[10px] text-white/90">{p.credit}</figcaption> : null}
-                  {trip.journal.photos.some((x) => x.id === p.id) ? (
+                  <Cover photo={p} fallbackLabel={i === 0 ? trip.destination : ''} showCredit className="aspect-[4/3] h-full w-full sm:aspect-auto" />
+                  {edit && trip.journal.photos.some((x) => x.id === p.id) ? (
                     <IconButton
                       icon={X}
                       tone="onImage"
                       label="Remove photo"
-                      className="absolute top-2 right-2 size-9 opacity-100 sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
+                      className="absolute top-2 right-2 size-9"
                       onClick={() => setJournal({ photos: trip.journal.photos.filter((x) => x.id !== p.id) })}
                     />
                   ) : null}
@@ -89,9 +104,11 @@ function JournalBody({ view }: { view: TripView }) {
               ))}
             </div>
           ) : null}
-          <Button variant="ghost" size="sm" icon={ImagePlus} className="mt-3 -ml-2" onClick={() => fileRef.current?.click()}>
-            Add photos
-          </Button>
+          {edit || photos.length === 0 ? (
+            <Button variant="ghost" size="sm" icon={ImagePlus} className="mt-3 -ml-2" onClick={() => fileRef.current?.click()}>
+              Add photos
+            </Button>
+          ) : null}
           <input
             ref={fileRef}
             type="file"
@@ -126,39 +143,15 @@ function JournalBody({ view }: { view: TripView }) {
           <div className="min-w-0">
             {/* Note */}
             <section aria-labelledby="story">
-              <div className="flex items-center justify-between">
-                <h2 id="story" className="text-heading">
-                  The trip
-                </h2>
-                {!editingNote ? (
-                  <Button size="sm" variant="quiet" icon={Pencil} onClick={() => (setNote(trip.journal.note), setEditingNote(true))}>
-                    {trip.journal.note ? 'Edit' : 'Write'}
-                  </Button>
-                ) : null}
-              </div>
-              {editingNote ? (
-                <div className="mt-2">
-                  <TextArea autoFocus rows={5} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What do you want to remember?" className="text-[17px] leading-7" />
-                  <div className="mt-2 flex justify-end gap-2">
-                    <Button size="sm" variant="ghost" onClick={() => setEditingNote(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setJournal({ note: note.trim() })
-                        setEditingNote(false)
-                        toast.success('Journal saved')
-                      }}
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </div>
+              <h2 id="story" className="text-heading">
+                The trip
+              </h2>
+              {edit ? (
+                <TextArea aria-labelledby="story" autoFocus rows={5} value={note} onChange={(e) => setNote(e.target.value)} placeholder="What do you want to remember?" className="mt-2 text-[17px] leading-7" />
               ) : trip.journal.note ? (
                 <p className="mt-2 max-w-[62ch] text-[18px] leading-[1.6] tracking-[-0.005em] text-ink">{trip.journal.note}</p>
               ) : (
-                <p className="mt-2 text-body text-ink-3">Nothing written yet. A few lines now are worth a lot in a year.</p>
+                <p className="mt-2 text-body text-ink-3">Nothing written yet. Use Edit journal to add a few lines; they are worth a lot in a year.</p>
               )}
               <p className="num mt-5 max-w-[62ch] text-body text-ink-2">
                 {days} {days === 1 ? 'day' : 'days'} with{' '}
@@ -186,20 +179,23 @@ function JournalBody({ view }: { view: TripView }) {
                         <span className={`block h-[7px] ${i === 0 || i === trip.journal.places.length - 1 ? 'bg-amber' : 'bg-forest'}`} />
                       </span>
                       <span className="font-medium">{p}</span>
+                      {edit ? (
                       <button
                         type="button"
                         aria-label={`Remove ${p}`}
                         onClick={() => setJournal({ places: trip.journal.places.filter((_, j) => j !== i) })}
-                        className="flex size-9 items-center justify-center rounded-full text-ink-3 opacity-100 hover:bg-sunken hover:text-ink sm:opacity-0 sm:group-focus-within:opacity-100 sm:group-hover:opacity-100"
+                        className="flex size-9 items-center justify-center rounded-full text-ink-3 hover:bg-sunken hover:text-ink"
                       >
                         <X size={15} aria-hidden />
                       </button>
+                      ) : null}
                     </li>
                   ))}
                 </ol>
               ) : (
-                <p className="mt-2 text-body text-ink-3">Add the places you went, in order.</p>
+                <p className="mt-2 text-body text-ink-3">No places yet. Add them in Edit journal, in the order you went.</p>
               )}
+              {edit ? (
               <form
                 className="mt-3 flex max-w-[420px] gap-2"
                 onSubmit={(e) => {
@@ -213,6 +209,7 @@ function JournalBody({ view }: { view: TripView }) {
                 <TextInput aria-label="Add a place" placeholder="Add a place" value={place} onChange={(e) => setPlace(e.target.value)} className="h-11" />
                 <Button type="submit" variant="secondary" icon={Plus} aria-label="Add place" className="px-3.5" />
               </form>
+              ) : null}
             </section>
           </div>
 
