@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom'
+import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { AppShell } from './components/navigation/AppShell'
 import { ExpenseSheet } from './components/expenses/ExpenseSheet'
 import { TripFormSheet } from './components/trips/TripFormSheet'
@@ -39,9 +39,12 @@ function Stores({ children }: { children: React.ReactNode }) {
   return <StoreProvider onSaveError={toast.error}>{children}</StoreProvider>
 }
 
+// The in-chat preview runs inside a sandboxed frame, so it keeps navigation in memory.
+const Router = import.meta.env.VITE_PREVIEW ? MemoryRouter : BrowserRouter
+
 export default function App() {
   return (
-    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <SkyProvider>
       <ToastProvider>
         <Stores>
@@ -68,6 +71,6 @@ export default function App() {
         </Stores>
       </ToastProvider>
       </SkyProvider>
-    </BrowserRouter>
+    </Router>
   )
 }

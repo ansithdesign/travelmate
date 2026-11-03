@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { SkyArt } from './SkyArt'
 
 /** Keeps one broken component from blanking the whole app. */
@@ -25,9 +26,9 @@ export class ErrorBoundary extends Component<{ children: ReactNode; resetKey?: s
           <button type="button" onClick={() => this.setState({ error: null })} className="press h-12 rounded-full bg-white px-6 font-semibold text-[#0c1736]">
             Try again
           </button>
-          <a href="/" className="press glass-control flex h-12 items-center rounded-full px-6 font-semibold text-white">
+          <Link to="/" onClick={() => this.setState({ error: null })} className="press glass-control flex h-12 items-center rounded-full px-6 font-semibold text-white">
             Back to trips
-          </a>
+          </Link>
         </div>
       </div>
     )

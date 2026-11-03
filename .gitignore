@@ -4,3 +4,4 @@ dist
 .impeccable/questions
 .impeccable/config.local.json
 *.log
+preview-dist
