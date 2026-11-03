@@ -58,6 +58,8 @@ interface Store {
   deleteExpense: (id: ID) => Expense | undefined
   restoreExpense: (expense: Expense) => void
   addMember: (tripId: ID, name: string, email?: string) => Person
+  /** Put someone who is already known from another trip onto this trip. */
+  addExistingMember: (tripId: ID, personId: ID) => void
   removeMember: (tripId: ID, personId: ID) => { ok: boolean; reason?: string }
   addInvite: (tripId: ID, name: string, contact?: string) => void
   revokeInvite: (tripId: ID, inviteId: ID) => void
@@ -122,6 +124,7 @@ export function StoreProvider({
         patchTrip(tripId, (t) => ({ ...t, members: [...t.members, p.id] }))
         return p
       },
+      addExistingMember: (tripId, personId) => patchTrip(tripId, (t) => (t.members.includes(personId) ? t : { ...t, members: [...t.members, personId] })),
       removeMember: (tripId, personId) => {
         const involved = data.expenses.some(
           (e) => e.tripId === tripId && (e.paidBy === personId || e.split.participants.includes(personId)),

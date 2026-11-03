@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ArrowUUpLeft, CaretDown, Check, CheckCircle, HandCoins, SealCheck } from '@phosphor-icons/react'
+import { ArrowRight, CaretDown, Check, CheckCircle, HandCoins, SealCheck } from '@phosphor-icons/react'
 import { TripSkyHeader } from '../components/trips/TripHeader'
 import { ContentSheet, SheetBody } from '../components/shared/Page'
 import { Avatar } from '../components/ui/Avatar'
@@ -59,87 +59,79 @@ function SettleBody({ view }: { view: TripView }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_360px]">
       <div className="min-w-0">
-        <h2 className="on-sky px-0.5 pt-2 text-display">{settled && !stamping ? 'All square' : `${transfers.length} ${transfers.length === 1 ? 'payment' : 'payments'} to settle`}</h2>
-        <p className="on-sky mt-1.5 max-w-[56ch] px-0.5 text-body">
-          {settled && !stamping
-            ? 'Every balance on this trip is at zero.'
-            : gross > transfers.length && payments.length === 0
-              ? `${gross} debts between the group, netted into ${transfers.length} ${transfers.length === 1 ? 'payment' : 'payments'}. Whoever is owed the most is paid first. Tap Paid once the money has changed hands.`
-              : 'The fewest payments that square everyone up. Tap Paid once the money has changed hands.'}
+        <h2 className="on-sky px-0.5 pt-2 text-display">{settled && !stamping ? 'All square' : `${tickets.length} ${tickets.length === 1 ? 'payment' : 'payments'} left`}</h2>
+        <p className="on-sky mt-1 px-0.5 text-body">
+          {settled && !stamping ? 'Every balance on this trip is zero.' : gross > transfers.length && payments.length === 0 ? `Netted down from ${gross} debts.` : 'The fewest payments that settle everyone.'}
         </p>
 
         {settled && !stamping ? (
-          <div className="panel mt-5 flex items-center gap-4 rounded-[28px] p-6">
+          <div className="panel mt-6 flex items-center gap-4 rounded-[28px] p-6">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
               <SealCheck size={28} weight="duotone" aria-hidden />
             </span>
             <div>
               <p className="text-heading">Nothing left to pay</p>
-              <p className="text-meta text-ink-3">
-                {payments.length} {payments.length === 1 ? 'payment' : 'payments'} recorded. New expenses reopen balances here.
-              </p>
+              <p className="text-meta text-ink-3">New expenses will reopen balances here.</p>
             </div>
           </div>
         ) : (
-          <ol className="mt-5 flex flex-col gap-3">
-            {tickets.map((t, i) => (
-              <li key={key(t)}>
-                <Ticket
-                  index={i + 1}
-                  total={tickets.length}
-                  from={person(t.from)!}
-                  to={person(t.to)!}
-                  amount={formatMoney(t.amount, { currency: cur })}
-                  mine={t.from === me.id || t.to === me.id}
-                  youPay={t.from === me.id}
-                  youGet={t.to === me.id}
-                  stamped={!!stamping && key(stamping) === key(t)}
-                  onPaid={() => setPending(t)}
-                />
-              </li>
-            ))}
-          </ol>
+          <section aria-labelledby="to-pay" className="mt-6">
+            <h3 id="to-pay" className="sr-only">
+              To pay
+            </h3>
+            <ol className="flex flex-col gap-3">
+              {tickets.map((t) => (
+                <li key={key(t)}>
+                  <PayCard
+                    from={person(t.from)!}
+                    to={person(t.to)!}
+                    sentence={t.from === me.id ? `You pay ${firstName(person(t.to)!.name)}` : t.to === me.id ? `${firstName(person(t.from)!.name)} pays you` : `${firstName(person(t.from)!.name)} pays ${firstName(person(t.to)!.name)}`}
+                    amount={formatMoney(t.amount, { currency: cur })}
+                    stamped={!!stamping && key(stamping) === key(t)}
+                    onPaid={() => setPending(t)}
+                  />
+                </li>
+              ))}
+            </ol>
+          </section>
         )}
 
         {payments.length ? (
-        <section aria-labelledby="history" className="mt-14">
-          <h2 id="history" className="flex min-h-11 items-center px-0.5 text-title">
-            Payment history
-          </h2>
-          {(
-            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
+          <section aria-labelledby="paid" className="mt-12">
+            <h3 id="paid" className="flex min-h-11 items-center gap-2 px-0.5 text-title">
+              Paid
+              <span className="num text-meta font-medium text-ink-3">{payments.length}</span>
+            </h3>
+            <ul className="panel-strong rows mt-2 overflow-hidden rounded-[28px]">
               {payments.map((p) => (
-                <li key={p.id} className="flex min-h-[68px] items-center gap-4 py-3 pr-3 pl-5">
+                <li key={p.id} className="flex min-h-[68px] items-center gap-4 py-3 pr-4 pl-5">
                   <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gain-soft text-gain">
-                    <CheckCircle size={20} weight="duotone" aria-hidden />
+                    <CheckCircle size={20} weight="fill" aria-hidden />
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold">
                       {name(p.from)} paid {name(p.to) === 'You' ? 'you' : name(p.to)}
                     </span>
-                    <span className="block text-caption text-ink-3">
-                      {fmt.full(p.date)}
-                      {p.note ? ` · ${p.note}` : ''}
-                    </span>
+                    <span className="block text-caption text-ink-3">Paid {fmt.dayMonth(p.date)}</span>
                   </span>
-                  <span className="num font-semibold">{formatMoney(p.amount, { currency: cur })}</span>
-                  <button
-                    type="button"
-                    aria-label={`Undo payment from ${name(p.from)} to ${name(p.to)}`}
-                    title="Undo"
-                    onClick={() => {
-                      deletePayment(p.id)
-                      toast.success('Payment removed, balances reopened')
-                    }}
-                    className="press flex size-10 items-center justify-center rounded-full text-ink-3 hover:bg-well hover:text-ink"
-                  >
-                    <ArrowUUpLeft size={18} weight="bold" aria-hidden />
-                  </button>
+                  <span className="shrink-0 text-right">
+                    <span className="num block font-semibold">{formatMoney(p.amount, { currency: cur })}</span>
+                    <button
+                      type="button"
+                      aria-label={`Undo payment from ${name(p.from)} to ${name(p.to)}`}
+                      onClick={() => {
+                        deletePayment(p.id)
+                        toast.success('Payment removed, balance reopened')
+                      }}
+                      className="press -mr-1 inline-flex h-7 items-center rounded-full px-1.5 text-caption font-semibold text-accent-ink hover:bg-accent-soft"
+                    >
+                      Undo
+                    </button>
+                  </span>
                 </li>
               ))}
             </ul>
-          )}
-        </section>
+          </section>
         ) : null}
       </div>
 
@@ -207,11 +199,11 @@ function SettleBody({ view }: { view: TripView }) {
         onClose={() => setPending(null)}
         tone="primary"
         icon={<HandCoins size={44} weight="duotone" className="text-accent" />}
-        title="Record this payment?"
+        title="Mark as paid?"
         body={
           pending ? (
             <>
-              {name(pending.from)} paid {pending.to === me.id ? 'you' : name(pending.to)} <span className="num font-semibold text-ink">{formatMoney(pending.amount, { currency: cur })}</span>. Balances update for everyone.
+              {pending.from === me.id ? 'You paid' : `${name(pending.from)} paid`} {pending.to === me.id ? 'you' : name(pending.to)} <span className="num font-semibold text-ink">{formatMoney(pending.amount, { currency: cur })}</span>. Balances update for everyone.
             </>
           ) : null
         }
@@ -232,48 +224,31 @@ function SettleBody({ view }: { view: TripView }) {
   )
 }
 
-/** One suggested payment: who pays whom, how much, and the action to record it. */
-function Ticket({
-  from,
-  to,
-  amount,
-  youPay,
-  youGet,
-  stamped,
-  onPaid,
-}: {
-  index: number
-  total: number
-  from: Person
-  to: Person
-  amount: string
-  mine: boolean
-  youPay: boolean
-  youGet: boolean
-  stamped: boolean
-  onPaid: () => void
-}) {
-  const mine = youPay || youGet
+/**
+ * One payment still to make. It says who pays whom, how much, that it is not
+ * paid yet, and has one action. Every card looks the same so the button never
+ * changes meaning or colour.
+ */
+function PayCard({ from, to, sentence, amount, stamped, onPaid }: { from: Person; to: Person; sentence: string; amount: string; stamped: boolean; onPaid: () => void }) {
   return (
-    <div
-      className={cx(
-        'panel relative flex items-center gap-3.5 overflow-hidden rounded-[28px] p-4 transition-[opacity,transform] duration-500',
-        mine && 'bg-panel-strong shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--accent)_35%,transparent),var(--shadow-soft)]',
-        stamped && 'pointer-events-none',
-      )}
-    >
-      <Avatar person={from} size={40} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-meta text-ink-3">{youPay ? `You pay ${firstName(to.name)}` : youGet ? `${firstName(from.name)} pays you` : `${firstName(from.name)} pays ${firstName(to.name)}`}</p>
-        <p className="num text-[24px] leading-8 font-[650] tracking-[-0.03em]">{amount}</p>
+    <div className={cx('panel relative overflow-hidden rounded-[28px] p-5 transition-[opacity,transform] duration-500', stamped && 'pointer-events-none')}>
+      <div className="flex items-center gap-2.5">
+        <Avatar person={from} size={36} />
+        <ArrowRight size={14} weight="bold" className="shrink-0 text-ink-3" aria-hidden />
+        <Avatar person={to} size={36} />
+        <p className="ml-1 min-w-0 flex-1 truncate font-semibold">{sentence}</p>
       </div>
-      <Button size="sm" variant={mine ? 'primary' : 'secondary'} icon={Check} onClick={onPaid} className="shrink-0">
-        Paid
+      <div className="mt-4 flex items-end justify-between gap-3">
+        <p className="num text-[30px] leading-9 font-[650] tracking-[-0.035em]">{amount}</p>
+        <span className="level aware mb-1.5">Not paid yet</span>
+      </div>
+      <Button block className="mt-4" icon={Check} onClick={onPaid}>
+        Mark as paid
       </Button>
       {stamped ? (
-        <span aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 bg-[color-mix(in_srgb,var(--haze)_80%,transparent)] text-heading text-gain backdrop-blur-sm [animation:fade-in_260ms_ease-out_both]">
+        <span aria-hidden className="absolute inset-0 flex items-center justify-center gap-2 bg-[color-mix(in_srgb,var(--haze)_82%,transparent)] text-heading text-gain backdrop-blur-sm [animation:fade-in_260ms_ease-out_both]">
           <CheckCircle size={26} weight="fill" className="[animation:pop_420ms_var(--ease-out-expo)_both]" />
-          Recorded
+          Marked as paid
         </span>
       ) : null}
     </div>

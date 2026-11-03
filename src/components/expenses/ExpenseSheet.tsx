@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { CaretDown, Check, CheckCircle, Receipt as ReceiptIcon, Scan, WarningCircle, X } from '@phosphor-icons/react'
+import { CaretDown, Check, CheckCircle, Plus, Receipt as ReceiptIcon, Scan, WarningCircle, X } from '@phosphor-icons/react'
 import { CategoryTile } from '../icons/CategoryIcon'
 import { CATEGORIES } from '../../data/categories'
 import { useStore } from '../../store/store'
@@ -84,7 +84,7 @@ function draftFor(trip: Trip | undefined, me: ID, expense?: Expense): Draft {
 
 export function ExpenseSheet() {
   const { expense: state, closeExpense } = useUI()
-  const { data, me, person, saveExpense } = useStore()
+  const { data, me, person, saveExpense, addMember, addExistingMember } = useStore()
   const toast = useToast()
 
   const editing = state.expenseId ? data.expenses.find((e) => e.id === state.expenseId) : undefined
@@ -96,6 +96,8 @@ export function ExpenseSheet() {
 
   const [draft, setDraft] = useState<Draft>(() => draftFor(undefined, me.id))
   const [submitted, setSubmitted] = useState(false)
+  const [addOpen, setAddOpen] = useState<null | 'payer' | 'split'>(null)
+  const [newName, setNewName] = useState('')
   const [showSplit, setShowSplit] = useState(false)
   const [showMore, setShowMore] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
@@ -108,6 +110,8 @@ export function ExpenseSheet() {
     setDraft(d)
     setSubmitted(false)
     // Most expenses are split equally between everyone: keep the split folded unless this one is different.
+    setAddOpen(null)
+    setNewName('')
     setShowSplit(d.method !== 'equal' || d.participants.length !== (t?.members.length ?? d.participants.length))
     setShowMore(!!d.notes || !!d.receipt)
     setScanOpen(!!state.scan)
@@ -157,6 +161,26 @@ export function ExpenseSheet() {
       return { ...d, participants, inputs: d.method === 'equal' ? d.inputs : seedInputs(d.method, participants) }
     })
   }
+
+  /** A person joined the trip from this form: include them in the split, and make them the payer when added from Paid by. */
+  function joined(id: ID, asPayer: boolean) {
+    setDraft((d) => {
+      const participants = d.participants.includes(id) ? d.participants : [...d.participants, id]
+      return { ...d, participants, paidBy: asPayer ? id : d.paidBy, inputs: d.method === 'equal' ? d.inputs : seedInputs(d.method, participants) }
+    })
+    setAddOpen(null)
+    setNewName('')
+  }
+  function addNew() {
+    const n = newName.trim()
+    if (!n || !trip) return
+    if (members.some((m) => m.name.toLowerCase() === n.toLowerCase())) {
+      toast.error(`${n} is already on this trip`)
+      return
+    }
+    joined(addMember(trip.id, n).id, addOpen === 'payer')
+  }
+  const known = data.people.filter((p) => !(trip?.members ?? []).includes(p.id))
 
   function changeTrip(id: ID) {
     const t = data.trips.find((x) => x.id === id)
@@ -339,7 +363,17 @@ export function ExpenseSheet() {
                   </button>
                 )
               })}
+              <button
+                type="button"
+                aria-expanded={addOpen === 'payer'}
+                onClick={() => setAddOpen(addOpen === 'payer' ? null : 'payer')}
+                className="glass-control press inline-flex h-[46px] shrink-0 items-center gap-1.5 rounded-full px-4 text-[14px] font-medium text-accent-ink"
+              >
+                <Plus size={16} weight="bold" aria-hidden />
+                Add person
+              </button>
             </div>
+            {addOpen === 'payer' ? <AddPersonPanel known={known} newName={newName} setNewName={setNewName} onPick={(p) => { if (trip) { addExistingMember(trip.id, p.id); joined(p.id, true) } }} onAdd={addNew} /> : null}
           </fieldset>
 
           {showSplit ? (
@@ -392,6 +426,11 @@ export function ExpenseSheet() {
                 )
               })}
             </ul>
+            <button type="button" aria-expanded={addOpen === 'split'} onClick={() => setAddOpen(addOpen === 'split' ? null : 'split')} className="press mt-2 inline-flex h-10 items-center gap-1.5 rounded-full px-2 text-[14px] font-semibold text-accent-ink">
+              <Plus size={15} weight="bold" aria-hidden />
+              Add person
+            </button>
+            {addOpen === 'split' ? <AddPersonPanel known={known} newName={newName} setNewName={setNewName} onPick={(p) => { if (trip) { addExistingMember(trip.id, p.id); joined(p.id, false) } }} onAdd={addNew} /> : null}
             {submitted && errors.split ? <p className="mt-2 pl-1 text-meta text-loss">{split.message && split.message.length > 6 ? split.message : errors.split}</p> : null}
           </fieldset>
           ) : (
@@ -538,5 +577,46 @@ function SplitStatus({
       {tone === 'ok' ? <CheckCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline" aria-hidden /> : tone === 'warn' ? <WarningCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline" aria-hidden /> : null}
       {text}
     </p>
+  )
+}
+
+/** Add someone to the trip without leaving the expense: pick a known person or type a new name. */
+function AddPersonPanel({ known, newName, setNewName, onPick, onAdd }: { known: Person[]; newName: string; setNewName: (v: string) => void; onPick: (p: Person) => void; onAdd: () => void }) {
+  return (
+    <div className="panel-strong mt-3 rounded-[24px] p-4">
+      {known.length ? (
+        <>
+          <p className="text-caption font-semibold text-ink-3">From your other trips</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {known.map((p) => (
+              <button key={p.id} type="button" onClick={() => onPick(p)} className="glass-control press inline-flex h-10 items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-[14px] font-medium">
+                <Avatar person={p} size={32} />
+                {firstName(p.name)}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
+      <p className={cx('text-caption font-semibold text-ink-3', known.length && 'mt-4')}>New person</p>
+      <div className="mt-2 flex gap-2">
+        <TextInput
+          aria-label="Name of the new person"
+          placeholder="Name"
+          value={newName}
+          maxLength={40}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              onAdd()
+            }
+          }}
+          className="h-12"
+        />
+        <Button type="button" onClick={onAdd} disabled={!newName.trim()} className="shrink-0">
+          Add
+        </Button>
+      </div>
+    </div>
   )
 }
