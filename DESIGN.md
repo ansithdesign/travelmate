@@ -140,6 +140,9 @@ Strong glass, radius 24, rows at least 68px with 20px side padding, a 36px accen
 ### Photo cards (Airbnb listing style)
 The featured trip: photo at 4:3 (16:10 on wider screens), radius 20, one white pill badge top-left ("In 39 days"). Under the photo: trip name (heading), place and dates (meta), spend (meta with the amount in ink), and your balance on the right. Past trips: square photo, radius 16, three short lines underneath. Nothing overlays the photo except the badge.
 
+### Category icons
+Soft 3D objects (bed, cloche, car, ticket, shopping bag, paper plane, sparkle) drawn as SVG: rounded forms lit from the top left, a gloss highlight and a gentle ground shadow, in the blue-led palette with warm accents. They sit on a faint plate in lists (36px) and the picker (46px); the selected category lifts onto an accent-soft pad with a soft ring. Everything else in the interface stays flat duotone line icons.
+
 ### Status chip (`.level`)
 11.5px / 650 pill with a 7px dot. `ok`, `act`, `aware`, `quiet`. Used for "You owe ₹4,300" under the hero figure and "Settled".
 
