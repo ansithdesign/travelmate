@@ -1,212 +1,207 @@
-import { Link } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { CaretRight, CheckCircle, Plus } from '@phosphor-icons/react'
-import { FeaturedTrip, PastTripCard, TripRow, TripWindowCard } from '../components/trips/TripCards'
-import { Button } from '../components/ui/Button'
-import { SkyArt } from '../components/shared/SkyArt'
-import { Avatar } from '../components/ui/Avatar'
+import { phaseLabel } from '../components/trips/status'
+import { BalanceList, TripGlance } from '../components/trips/TripSections'
+import { ExpenseDetailSheet } from '../components/expenses/ExpenseDetailSheet'
+import { ExpenseRow } from '../components/expenses/ExpenseRow'
 import { BrandMark } from '../components/shared/BrandMark'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
-import { useAllTripViews, type TripView } from '../hooks/useTrip'
+import { Button } from '../components/ui/Button'
+import { Segmented } from '../components/ui/Controls'
+import { Cover } from '../components/ui/Cover'
+import { Figure } from '../components/ui/Money'
+import { useToast } from '../components/ui/Toast'
+import { useAllTripViews } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
-import { useToast } from '../components/ui/Toast'
-import { parseDate, tripLength } from '../utils/dates'
+import type { Expense, Person } from '../types'
+import { cx } from '../utils/cx'
+import { fmt, formatRange } from '../utils/dates'
 import { firstName } from '../utils/id'
 import { formatMoney } from '../utils/money'
-import { cx } from '../utils/cx'
+
+type Panel = 'activity' | 'balances' | 'plans'
+
+/** Spend per day for the most recent days that have expenses, oldest first. */
+function spendByDay(expenses: Expense[]) {
+  const map = new Map<string, number>()
+  for (const e of expenses) {
+    const d = e.date.slice(0, 10)
+    map.set(d, (map.get(d) ?? 0) + e.amount)
+  }
+  return [...map.entries()].sort((a, b) => a[0].localeCompare(b[0])).slice(-12)
+}
 
 export function Home() {
   const views = useAllTripViews()
-  const { me, saveTrip } = useStore()
-  const { openTrip } = useUI()
+  const { me, person, saveTrip } = useStore()
+  const { openTrip, openExpense } = useUI()
+  const navigate = useNavigate()
   const toast = useToast()
+  const [picked, setPicked] = useState<string | null>(null)
+  const [panel, setPanel] = useState<Panel>('activity')
+  const [open, setOpen] = useState<Expense | null>(null)
+  const { data } = useStore()
   const h = new Date().getHours()
   const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'
 
+  // Rail order: what is happening or coming first, then trips that just ended, then the journal.
+  const ordered = useMemo(() => {
+    const rank = { ongoing: 0, upcoming: 1, ended: 2, completed: 3 } as const
+    return [...views].sort((a, b) => rank[a.status.phase] - rank[b.status.phase] || (a.status.phase === 'completed' ? b.trip.endDate.localeCompare(a.trip.endDate) : a.trip.startDate.localeCompare(b.trip.startDate)))
+  }, [views])
+
   if (views.length === 0) return <FirstRun />
 
-  const active = views
-    .filter((v) => v.status.phase === 'upcoming' || v.status.phase === 'ongoing')
-    .sort((a, b) => (a.status.phase === 'ongoing' ? -1 : b.status.phase === 'ongoing' ? 1 : a.trip.startDate.localeCompare(b.trip.startDate)))
-  const ended = views.filter((v) => v.status.phase === 'ended')
-  const past = views.filter((v) => v.status.phase === 'completed').sort((a, b) => b.trip.endDate.localeCompare(a.trip.endDate))
-  const lead = active[0]
+  const view = ordered.find((v) => v.trip.id === picked) ?? ordered[0]
+  const { trip, status, ledger, expenses, transfers, settled } = view
+  const cur = trip.currency
+  const myNet = ledger.net[me.id] ?? 0
+  const members = trip.members.map(person).filter(Boolean) as Person[]
+  const bars = spendByDay(expenses)
+  const peak = Math.max(1, ...bars.map(([, v]) => v))
+  const peakDay = bars.find(([, v]) => v === peak)
 
   return (
     <>
-      <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-12 lg:pt-12">
+      <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-2 lg:pt-12">
         <div className="on-sky">
-        <header className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-body text-ink-3">{greeting},</p>
-            <h1 className="mt-0.5 text-[46px] leading-[1.02] font-semibold tracking-[-0.045em]">
-              {firstName(me.name)}
-              <Dot />
-            </h1>
-          </div>
-          <Button size="sm" variant="secondary" icon={Plus} onClick={() => openTrip()} className="mb-0.5 lg:hidden">
-            New trip
-          </Button>
-        </header>
-        <YearLine views={views} />
-        </div>
-
-        <div className="mt-10 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:items-start lg:gap-10">
-        <div>
-          {lead ? (
-            <FeaturedTrip view={lead} />
-          ) : (
-            <div className="panel flex items-center gap-5 rounded-[26px] p-5">
-              <SkyArt size={96} className="shrink-0" />
-              <div>
-                <p className="text-title">Nothing planned yet</p>
-                <p className="mt-1 text-body text-ink-3">Start a trip and the money, plans and people land in one place.</p>
-                <Button className="mt-4" size="sm" icon={Plus} onClick={() => openTrip()}>
-                  Plan a trip
-                </Button>
-              </div>
+          <header className="flex items-end justify-between gap-3">
+            <div>
+              <p className="text-body text-ink-3">{greeting},</p>
+              <h1 className="mt-0.5 text-[46px] leading-[1.02] font-semibold tracking-[-0.045em]">
+                {firstName(me.name)}
+                <Dot />
+              </h1>
             </div>
-          )}
-        </div>
-        <aside className="hidden lg:block">
-          {views.some((v) => v.transfers.some((t) => t.from === me.id || t.to === me.id)) ? (
-          <div>
-            <OutstandingSummary views={views} />
-            <p className="mt-3 px-1 text-caption text-ink-3">Balances update the moment anyone adds an expense or marks a payment.</p>
+            <Button size="sm" variant="secondary" icon={Plus} onClick={() => openTrip()} className="mb-0.5 lg:hidden">
+              New trip
+            </Button>
+          </header>
+
+          {/* Story rail: each trip is a round cover whose ring fills as the budget is used */}
+          <div role="tablist" aria-label="Your trips" className="no-scrollbar -mx-6 mt-8 flex gap-5 overflow-x-auto px-6 py-1 lg:mx-0 lg:px-0">
+            <button type="button" onClick={() => openTrip()} className="press group shrink-0 text-center" aria-label="Plan a new trip">
+              <span className="flex size-[72px] items-center justify-center rounded-full bg-white/20 text-white">
+                <Plus size={26} weight="bold" aria-hidden />
+              </span>
+              <span className="mt-2 block text-caption font-medium text-ink-3">New</span>
+            </button>
+            {ordered.map((v, i) => {
+              const on = v.trip.id === trip.id
+              const ratio = v.trip.budget ? Math.min(1, v.ledger.total / v.trip.budget) : v.status.phase === 'completed' ? 1 : 0.12
+              return (
+                <button key={v.trip.id} type="button" role="tab" aria-selected={on} onClick={() => setPicked(v.trip.id)} className="press shrink-0 text-center">
+                  <span className="block size-[72px] rounded-full p-[3px]" style={{ background: `conic-gradient(#fff ${ratio * 360}deg, rgba(255,255,255,0.3) 0)` }}>
+                    <Cover photo={v.trip.cover} seed={i + 1} className="size-full rounded-full border-[3px] border-[var(--sky-1)]" />
+                  </span>
+                  <span className={cx('mt-2 block max-w-[76px] truncate text-caption', on ? 'font-bold text-ink' : 'font-medium text-ink-3')}>{v.trip.name.split(/[ ,]/)[0]}</span>
+                </button>
+              )
+            })}
           </div>
-          ) : null}
-        </aside>
+
+          {/* The selected trip's numbers sit straight on the sky */}
+          <div className="mt-7">
+            <p className="text-meta font-semibold text-ink-3">
+              {trip.name} · {phaseLabel(trip, status)}
+            </p>
+            <Figure value={ledger.total} currency={cur} size="xl" className="mt-1.5" />
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className={cx('level num', myNet > 0 ? 'ok' : myNet < 0 ? 'act' : 'quiet')}>
+                {myNet > 0 ? `You get back ${formatMoney(myNet, { currency: cur })}` : myNet < 0 ? `You owe ${formatMoney(-myNet, { currency: cur })}` : 'You are all square'}
+              </span>
+              {trip.budget ? <span className="text-caption font-medium text-ink-3">{Math.round((ledger.total / trip.budget) * 100)}% of budget</span> : null}
+            </div>
+            {bars.length > 1 ? (
+              <div className="mt-6">
+                <div className="flex h-[70px] items-end gap-[6px]" role="img" aria-label={`Spend by day, peak ${formatMoney(peak, { currency: cur })}`}>
+                  {bars.map(([d, v]) => (
+                    <span key={d} className="flex-1 rounded-[6px]" style={{ height: `${Math.max(8, (v / peak) * 100)}%`, background: v === peak ? '#fff' : 'rgba(255,255,255,0.35)' }} />
+                  ))}
+                </div>
+                {peakDay ? <p className="num mt-2 text-caption text-ink-3">Biggest day: {fmt.dayMonth(peakDay[0])}, {formatMoney(peak, { currency: cur })}</p> : null}
+              </div>
+            ) : null}
+          </div>
         </div>
       </SkyHero>
 
       <ContentSheet>
-        <SheetBody>
-          {ended.map((v) => (
-            <div key={v.trip.id} className="panel mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[22px] p-4">
-              <p className="min-w-0 flex-1 text-meta text-ink-2">
-                <Link to={`/trips/${v.trip.id}`} className="font-semibold text-ink hover:underline">
-                  {v.trip.name}
-                </Link>{' '}
-                ended {v.status.days === 1 ? 'yesterday' : `${v.status.days} days ago`}. Mark it complete to keep it as a journal.
-              </p>
+        <SheetBody className="pt-8">
+          {status.phase === 'ended' ? (
+            <div className="panel mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[28px] p-5">
+              <p className="min-w-0 flex-1 text-meta text-ink-2">{trip.name} ended {status.days === 1 ? 'yesterday' : `${status.days} days ago`}. Mark it complete to keep it as a journal.</p>
               <Button
                 size="sm"
                 variant="secondary"
                 icon={CheckCircle}
                 iconWeight="duotone"
                 onClick={() => {
-                  saveTrip({ ...v.trip, completed: true, completedAt: new Date().toISOString() })
-                  toast.success(`${v.trip.name} marked complete`)
+                  saveTrip({ ...trip, completed: true, completedAt: new Date().toISOString() })
+                  toast.success(`${trip.name} marked complete`)
                 }}
               >
                 Mark complete
               </Button>
             </div>
-          ))}
+          ) : null}
 
-          <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <div className="section-rule lg:hidden">
-              <OutstandingSummary views={views} />
+          <div className="mx-auto max-w-[680px]">
+            <Segmented<Panel>
+              label="Trip details"
+              value={panel}
+              onChange={setPanel}
+              options={[
+                { value: 'activity', label: 'Activity' },
+                { value: 'balances', label: 'Balances' },
+                { value: 'plans', label: 'Plans' },
+              ]}
+            />
+
+            <div className="mt-5">
+              {panel === 'activity' ? (
+                expenses.length ? (
+                  <ul className="panel-strong rows overflow-hidden rounded-[28px]">
+                    {expenses.slice(0, 4).map((e) => (
+                      <li key={e.id}>
+                        <ExpenseRow expense={e} currency={cur} settled={settled} onOpen={() => setOpen(e)} />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="panel rounded-[28px] p-6 text-body text-ink-3">No expenses yet. Add the first one when someone pays for something.</p>
+                )
+              ) : null}
+              {panel === 'balances' ? (
+                <>
+                  <BalanceList view={view} members={members} />
+                  <p className="mt-3 px-1 text-caption text-ink-3">{settled ? 'Everyone is settled up.' : `${transfers.length} ${transfers.length === 1 ? 'payment settles' : 'payments settle'} everyone.`}</p>
+                </>
+              ) : null}
+              {panel === 'plans' ? <TripGlance view={view} /> : null}
             </div>
 
-            {active.length > 1 ? (
-              <section aria-labelledby="coming-up" className="section-rule">
-                <h2 id="coming-up" className="flex min-h-11 items-center px-0.5 text-title">
-                  Also coming up
-                </h2>
-                <div className="panel-strong rows mt-3 flex flex-col overflow-hidden rounded-[28px]">
-                  {active.slice(1).map((v, i) => (
-                    <TripRow key={v.trip.id} view={v} seed={i + 2} />
-                  ))}
-                </div>
-              </section>
-            ) : null}
-
-            <section aria-labelledby="past-trips" className="section-rule lg:col-span-2">
-              <div className="flex min-h-11 items-center justify-between px-0.5">
-                <h2 id="past-trips" className="text-title">
-                  Past trips
-                </h2>
-                <span className="num text-meta text-ink-3">{past.length}</span>
-              </div>
-              {past.length ? (
-                <>
-                  <div className="no-scrollbar -mx-6 mt-2 flex snap-x scroll-px-6 gap-5 overflow-x-auto px-6 py-4 sm:-mx-6 sm:px-6 lg:hidden">
-                    {past.map((v, i) => (
-                      <TripWindowCard key={v.trip.id} view={v} seed={i + 1} />
-                    ))}
-                  </div>
-                  <div className="mt-2 hidden gap-4 lg:grid lg:grid-cols-2">
-                    {past.map((v, i) => (
-                      <PastTripCard key={v.trip.id} view={v} seed={i + 1} />
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <p className="mt-2 max-w-[48ch] text-body text-ink-2">Finished trips become journal pages here, with what they cost and how they settled.</p>
-              )}
-            </section>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <Button size="lg" icon={Plus} onClick={() => openExpense({ tripId: trip.id })} disabled={data.trips.length === 0}>
+                Add expense
+              </Button>
+              <Button size="lg" variant="secondary" onClick={() => navigate(`/trips/${trip.id}/settle`)}>
+                Settle up
+              </Button>
+            </div>
+            <Link to={`/trips/${trip.id}`} className="mt-4 flex h-12 items-center justify-center gap-1 text-[14px] font-semibold text-accent-ink">
+              Open {trip.name} <CaretRight size={14} weight="bold" aria-hidden />
+            </Link>
+            <p className="num mt-1 text-center text-caption text-ink-3">
+              {formatRange(trip.startDate, trip.endDate)} · {members.length} {members.length === 1 ? 'traveller' : 'travellers'}
+            </p>
           </div>
         </SheetBody>
       </ContentSheet>
+      <ExpenseDetailSheet expense={open ? (data.expenses.find((x) => x.id === open.id) ?? null) : null} onClose={() => setOpen(null)} />
     </>
-  )
-}
-
-/** One calm sentence instead of a stat-card row. */
-function YearLine({ views }: { views: TripView[] }) {
-  const { me } = useStore()
-  const year = new Date().getFullYear()
-  const thisYear = views.filter((v) => parseDate(v.trip.startDate).getFullYear() === year && v.trip.currency === 'INR')
-  const myShare = thisYear.reduce((a, v) => a + (v.ledger.share[me.id] ?? 0), 0)
-  const days = thisYear.filter((v) => v.status.phase !== 'upcoming').reduce((a, v) => a + tripLength(v.trip.startDate, v.trip.endDate), 0)
-  if (thisYear.length === 0) return <p className="mt-2 text-body text-ink-3">Every trip, every expense, every memory, in one place.</p>
-  return (
-    <p className="mt-2 max-w-[44ch] text-body text-ink-3">
-      {year} so far: <span className="num font-semibold text-ink">{formatMoney(myShare, { round: true })}</span> your share across{' '}
-      <span className="num font-semibold text-ink">{thisYear.length}</span> {thisYear.length === 1 ? 'trip' : 'trips'}
-      {days ? (
-        <>
-          , <span className="num font-semibold text-ink">{days}</span> days away.
-        </>
-      ) : (
-        '.'
-      )}
-    </p>
-  )
-}
-
-function OutstandingSummary({ views }: { views: TripView[] }) {
-  const { me, person } = useStore()
-  const rows = views
-    .flatMap((v) =>
-      v.transfers
-        .filter((t) => t.from === me.id || t.to === me.id)
-        .map((t) => ({ trip: v.trip, other: person(t.from === me.id ? t.to : t.from), amount: t.from === me.id ? -t.amount : t.amount })),
-    )
-    .filter((r) => r.other)
-  if (rows.length === 0) return null
-  return (
-    <section aria-labelledby="to-settle">
-      <h2 id="to-settle" className="flex min-h-11 items-center px-0.5 text-title">
-        To settle
-      </h2>
-      <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
-        {rows.map((r, i) => (
-          <li key={i}>
-            <Link to={`/trips/${r.trip.id}/settle`} className="group flex min-h-[68px] items-center gap-4 px-5 py-3.5 hover:bg-well active:bg-well">
-              <Avatar person={r.other!} size={36} />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate font-semibold">{r.amount > 0 ? `${firstName(r.other!.name)} owes you` : `You owe ${firstName(r.other!.name)}`}</span>
-                <span className="block truncate text-caption text-ink-3">{r.trip.name}</span>
-              </span>
-              <span className={cx('num shrink-0 font-semibold', r.amount > 0 ? 'text-gain' : 'text-loss')}>{formatMoney(Math.abs(r.amount), { currency: r.trip.currency })}</span>
-              <CaretRight size={14} weight="bold" className="shrink-0 text-faint" aria-hidden />
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
   )
 }
 
