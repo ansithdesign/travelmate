@@ -48,7 +48,8 @@ export function Home() {
         </h1>
         <YearLine views={views} />
 
-        <div className="mt-8 lg:max-w-[640px]">
+        <div className="mt-8 lg:grid lg:grid-cols-[minmax(0,560px)_minmax(360px,1fr)] lg:items-start lg:gap-10">
+        <div>
           {lead ? (
             <>
               <FeaturedTrip view={lead} />
@@ -73,6 +74,15 @@ export function Home() {
               </div>
             </div>
           )}
+        </div>
+        <aside className="hidden lg:block">
+          {views.some((v) => v.transfers.some((t) => t.from === me.id || t.to === me.id)) ? (
+          <div className="sheet-glass rounded-[30px] p-5">
+            <OutstandingSummary views={views} />
+            <p className="mt-4 text-meta text-ink-3">Balances update the moment anyone adds an expense or marks a payment.</p>
+          </div>
+          ) : null}
+        </aside>
         </div>
       </SkyHero>
 
@@ -102,7 +112,9 @@ export function Home() {
           ))}
 
           <div className="grid gap-x-10 gap-y-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <OutstandingSummary views={views} />
+            <div className="lg:hidden">
+              <OutstandingSummary views={views} />
+            </div>
 
             {active.length > 1 ? (
               <section aria-labelledby="coming-up">

@@ -43,7 +43,7 @@ function Overview({ view }: { view: TripView }) {
 
   return (
     <>
-      <SkyHero className="pt-[max(14px,env(safe-area-inset-top))] pb-5 lg:pt-8">
+      <SkyHero className="pt-[max(12px,env(safe-area-inset-top))] pb-4 lg:pt-8 lg:pb-5">
         <div className="flex items-center justify-between">
           <IconButton icon={ArrowLeft} label="Back to trips" tone="sky" onClick={() => navigate('/')} />
           <Menu items={items} label="Trip actions" tone="sky" />
@@ -64,15 +64,15 @@ function Overview({ view }: { view: TripView }) {
             </Link>
           </div>
         </div>
-        <TripTabs view={view} className="mt-5" />
+        <TripTabs view={view} className="mt-4" />
       </SkyHero>
 
       <ContentSheet>
-        <SheetBody className="pt-5">
+        <SheetBody className="pt-4 sm:pt-5">
           <div className="grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="min-w-0">
               {/* The money statement */}
-              <section aria-labelledby="money" className="panel rounded-[28px] p-5 sm:p-6">
+              <section aria-labelledby="money" className="panel rounded-[28px] px-4 py-4 sm:p-6">
                 <h2 id="money" className="sr-only">
                   Money
                 </h2>
@@ -90,9 +90,9 @@ function Overview({ view }: { view: TripView }) {
                     </p>
                   </div>
                 </div>
-                {trip.budget ? <FlightPath spent={ledger.total} budget={trip.budget} currency={cur} className="mt-4" /> : null}
+                {trip.budget ? <FlightPath spent={ledger.total} budget={trip.budget} currency={cur} className="mt-3" /> : null}
 
-                <div className="mt-4 border-t border-line pt-2">
+                <div className="mt-3 border-t border-line pt-1.5">
                   <BalanceBars view={view} members={members} />
                 </div>
 
@@ -154,7 +154,7 @@ function BalanceBars({ view, members }: { view: TripView; members: Person[] }) {
         const net = ledger.net[m.id] ?? 0
         const w = (Math.abs(net) / max) * 50
         return (
-          <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-[7px] sm:grid-cols-[170px_minmax(0,1fr)_150px] sm:gap-4">
+          <li key={m.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-[5px] sm:grid-cols-[170px_minmax(0,1fr)_150px] sm:gap-4 sm:py-[7px]">
             <span className="flex min-w-0 items-center gap-2.5">
               <Avatar person={m} size={30} />
               <span className="min-w-0">
@@ -220,7 +220,7 @@ function RecentActivity({ view }: { view: TripView }) {
                 <button type="button" onClick={() => setOpen(it.e)} className="flex w-full items-center gap-3.5 px-4 py-3 text-left hover:bg-well">
                   <CategoryTile id={it.e.category} size={44} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-meta">
+                    <span className="line-clamp-2 text-meta">
                       <span className="font-semibold">{name(it.e.paidBy)}</span> <span className="text-ink-2">paid for</span> <span className="font-semibold">{it.e.title}</span>
                     </span>
                     <span className="block text-caption text-ink-3">
@@ -281,9 +281,8 @@ function WhereItWent({ view }: { view: TripView }) {
             })}
           </svg>
           <div className="min-w-0">
-            <p className="text-caption text-ink-3">Biggest</p>
-            <p className="truncate text-heading">{categoryById[byCat[0].c.id].label}</p>
-            <p className="num text-meta text-ink-2">{Math.round((byCat[0].v / ledger.total) * 100)}% of spend</p>
+            <p className="num text-[34px] leading-10 font-extralight tracking-[-0.04em]">{Math.round((byCat[0].v / ledger.total) * 100)}%</p>
+            <p className="text-meta text-ink-2">went on {categoryById[byCat[0].c.id].label.toLowerCase()}</p>
           </div>
         </div>
         <ul className="mt-4 flex flex-col gap-2.5">

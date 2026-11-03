@@ -35,7 +35,7 @@ export function ExpenseRow({
       <CategoryTile id={expense.category} size={46} className="transition-transform duration-500 ease-[var(--ease-glide)] group-hover:scale-105" />
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5">
-          <span className="truncate font-semibold">{expense.title}</span>
+          <span className="line-clamp-2 font-semibold leading-5">{expense.title}</span>
           {expense.receipt ? <Paperclip size={14} weight="bold" className="shrink-0 text-ink-3" aria-label="Receipt attached" /> : null}
         </span>
         <span className="block truncate text-meta text-ink-3">

@@ -25,7 +25,7 @@ const variants: Record<Variant, string> = {
   quiet: 'text-accent hover:bg-accent-soft disabled:text-ink-3',
   danger:
     'text-white bg-[linear-gradient(180deg,#f2566a_0%,#d02c42_100%)] shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_10px_24px_-12px_rgb(214_54_74/0.7)] hover:brightness-105 disabled:opacity-45',
-  sky: 'glass text-white [text-shadow:0_1px_8px_rgb(8_22_70/0.35)] hover:bg-white/30',
+  sky: 'glass text-white [text-shadow:0_1px_8px_rgb(8_22_70/0.35)] hover:brightness-110',
   white: 'bg-white text-[#0c1736] shadow-[0_10px_30px_-12px_rgb(8_20_60/0.5),inset_0_-1px_0_rgb(12_23_54/0.08)] hover:bg-white/92',
 }
 
@@ -75,7 +75,7 @@ export const IconButton = forwardRef<
         'press inline-flex size-11 shrink-0 items-center justify-center rounded-full',
         tone === 'plain' && 'text-ink hover:bg-well',
         tone === 'panel' && 'bg-panel-strong text-ink shadow-[inset_0_0_0_1px_var(--color-line-strong)] hover:bg-panel',
-        tone === 'sky' && 'glass text-white hover:bg-white/30',
+        tone === 'sky' && 'glass text-white hover:brightness-110',
         className,
       )}
       {...rest}

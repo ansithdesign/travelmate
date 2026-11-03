@@ -17,7 +17,7 @@ export function ContentSheet({ children, className, wide }: { children: ReactNod
     <div
       key={pathname}
       className={cx(
-        'sheet-glass relative mx-auto min-h-[70dvh] w-full rounded-t-[34px] pb-[calc(110px+env(safe-area-inset-bottom))] [animation:rise_640ms_var(--ease-out-expo)_both] lg:mb-10 lg:rounded-[34px] lg:pb-0',
+        'sheet-glass relative mx-auto min-h-[70dvh] w-full rounded-t-[34px] pb-[calc(110px+env(safe-area-inset-bottom))] [animation:rise_640ms_var(--ease-out-expo)_both] lg:mb-10 lg:min-h-0 lg:rounded-[34px] lg:pb-0',
         wide ? 'lg:max-w-[1080px]' : 'lg:max-w-[1080px]',
         className,
       )}

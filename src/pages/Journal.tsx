@@ -20,6 +20,7 @@ import { firstName, uid } from '../utils/id'
 import { readImage } from '../utils/image'
 import { formatMoney } from '../utils/money'
 import { NotFound } from './NotFound'
+import { RouteMap } from '../components/trips/RouteMap'
 import { Figure } from '../components/ui/Money'
 import { CategoryIcon } from '../components/icons/CategoryIcon'
 
@@ -184,6 +185,7 @@ function JournalBody({ view }: { view: TripView }) {
                 Places along the way
               </h2>
               {trip.journal.places.length ? (
+                edit ? (
                 <ol className="relative mt-4 ml-[13px] border-l-2 border-dashed border-accent/35 pl-7">
                   {trip.journal.places.map((p, i) => (
                     <li key={p + i} className="group relative flex min-h-10 items-center justify-between gap-3 py-1.5">
@@ -208,6 +210,11 @@ function JournalBody({ view }: { view: TripView }) {
                     </li>
                   ))}
                 </ol>
+                ) : (
+                  <div className="mt-4">
+                    <RouteMap places={trip.journal.places} />
+                  </div>
+                )
               ) : (
                 <p className="mt-2 text-body text-ink-3">No places yet. Add them in Edit journal, in the order you went.</p>
               )}

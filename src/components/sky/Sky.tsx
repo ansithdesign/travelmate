@@ -72,8 +72,6 @@ export const Sky = memo(function Sky() {
         />
       ))}
 
-      {/* Sun or moon */}
-      <Luminary phase={phase} />
 
       {/* Stars */}
       <div className={cx('absolute inset-0 transition-opacity duration-[2000ms]', phase === 'night' ? 'opacity-100' : 'opacity-0')}>
@@ -111,6 +109,12 @@ export const Sky = memo(function Sky() {
         ))}
       </div>
 
+      {/* Zenith: the sky deepens overhead, which also keeps type on the sky legible over passing clouds */}
+      <div className="absolute inset-x-0 top-0 h-[42%]" style={{ background: 'linear-gradient(180deg, rgb(6 18 64 / 0.26) 0%, rgb(6 18 64 / 0.1) 55%, transparent 100%)' }} />
+
+      {/* Sun or moon, above the zenith wash so it stays luminous */}
+      <Luminary phase={phase} />
+
       {/* Low haze where the horizon would be */}
       <div
         className="absolute inset-x-0 bottom-0 h-[45%]"
@@ -127,10 +131,10 @@ export const Sky = memo(function Sky() {
 
 function Luminary({ phase }: { phase: SkyPhase }) {
   const pos: Record<SkyPhase, { x: string; y: string; size: number; core: string; glow: string }> = {
-    dawn: { x: '88%', y: '7%', size: 60, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
-    day: { x: '90%', y: '2%', size: 76, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
-    golden: { x: '89%', y: '9%', size: 70, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
-    night: { x: '91%', y: '3.5%', size: 40, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
+    dawn: { x: '52%', y: '0.5%', size: 64, core: '#fff1d6', glow: 'rgb(255 200 170 / 0.55)' },
+    day: { x: '52%', y: '-0.5%', size: 80, core: '#fffbe8', glow: 'rgb(255 244 200 / 0.6)' },
+    golden: { x: '52%', y: '1%', size: 74, core: '#ffe2b8', glow: 'rgb(255 170 120 / 0.6)' },
+    night: { x: '54%', y: '2.5%', size: 42, core: '#f4f6ff', glow: 'rgb(170 190 255 / 0.4)' },
   }
   const p = pos[phase]
   return (
@@ -161,47 +165,75 @@ function Luminary({ phase }: { phase: SkyPhase }) {
   )
 }
 
-/** A soft, volumetric cloud: overlapping puffs with a lit top and a tinted belly. */
+// Cumulus layouts: [cx, cy, rx, ry]. Bigger puffs on top, a flatter base below.
+const PUFFS: number[][][] = [
+  [
+    [62, 70, 34, 28],
+    [98, 52, 40, 36],
+    [140, 58, 36, 32],
+    [176, 74, 26, 20],
+    [34, 82, 22, 16],
+    [118, 84, 70, 18],
+    [72, 86, 44, 14],
+  ],
+  [
+    [56, 72, 30, 24],
+    [92, 56, 36, 32],
+    [128, 50, 30, 30],
+    [160, 66, 28, 22],
+    [110, 84, 64, 16],
+    [190, 80, 18, 12],
+  ],
+  [
+    [48, 76, 26, 20],
+    [84, 62, 34, 30],
+    [124, 46, 40, 38],
+    [166, 60, 32, 28],
+    [198, 78, 20, 14],
+    [128, 86, 78, 16],
+  ],
+]
+
+/**
+ * A volumetric cumulus. Puffs are pushed through fractal noise so the outline
+ * billows instead of reading as circles, lit from the top with a shaded belly,
+ * and a soft halo behind gives it depth.
+ */
 export function CloudShape({ width, top = '#fff', belly = '#cfe0f5', variant = 0 }: { width: number; top?: string; belly?: string; variant?: number }) {
   const id = `c${useId().replace(/:/g, '')}`
-  const puffs = [
-    [
-      [60, 62, 34],
-      [100, 46, 40],
-      [146, 56, 32],
-      [178, 70, 22],
-      [30, 74, 20],
-    ],
-    [
-      [50, 60, 28],
-      [90, 44, 36],
-      [134, 52, 30],
-      [168, 66, 22],
-    ],
-    [
-      [44, 66, 24],
-      [80, 52, 32],
-      [122, 42, 38],
-      [166, 58, 28],
-      [196, 72, 18],
-    ],
-  ][variant]
+  const puffs = PUFFS[variant % PUFFS.length]
   return (
-    <svg width={width} height={width * 0.45} viewBox="0 0 220 100" style={{ overflow: 'visible' }}>
+    <svg width={width} height={width * 0.5} viewBox="0 0 240 120" style={{ overflow: 'visible' }} aria-hidden>
       <defs>
-        <linearGradient id={`${id}-g`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0.25" stopColor={top} />
+        <radialGradient id={`${id}-p`} cx="0.42" cy="0.3" r="0.75">
+          <stop offset="0" stopColor={top} />
+          <stop offset="0.55" stopColor={top} />
+          <stop offset="1" stopColor={belly} />
+        </radialGradient>
+        <linearGradient id={`${id}-b`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor={top} />
           <stop offset="1" stopColor={belly} />
         </linearGradient>
-        <filter id={`${id}-f`} x="-20%" y="-40%" width="140%" height="180%">
-          <feGaussianBlur stdDeviation="1.6" />
+        <filter id={`${id}-f`} x="-25%" y="-45%" width="150%" height="190%" colorInterpolationFilters="sRGB">
+          <feTurbulence type="fractalNoise" baseFrequency="0.032" numOctaves="3" seed={variant * 11 + 4} result="n" />
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="18" xChannelSelector="R" yChannelSelector="G" result="d" />
+          <feGaussianBlur in="d" stdDeviation="1.1" />
+        </filter>
+        <filter id={`${id}-h`} x="-40%" y="-60%" width="180%" height="220%">
+          <feGaussianBlur stdDeviation="9" />
         </filter>
       </defs>
-      <g filter={`url(#${id}-f)`} fill={`url(#${id}-g)`}>
-        {puffs.map(([cx, cy, r], i) => (
-          <circle key={i} cx={cx} cy={cy} r={r} />
+      {/* Halo */}
+      <g filter={`url(#${id}-h)`} opacity="0.55" fill={top}>
+        {puffs.map(([cx, cy, rx, ry], i) => (
+          <ellipse key={i} cx={cx} cy={cy} rx={rx * 1.05} ry={ry * 1.05} />
         ))}
-        <rect x="18" y="62" width="190" height="30" rx="15" />
+      </g>
+      {/* Body */}
+      <g filter={`url(#${id}-f)`}>
+        {puffs.map(([cx, cy, rx, ry], i) => (
+          <ellipse key={i} cx={cx} cy={cy} rx={rx} ry={ry} fill={ry < 20 ? `url(#${id}-b)` : `url(#${id}-p)`} />
+        ))}
       </g>
     </svg>
   )

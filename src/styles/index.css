@@ -205,7 +205,7 @@
   }
   /* Floating glass controls placed directly on the sky */
   .glass {
-    background: rgb(255 255 255 / 0.2);
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.06)), rgb(10 26 84 / 0.24);
     -webkit-backdrop-filter: blur(18px) saturate(1.8);
     backdrop-filter: blur(18px) saturate(1.8);
     box-shadow:
@@ -223,13 +223,14 @@
       inset 0 0 0 1px var(--color-line),
       0 18px 40px -18px rgb(var(--t-shadow) / 0.5);
   }
+  /* Type on the sky carries a soft atmospheric shadow so it holds even when a cloud drifts behind it */
   .text-sky {
     color: #fff;
-    text-shadow: 0 1px 14px rgb(8 22 70 / 0.28);
+    text-shadow: 0 1px 2px rgb(8 22 70 / 0.28), 0 2px 18px rgb(8 22 70 / 0.38);
   }
   .text-sky-2 {
-    color: rgb(255 255 255 / 0.88);
-    text-shadow: 0 1px 10px rgb(8 22 70 / 0.26);
+    color: rgb(255 255 255 / 0.92);
+    text-shadow: 0 1px 2px rgb(8 22 70 / 0.32), 0 1px 14px rgb(8 22 70 / 0.42);
   }
 }
 

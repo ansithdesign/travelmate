@@ -256,10 +256,7 @@ function Ticket({
         style={{ mask: notch, WebkitMask: notch }}
       >
         <div className="min-w-0 flex-1 p-4 sm:p-5">
-          <p className="font-mono text-[10px] font-medium tracking-[0.14em] text-ink-3 uppercase">
-            Payment {index} of {total}
-          </p>
-          <div className="mt-2 flex items-center gap-2">
+          <div className="flex h-full items-center gap-2">
             <Code person={from} you={youPay} />
             <span className="relative flex min-w-[40px] flex-1 items-center" aria-hidden>
               <span className="h-px flex-1 border-t-2 border-dotted border-line-strong" />
@@ -271,8 +268,10 @@ function Ticket({
         </div>
         <div className="flex shrink-0 flex-col justify-between border-l-2 border-dashed border-line-strong p-4" style={{ width: stub }}>
           <div>
-            <p className="font-mono text-[10px] font-medium tracking-[0.14em] text-ink-3 uppercase">Amount</p>
-            <p className="num mt-1 text-heading leading-6">{amount}</p>
+            <p className="num text-heading leading-6">{amount}</p>
+            <p className="font-mono text-[11px] text-ink-3">
+              {index} of {total}
+            </p>
           </div>
           <Button size="sm" variant={youPay || youGet ? 'primary' : 'secondary'} icon={Check} className="mt-3 w-full px-2" onClick={onPaid}>
             Paid

@@ -63,7 +63,7 @@ export function FlightPath({ spent, budget, className, currency }: { spent: Pais
         </span>
       </div>
       <svg
-        viewBox="0 0 320 92"
+        viewBox="0 -14 320 106"
         className="mx-auto mt-1 block w-full max-w-[440px] overflow-visible"
         role="meter"
         aria-valuemin={0}
@@ -97,6 +97,20 @@ export function FlightPath({ spent, budget, className, currency }: { spent: Pais
           <path d="M0 -9c-3.6 0-6.2 2.7-6.2 6 0 4.4 6.2 9.6 6.2 9.6s6.2-5.2 6.2-9.6c0-3.3-2.6-6-6.2-6z" fill={over ? '#e5484d' : '#ff8a5c'} />
           <circle cy="-3" r="2.2" fill="#fff" />
         </g>
+        {/* Spent tag rides above the plane */}
+        {(() => {
+          const label = formatMoney(spent, { currency })
+          const w = label.length * 6.9 + 18
+          const x = Math.min(Math.max(pt.x, w / 2 + 2), 320 - w / 2 - 2)
+          return (
+            <g transform={`translate(${x} ${pt.y - 30})`}>
+              <rect x={-w / 2} y={-11} width={w} height={22} rx={11} fill={over ? '#e5484d' : '#2563eb'} />
+              <text textAnchor="middle" y={4} fontSize="11.5" fontWeight="600" fill="#fff" className="num">
+                {label}
+              </text>
+            </g>
+          )
+        })()}
         {/* Plane */}
         <g transform={`translate(${pt.x} ${pt.y}) rotate(${pt.a})`}>
           <circle r="13" className="fill-panel-strong" style={{ filter: 'drop-shadow(0 4px 8px rgb(12 23 54 / 0.25))' }} />
@@ -106,9 +120,9 @@ export function FlightPath({ spent, budget, className, currency }: { spent: Pais
           />
         </g>
       </svg>
-      <div className="mx-auto -mt-1 flex max-w-[440px] justify-between text-caption text-ink-3">
-        <span className="num">Spent {formatMoney(spent, { currency })}</span>
-        <span>Budget</span>
+      <div className="num mx-auto -mt-1 flex max-w-[440px] justify-between text-caption text-ink-3">
+        <span>Departed {formatMoney(0, { currency })}</span>
+        <span className="font-semibold text-ink-2">Budget {formatMoney(budget, { currency })}</span>
       </div>
     </div>
   )

@@ -63,12 +63,12 @@ export function Profile() {
             <p className="text-sky-2 truncate text-meta">{me.email}</p>
           </div>
         </div>
-        <div className="mt-7 grid grid-cols-3 gap-2.5">
-          <Stat value={String(views.length)} label="Trips" />
-          <Stat value={String(days)} label="Days away" />
-          <Stat value={String(places)} label="Places" />
-        </div>
-        <p className="text-sky-2 num mt-4 text-meta">
+        <p className="text-sky num mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <Figure value={views.length} label={views.length === 1 ? 'trip' : 'trips'} />
+          <Figure value={days} label="days away" />
+          <Figure value={places} label={places === 1 ? 'place' : 'places'} />
+        </p>
+        <p className="text-sky-2 num mt-3 text-meta">
           Your share of everything: <span className="font-semibold text-white">{formatMoney(shareInr, { round: true })}</span>
         </p>
       </SkyHero>
@@ -187,12 +187,12 @@ export function Profile() {
   )
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Figure({ value, label }: { value: number; label: string }) {
   return (
-    <div className="glass rounded-[24px] px-4 py-3">
-      <p className="text-sky num text-[34px] leading-10 font-extralight tracking-[-0.04em]">{value}</p>
-      <p className="text-sky-2 text-caption font-semibold">{label}</p>
-    </div>
+    <span className="whitespace-nowrap">
+      <span className="text-[44px] leading-[48px] font-extralight tracking-[-0.05em]">{value}</span>
+      <span className="text-sky-2 ml-1.5 text-body font-medium">{label}</span>
+    </span>
   )
 }
 

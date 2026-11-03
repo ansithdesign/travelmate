@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import { NavLink, Outlet, useLocation, useMatch } from 'react-router-dom'
-import { House, Plus, Receipt, User, type Icon } from '@phosphor-icons/react'
+import { Plus } from '@phosphor-icons/react'
+import { ExpensesIcon, ProfileIcon, TripsIcon } from '../icons/NavIcons'
 import { useAllTripViews } from '../../hooks/useTrip'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
@@ -12,10 +13,10 @@ import { Avatar } from '../ui/Avatar'
 import { Window } from '../ui/Cover'
 import { Sky } from '../sky/Sky'
 
-const NAV: { to: string; label: string; icon: Icon; match: (p: string) => boolean }[] = [
-  { to: '/', label: 'Trips', icon: House, match: (p) => p === '/' || p.startsWith('/trips') },
-  { to: '/expenses', label: 'Expenses', icon: Receipt, match: (p) => p.startsWith('/expenses') },
-  { to: '/profile', label: 'Profile', icon: User, match: (p) => p.startsWith('/profile') },
+const NAV: { to: string; label: string; icon: (p: { active?: boolean; size?: number }) => JSX.Element; match: (p: string) => boolean }[] = [
+  { to: '/', label: 'Trips', icon: TripsIcon, match: (p) => p === '/' || p.startsWith('/trips') },
+  { to: '/expenses', label: 'Expenses', icon: ExpensesIcon, match: (p) => p.startsWith('/expenses') },
+  { to: '/profile', label: 'Profile', icon: ProfileIcon, match: (p) => p.startsWith('/profile') },
 ]
 
 export function AppShell() {
@@ -68,7 +69,7 @@ function TabBar({ pathname }: { pathname: string }) {
                   aria-current={on ? 'page' : undefined}
                   className={cx('press flex h-[52px] w-[76px] flex-col items-center justify-center gap-0.5 rounded-full text-[11px] font-semibold', on ? 'text-accent' : 'text-ink-3 hover:text-ink')}
                 >
-                  <I size={23} weight={on ? 'fill' : 'duotone'} aria-hidden />
+                  <I size={24} active={on} />
                   {label}
                 </NavLink>
               </li>
@@ -122,7 +123,7 @@ function SideRail({ pathname }: { pathname: string }) {
                   aria-current={on ? 'page' : undefined}
                   className={cx('press flex h-11 items-center gap-3 rounded-full px-4 text-body font-semibold', on ? 'bg-white text-[#0c1736] shadow-[0_8px_22px_-10px_rgb(0_0_0/0.4)]' : 'text-white/85 hover:bg-white/10')}
                 >
-                  <I size={20} weight={on ? 'fill' : 'duotone'} aria-hidden />
+                  <I size={21} active={on} />
                   {label}
                 </NavLink>
               </li>

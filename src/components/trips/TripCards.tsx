@@ -71,7 +71,7 @@ export function TripWindowCard({ view, seed = 0 }: { view: TripView; seed?: numb
   const { trip, status, ledger } = view
   const myNet = ledger.net[me.id] ?? 0
   return (
-    <Link to={`/trips/${trip.id}`} className="group block w-[150px] shrink-0 snap-start">
+    <Link to={`/trips/${trip.id}`} className="group block w-[150px] shrink-0 snap-start lg:w-[200px]">
       <Window photo={trip.cover} seed={seed} shade={0.1} className="aspect-[0.8] w-full transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-1" />
       <p className="mt-3 truncate text-body font-semibold">{trip.name}</p>
       <p className="truncate text-meta text-ink-3">{phaseLabel(trip, status)}</p>

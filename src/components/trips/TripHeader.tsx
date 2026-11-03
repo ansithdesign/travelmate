@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ArrowLeft } from '@phosphor-icons/react'
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import type { TripView } from '../../hooks/useTrip'
 import { cx } from '../../utils/cx'
 import { IconButton } from '../ui/Button'
@@ -17,8 +17,21 @@ export function TripTabs({ view, className }: { view: TripView; className?: stri
     { to: `/trips/${trip.id}/details`, label: 'Details' },
     ...(status.phase === 'completed' ? [{ to: `/trips/${trip.id}/journal`, label: 'Journal' }] : []),
   ]
+  const ref = useRef<HTMLElement>(null)
+  // Keep the current section visible when the strip scrolls on narrow screens.
+  useEffect(() => {
+    const el = ref.current?.querySelector<HTMLElement>('[aria-current="page"]')
+    if (el && ref.current) ref.current.scrollTo({ left: el.offsetLeft - ref.current.clientWidth / 2 + el.clientWidth / 2 })
+  }, [trip.id])
   return (
-    <nav aria-label="Trip sections" className={cx('no-scrollbar glass flex w-fit max-w-full gap-1 overflow-x-auto rounded-full p-1', className)}>
+    <nav
+      ref={ref}
+      aria-label="Trip sections"
+      className={cx(
+        'no-scrollbar glass flex w-fit max-w-full gap-1 overflow-x-auto rounded-full p-1 max-sm:[mask-image:linear-gradient(90deg,transparent_0,#000_14px,#000_calc(100%-22px),transparent)]',
+        className,
+      )}
+    >
       {tabs.map((t) => (
         <NavLink
           key={t.to}

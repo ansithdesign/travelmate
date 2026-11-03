@@ -136,8 +136,8 @@ export function CategoryIcon({ id, size = 40, className }: { id: CategoryId; siz
       <>
         <defs>
           <linearGradient id={g('fus')} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#f7faff" />
-            <stop offset="1" stopColor="#9fb4df" />
+            <stop offset="0" stopColor="#eef4ff" />
+            <stop offset="1" stopColor="#7c95cb" />
           </linearGradient>
           <linearGradient id={g('tail')} x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#5ea2ff" />
@@ -150,7 +150,7 @@ export function CategoryIcon({ id, size = 40, className }: { id: CategoryId; siz
           <path d="M25.5 33 38 38.5v-3.2l-12.5-9z" fill="#7f97c9" />
           <path d="M21.5 24 4 31.5v-4L21.5 16z" fill={url('fus')} stroke="#7f97c9" strokeWidth="0.6" />
           <path d="M26.5 24 44 31.5v-4L26.5 16z" fill="#b9c9ea" />
-          <path d="M24 3c2 0 3 2.5 3 6v26c0 4-1.3 8-3 8s-3-4-3-8V9c0-3.5 1-6 3-6z" fill={url('fus')} />
+          <path d="M24 3c2 0 3 2.5 3 6v26c0 4-1.3 8-3 8s-3-4-3-8V9c0-3.5 1-6 3-6z" fill={url('fus')} stroke="#5b76b3" strokeWidth="0.8" />
           <path d="M21.6 38 24 43l2.4-5z" fill={url('tail')} />
           <path d="M22.4 8.5c.4-2.4 1-3.6 1.6-3.6" stroke="#2563eb" strokeWidth="1.6" strokeLinecap="round" />
           <path d="M22.5 13v18" stroke="#fff" strokeWidth="1" opacity="0.9" />
