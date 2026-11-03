@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ArrowCounterClockwise, DownloadSimple, Trash, type Icon } from '@phosphor-icons/react'
 import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
-import { PassportPickerSheet, PassportScene } from '../components/profile/PassportPickerSheet'
+import { PassportScene } from '../components/profile/PassportPickerSheet'
 import { usePassportLook } from '../store/passport'
 import { SkyPickerSheet, themeGradient } from '../components/profile/SkyPickerSheet'
 import { skyThemeById } from '../data/skyThemes'
@@ -15,15 +15,13 @@ import { useStore } from '../store/store'
 import { cx } from '../utils/cx'
 import { initials } from '../utils/id'
 import { tripLength } from '../utils/dates'
-import { formatMoney } from '../utils/money'
 
 export function Profile() {
   const { me, updateMe, data, resetDemo, clearAll } = useStore()
   const { phase, lightSky } = useSky()
   const lightTheme = skyThemeById(lightSky)
   const [skyOpen, setSkyOpen] = useState(false)
-  const [passOpen, setPassOpen] = useState(false)
-  const [look, setLook] = usePassportLook()
+  const [look] = usePassportLook()
   const views = useAllTripViews()
   const toast = useToast()
   const [name, setName] = useState(me.name)
@@ -34,7 +32,6 @@ export function Profile() {
 
   const done = views.filter((v) => v.status.phase === 'completed')
   const days = done.reduce((a, v) => a + tripLength(v.trip.startDate, v.trip.endDate), 0)
-  const shareInr = views.filter((v) => v.trip.currency === 'INR').reduce((a, v) => a + (v.ledger.share[me.id] ?? 0), 0)
   // One stamp per place, newest first, up to four
   const stamps = (() => {
     const seen = new Set<string>()
@@ -71,16 +68,10 @@ export function Profile() {
           Profile
           <Dot />
         </h1>
-        <div className="mt-8">
-          <PassportScene look={look} info={info} />
+        <div className="mt-8 flex justify-center">
+          <PassportScene look={look} info={info} className="gap-8" />
           {stamps.length === 0 ? <p className="mt-4 text-center text-meta text-ink-3">Your places will be stamped here after your first trip.</p> : null}
         </div>
-        <button type="button" onClick={() => setPassOpen(true)} className="glass-control press mt-5 inline-flex h-10 items-center rounded-full px-4 text-[14px] font-semibold">
-          Change passport
-        </button>
-        <p className="num mt-6 text-meta text-ink-3">
-          Your share of everything: <span className="font-semibold text-ink">{formatMoney(shareInr, { round: true })}</span>
-        </p>
       </SkyHero>
 
       <ContentSheet>
@@ -142,7 +133,6 @@ export function Profile() {
       </ContentSheet>
 
       <SkyPickerSheet open={skyOpen} onClose={() => setSkyOpen(false)} />
-      <PassportPickerSheet open={passOpen} onClose={() => setPassOpen(false)} look={look} info={info} onSave={setLook} />
 
       <ConfirmDialog
         open={confirm === 'reset'}
