@@ -56,7 +56,7 @@ export function FullScreen({
           </div>
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6">{children}</div>
-        {footer ? <div className="safe-bottom px-6 pt-3 pb-4">{footer}</div> : null}
+        {footer ? <div className="px-6 pt-3 pb-[max(22px,calc(env(safe-area-inset-bottom)+10px))]">{footer}</div> : null}
       </div>
     </div>,
     document.body,
