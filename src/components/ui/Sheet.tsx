@@ -153,7 +153,7 @@ export function Sheet({
         tabIndex={-1}
         style={{ transform: visible ? `translateY(${dy}px)` : undefined }}
         className={cx(
-          'sheet-glass relative flex max-h-[92dvh] w-full flex-col outline-none',
+          'sheet-glass relative flex max-h-[92dvh] w-full max-w-[430px] flex-col outline-none',
           'rounded-t-[34px] md:h-full md:max-h-none md:rounded-[30px]',
           size === 'lg' ? 'md:w-[540px]' : 'md:w-[460px]',
           !dragging && 'transition-[transform,opacity] duration-[520ms] ease-[var(--ease-glide)]',
@@ -176,7 +176,7 @@ export function Sheet({
           </header>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 pt-3 pb-8 md:px-7">{children}</div>
-        {footer ? <div className="safe-bottom px-6 pt-4 pb-4 shadow-[0_-1px_0_var(--divider)] md:rounded-b-[30px] md:px-7 md:py-5">{footer}</div> : null}
+        {footer ? <div className="px-6 pt-4 pb-[max(22px,calc(env(safe-area-inset-bottom)+10px))] shadow-[0_-1px_0_var(--divider)] md:rounded-b-[30px] md:px-7 md:pt-5 md:pb-5">{footer}</div> : null}
       </div>
     </div>,
     document.body,

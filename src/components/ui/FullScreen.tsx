@@ -40,12 +40,12 @@ export function FullScreen({
       aria-labelledby={titleId}
       tabIndex={-1}
       className={cx(
-        'fixed inset-0 z-[49] flex flex-col bg-haze outline-none transition-[transform,opacity] duration-[480ms] ease-[var(--ease-glide)]',
+        'fixed inset-0 z-[49] flex justify-center bg-[#0b1020] outline-none transition-[transform,opacity] duration-[480ms] ease-[var(--ease-glide)]',
         visible ? 'translate-y-0 opacity-100' : 'translate-y-[8%] opacity-0',
       )}
     >
-      {wash ? <div aria-hidden className="add-wash pointer-events-none absolute inset-x-0 top-0 h-[340px]" /> : null}
-      <div className="relative mx-auto flex min-h-0 w-full max-w-[560px] flex-1 flex-col">
+      <div className="relative flex min-h-0 w-full max-w-[430px] flex-1 flex-col overflow-hidden bg-haze">
+        {wash ? <div aria-hidden className="add-wash pointer-events-none absolute inset-x-0 top-0 h-[340px]" /> : null}
         <header className="relative flex items-center px-4 pt-[max(14px,env(safe-area-inset-top))] pb-2">
           <IconButton icon={X} label="Close" tone="plain" size={22} weight="regular" onClick={onClose} />
           <div className="pointer-events-none absolute inset-x-16 top-[max(14px,env(safe-area-inset-top))] flex min-h-11 flex-col items-center justify-center text-center">

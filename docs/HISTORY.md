@@ -66,3 +66,10 @@ A running record of what was built and why, in order. Dates are 2026-11-03 onwar
 - One row above the button says who paid and how it is split, with the amount each. It turns red when the split does not add up.
 - The form is a full screen on every device. Category, date, note and receipt, split and paid by each open as a bottom sheet over it. The split sheet shows names only, with a single Select all / Select none button, a live total and a reset to equal.
 - Built for large groups. Nothing on the form shows avatars, and Paid by is one flat list.
+
+## Phone-only layout
+
+- The app is one phone-wide column (430 px) in every browser, centred on a dark backdrop when the window is wider. The tablet and desktop layouts, including the side rail, are removed, and the tablet and desktop breakpoints never switch on.
+- Sheets, the full-screen form, the tab bar and toasts are held to the same column.
+- Sheet footers keep at least 22 px of space below the primary button.
+- The category filter on Expenses moved from a row of chips into the Filters sheet.

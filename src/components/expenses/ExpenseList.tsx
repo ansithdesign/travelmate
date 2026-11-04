@@ -9,7 +9,6 @@ import { formatMoney } from '../../utils/money'
 import { Button } from '../ui/Button'
 import { Chip, EmptyState, Segmented } from '../ui/Controls'
 import { Field, TextInput, inputClass } from '../ui/Field'
-import { ScrollRow } from '../ui/ScrollRow'
 import { Sheet } from '../ui/Sheet'
 import { ExpenseDetailSheet } from './ExpenseDetailSheet'
 import { ExpenseRow } from './ExpenseRow'
@@ -105,7 +104,7 @@ export function ExpenseList({
     return [...m.entries()].map(([k, items]) => ({ key: k, label: dayLabel(k) + (parseDate(k).getFullYear() !== new Date().getFullYear() ? ` ${parseDate(k).getFullYear()}` : ''), items }))
   }, [filtered, byDate])
 
-  const advanced = (f.paidBy !== 'any' ? 1 : 0) + (f.from || f.to ? 1 : 0) + (f.sort !== 'newest' ? 1 : 0)
+  const advanced = (f.categories.length ? 1 : 0) + (f.paidBy !== 'any' ? 1 : 0) + (f.from || f.to ? 1 : 0) + (f.sort !== 'newest' ? 1 : 0)
   const anyFilter = f.q || f.categories.length || advanced
   const total = filtered.reduce((a, e) => a + e.amount, 0)
   const currencies = new Set(filtered.map((e) => tripById[e.tripId]?.currency ?? 'INR'))
@@ -147,25 +146,6 @@ export function ExpenseList({
           {advanced ? <span className="num absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-accent text-[11px] font-semibold text-[var(--on-accent)]">{advanced}</span> : null}
         </Button>
       </div>
-
-      <ScrollRow className="-mx-6 mt-3 flex gap-2 px-6 lg:mx-0 lg:px-0">
-        <Chip active={f.categories.length === 0} onClick={() => setF((x) => ({ ...x, categories: [] }))}>
-          All
-        </Chip>
-        {CATEGORIES.filter((c) => catCounts[c.id]).map((c) => (
-          <Chip
-            key={c.id}
-            active={f.categories.includes(c.id)}
-            count={catCounts[c.id]}
-            onClick={() =>
-              setF((x) => ({ ...x, categories: x.categories.includes(c.id) ? x.categories.filter((y) => y !== c.id) : [...x.categories, c.id] }))
-            }
-          >
-            {c.short}
-          </Chip>
-        ))}
-        <span aria-hidden className="w-6 shrink-0" />
-      </ScrollRow>
 
       <div className="mt-5 flex items-baseline justify-between gap-3 px-1 text-meta">
         <span className="text-ink-2">
@@ -243,6 +223,24 @@ export function ExpenseList({
                 { value: 'lowest', label: 'Lowest' },
               ]}
             />
+          </div>
+          <div>
+            <h3 className="mb-2 text-meta font-medium text-ink-2">Category</h3>
+            <div className="flex flex-wrap gap-2">
+              <Chip active={f.categories.length === 0} onClick={() => setF((x) => ({ ...x, categories: [] }))}>
+                All
+              </Chip>
+              {CATEGORIES.filter((c) => catCounts[c.id]).map((c) => (
+                <Chip
+                  key={c.id}
+                  active={f.categories.includes(c.id)}
+                  count={catCounts[c.id]}
+                  onClick={() => setF((x) => ({ ...x, categories: x.categories.includes(c.id) ? x.categories.filter((y) => y !== c.id) : [...x.categories, c.id] }))}
+                >
+                  {c.short}
+                </Chip>
+              ))}
+            </div>
           </div>
           <div>
             <h3 className="mb-2 text-meta font-medium text-ink-2">Paid by</h3>

@@ -10,6 +10,12 @@
 */
 
 @theme {
+  /* A phone app: the tablet and desktop breakpoints never switch on, in any browser */
+  --breakpoint-sm: 1000rem;
+  --breakpoint-md: 1000rem;
+  --breakpoint-lg: 1000rem;
+  --breakpoint-xl: 1000rem;
+  --breakpoint-2xl: 1000rem;
   --font-sans: 'Figtree Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
 
@@ -205,7 +211,17 @@
   html {
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    background: #0b1020;
+  }
+  /* The whole app is one phone-wide column, centred when the browser is wider */
+  #root {
+    position: relative;
+    isolation: isolate;
+    max-width: 430px;
+    min-height: 100dvh;
+    margin: 0 auto;
     background: var(--haze);
+    overflow-x: clip;
   }
   body {
     color: var(--color-ink);
