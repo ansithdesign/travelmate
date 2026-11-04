@@ -58,3 +58,11 @@ A running record of what was built and why, in order. Dates are 2026-11-03 onwar
 - Other trips on Home carry a small cover photo.
 - The balance bars on Settle up sit on a faint track, so small amounts still read as a bar.
 - Plans has tickets and files with naming, rename, in-app preview, open and download.
+
+## New Add expense form
+
+- Amount and "what was it for" lead. The amount is 44 px with the currency symbol beside it, on a pale wash that follows the theme.
+- The category is guessed from the description and shown as a 3D icon at the left of the card. Typing something that matches nothing files it under Other. A manual choice sticks while you edit the text, and "Use suggestion" hands control back.
+- One row above the button says who paid and how it is split, with the amount each. It turns red when the split does not add up.
+- Category, date, note and receipt, split and paid by each open as a bottom sheet. The split sheet shows names only, with a single Select all / Select none button, a live total and a reset to equal.
+- Built for large groups. Nothing on the form shows avatars, and Paid by is one flat list.

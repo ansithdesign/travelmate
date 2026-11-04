@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { CaretDown, Check, CheckCircle, Plus, Receipt as ReceiptIcon, Scan, WarningCircle, X } from '@phosphor-icons/react'
-import { CategoryTile } from '../icons/CategoryIcon'
-import { CATEGORIES } from '../../data/categories'
+import { CaretDown, CheckCircle, Tag, WarningCircle } from '@phosphor-icons/react'
+import { CategoryIcon } from '../icons/CategoryIcon'
+import { categoryById } from '../../data/categories'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
 import type { CategoryId, Expense, ID, Person, Receipt, SplitMethod, Trip } from '../../types'
@@ -12,13 +12,13 @@ import { currencySymbol, formatMoney, parseMoney, toInput } from '../../utils/mo
 import { computeSplit, defaultValues } from '../../utils/split'
 import { Avatar } from '../ui/Avatar'
 import { Button } from '../ui/Button'
-import { Segmented } from '../ui/Controls'
-import { Field, TextArea, TextInput, inputClass } from '../ui/Field'
+import { TextInput } from '../ui/Field'
 import { Sheet } from '../ui/Sheet'
 import { useToast } from '../ui/Toast'
 import { ReceiptScanner } from '../receipts/ReceiptScanner'
 import { guessCategory } from '../../utils/guessCategory'
 import { tripStatus } from '../../hooks/useTrip'
+import { AddPersonRow, CategorySheet, DateSheet, NoteSheet, PayerSheet, SplitSheet, TripSheet } from './ExpenseSubSheets'
 
 interface Draft {
   tripId: ID
@@ -36,13 +36,6 @@ interface Draft {
   receipt?: Receipt
 }
 
-const METHODS: { value: SplitMethod; label: string }[] = [
-  { value: 'equal', label: 'Equally' },
-  { value: 'exact', label: 'Amounts' },
-  { value: 'percent', label: 'Percent' },
-  { value: 'shares', label: 'Shares' },
-]
-
 function draftFor(trip: Trip | undefined, me: ID, expense?: Expense): Draft {
   if (expense) {
     const inputs: Record<ID, string> = {}
@@ -54,7 +47,7 @@ function draftFor(trip: Trip | undefined, me: ID, expense?: Expense): Draft {
     return {
       tripId: expense.tripId,
       title: expense.title,
-      amount: toInput(expense.amount),
+      amount: groupDigits(toInput(expense.amount)),
       category: expense.category,
       categoryTouched: true,
       paidBy: expense.paidBy,
@@ -71,7 +64,7 @@ function draftFor(trip: Trip | undefined, me: ID, expense?: Expense): Draft {
     tripId: trip?.id ?? '',
     title: '',
     amount: '',
-    category: 'food',
+    category: 'other',
     categoryTouched: false,
     paidBy: members.includes(me) ? me : members[0],
     participants: members,
@@ -81,6 +74,34 @@ function draftFor(trip: Trip | undefined, me: ID, expense?: Expense): Draft {
     notes: '',
   }
 }
+
+/** The category a title points to. Anything typed that matches nothing is filed under Other. */
+function autoCategory(title: string): CategoryId | undefined {
+  return guessCategory(title) ?? (title.trim().length >= 3 ? 'other' : undefined)
+}
+
+const dateLabel = (local: string) => {
+  const d = new Date(local)
+  if (Number.isNaN(d.getTime())) return 'Pick a date'
+  const a = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+  const n = new Date()
+  const diff = Math.round((a - new Date(n.getFullYear(), n.getMonth(), n.getDate()).getTime()) / 86400000)
+  if (diff === 0) return 'Today'
+  if (diff === -1) return 'Yesterday'
+  if (diff === 1) return 'Tomorrow'
+  return new Intl.DateTimeFormat('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }).format(d)
+}
+
+/** 12000 becomes 12,000 as you type (Indian grouping), decimals untouched */
+function groupDigits(v: string) {
+  const raw = v.replace(/,/g, '')
+  if (!raw) return ''
+  const [int, dec] = raw.split('.')
+  const grouped = int ? Number(int).toLocaleString('en-IN') : '0'
+  return dec === undefined ? grouped : `${grouped}.${dec}`
+}
+
+type Panel = null | 'category' | 'date' | 'note' | 'split' | 'payer' | 'trip'
 
 export function ExpenseSheet() {
   const { expense: state, closeExpense } = useUI()
@@ -96,10 +117,9 @@ export function ExpenseSheet() {
 
   const [draft, setDraft] = useState<Draft>(() => draftFor(undefined, me.id))
   const [submitted, setSubmitted] = useState(false)
-  const [addOpen, setAddOpen] = useState<null | 'payer' | 'split'>(null)
+  const [panel, setPanel] = useState<Panel>(null)
+  const [addOpen, setAddOpen] = useState(false)
   const [newName, setNewName] = useState('')
-  const [showSplit, setShowSplit] = useState(false)
-  const [showMore, setShowMore] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
   const amountRef = useRef<HTMLInputElement>(null)
 
@@ -113,11 +133,9 @@ export function ExpenseSheet() {
     }
     setDraft(d)
     setSubmitted(false)
-    // Most expenses are split equally between everyone: keep the split folded unless this one is different.
-    setAddOpen(null)
+    setPanel(null)
+    setAddOpen(false)
     setNewName('')
-    setShowSplit(d.method !== 'equal' || d.participants.length !== (t?.members.length ?? d.participants.length))
-    setShowMore(!!d.notes || !!d.receipt)
     setScanOpen(!!state.scan)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.open, state.expenseId, state.tripId, state.category])
@@ -126,6 +144,7 @@ export function ExpenseSheet() {
   const currency = trip?.currency ?? 'INR'
   const members = (trip?.members.map(person).filter(Boolean) as Person[]) ?? []
   const amount = parseMoney(draft.amount) ?? 0
+  const payer = members.find((m) => m.id === draft.paidBy)
 
   const values = useMemo(() => {
     const v: Record<ID, number> = {}
@@ -147,8 +166,8 @@ export function ExpenseSheet() {
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }))
 
-  function seedInputs(method: SplitMethod, participants: ID[]) {
-    const seeded = defaultValues(method, amount, participants)
+  function seedInputs(method: SplitMethod, participants: ID[], amt = amount) {
+    const seeded = defaultValues(method, amt, participants)
     const inputs: Record<ID, string> = {}
     for (const [k, v] of Object.entries(seeded)) inputs[k] = method === 'exact' ? toInput(v) : String(v)
     return inputs
@@ -166,46 +185,58 @@ export function ExpenseSheet() {
     })
   }
 
+  function selectAll(all: boolean) {
+    setDraft((d) => {
+      const participants = all ? members.map((m) => m.id) : []
+      return { ...d, participants, inputs: d.method === 'equal' ? d.inputs : seedInputs(d.method, participants) }
+    })
+  }
+
   /** A person joined the trip from this form: include them in the split, and make them the payer when added from Paid by. */
   function joined(id: ID, asPayer: boolean) {
     setDraft((d) => {
       const participants = d.participants.includes(id) ? d.participants : [...d.participants, id]
       return { ...d, participants, paidBy: asPayer ? id : d.paidBy, inputs: d.method === 'equal' ? d.inputs : seedInputs(d.method, participants) }
     })
-    setAddOpen(null)
+    setAddOpen(false)
     setNewName('')
   }
-  function addNew() {
+  function addNew(asPayer: boolean) {
     const n = newName.trim()
     if (!n || !trip) return
     if (members.some((m) => m.name.toLowerCase() === n.toLowerCase())) {
       toast.error(`${n} is already on this trip`)
       return
     }
-    joined(addMember(trip.id, n).id, addOpen === 'payer')
+    joined(addMember(trip.id, n).id, asPayer)
   }
   const known = data.people.filter((p) => !(trip?.members ?? []).includes(p.id))
+  const addPerson = (asPayer: boolean) => (
+    <AddPersonRow open={addOpen} onToggle={() => setAddOpen((o) => !o)}>
+      <AddPersonPanel known={known} newName={newName} setNewName={setNewName} onPick={(p) => { if (trip) { addExistingMember(trip.id, p.id); joined(p.id, asPayer) } }} onAdd={() => addNew(asPayer)} />
+    </AddPersonRow>
+  )
 
   function changeTrip(id: ID) {
     const t = data.trips.find((x) => x.id === id)
     setDraft((d) => ({ ...draftFor(t, me.id), title: d.title, amount: d.amount, category: d.category, categoryTouched: d.categoryTouched, date: d.date, notes: d.notes, receipt: d.receipt }))
   }
 
+  const shownCategory: CategoryId | undefined = draft.categoryTouched ? draft.category : autoCategory(draft.title)
+
   const errors = {
     trip: !trip ? 'Choose a trip' : undefined,
     amount: amount <= 0 ? 'Enter how much it cost' : undefined,
     title: !draft.title.trim() ? 'Give it a short name' : undefined,
     split: !split.valid ? 'The split does not add up yet' : undefined,
-    date: !draft.date || Number.isNaN(new Date(draft.date).getTime()) ? 'Pick when it happened' : undefined,
   }
-  const valid = !errors.trip && !errors.amount && !errors.title && !errors.split && !errors.date
+  const valid = !errors.trip && !errors.amount && !errors.title && !errors.split
 
   function save() {
     setSubmitted(true)
     if (!valid || !trip) {
       if (errors.amount) amountRef.current?.focus()
-      if (errors.split) setShowSplit(true)
-      if (errors.date) setShowMore(true)
+      if (errors.split) setPanel('split')
       return
     }
     const now = new Date().toISOString()
@@ -214,7 +245,7 @@ export function ExpenseSheet() {
       tripId: trip.id,
       title: draft.title.trim(),
       amount,
-      category: draft.category,
+      category: shownCategory ?? 'other',
       paidBy: draft.paidBy,
       date: new Date(draft.date).toISOString(),
       split: { method: draft.method, participants: draft.participants, values: draft.method === 'equal' ? {} : values },
@@ -228,6 +259,25 @@ export function ExpenseSheet() {
   }
 
   const remaining = draft.method === 'percent' ? 100 - split.assigned : amount - split.assigned
+  const n = draft.participants.length
+  const methodWord = { equal: 'equally', exact: 'by amounts', percent: 'by percent', shares: 'by shares' }[draft.method]
+  const tripChoices = [...openTrips, ...data.trips.filter((t) => !openTrips.includes(t))]
+  const noteState = draft.notes.trim() && draft.receipt ? 'Note and receipt added' : draft.notes.trim() ? 'Note added' : draft.receipt ? 'Receipt added' : 'Add note or receipt'
+
+  let summary: React.ReactNode
+  if (amount <= 0) summary = <span className="text-ink-3">Add an amount</span>
+  else if (n === 0) summary = <span className="text-loss">No one selected</span>
+  else if (!split.valid && draft.method !== 'equal') {
+    const r = Math.round(remaining * 100) / 100
+    summary = <span className="text-loss">{draft.method === 'percent' ? `${Math.abs(r)}%` : formatMoney(Math.abs(r), { currency })}{r > 0 ? ' left' : ' over'}</span>
+  } else {
+    summary = (
+      <>
+        <span className="font-semibold">{draft.method === 'equal' ? `${formatMoney(Math.round(amount / n), { currency })} each` : 'Custom split'}</span>
+        <span className="font-medium text-ink-3"> · {n === members.length ? `${n} people` : `${n} of ${members.length}`}</span>
+      </>
+    )
+  }
 
   return (
     <>
@@ -235,58 +285,58 @@ export function ExpenseSheet() {
         open={state.open}
         onClose={closeExpense}
         title={editing ? 'Edit expense' : 'New expense'}
-        description={trip && !(!editing && data.trips.length > 1) ? trip.name : undefined}
-        size="lg"
-        headerAction={
-          <Button size="sm" variant="secondary" icon={Scan} onClick={() => setScanOpen(true)} className="mt-0.5">
-            Scan
-          </Button>
+        description={
+          trip && !editing && data.trips.length > 1 ? (
+            <button type="button" onClick={() => setPanel('trip')} className="press -ml-1 inline-flex items-center gap-1 rounded-full px-1 text-meta font-medium text-ink-3">
+              {trip.name}
+              <CaretDown size={12} weight="bold" aria-hidden />
+            </button>
+          ) : (
+            trip?.name
+          )
         }
+        size="lg"
         footer={
-          <div className="flex items-center gap-4">
-            <SplitStatus method={draft.method} amount={amount} split={split} remaining={remaining} currency={currency} />
-            <Button size="lg" className="min-w-[140px]" onClick={save} disabled={submitted && !valid}>
-              {editing ? 'Save' : 'Add expense'}
+          <div>
+            <button type="button" onClick={() => setPanel('split')} aria-label="Paid by and split, edit" className="press mb-3.5 flex w-full items-center gap-4 rounded-[24px] bg-panel-strong px-[18px] py-5 text-left shadow-[inset_0_0_0_1px_var(--line)]">
+              <span className="flex min-w-0 flex-col gap-1.5">
+                <span className="text-[12.5px] leading-none text-ink-3">Paid by</span>
+                <span className="truncate text-[15.5px] leading-tight font-semibold">{payer ? (payer.isYou ? 'You' : firstName(payer.name)) : 'Choose'}</span>
+              </span>
+              <span aria-hidden className="h-10 w-px shrink-0 bg-line" />
+              <span className="num flex min-w-0 flex-1 flex-col gap-1.5">
+                <span className="text-[12.5px] leading-none text-ink-3">Split {methodWord}</span>
+                <span className="truncate text-[15.5px] leading-tight">{summary}</span>
+              </span>
+              <span aria-hidden className="text-faint">›</span>
+            </button>
+            <Button size="lg" block onClick={save} disabled={submitted && !valid}>
+              {editing ? 'Save' : amount > 0 ? <span><span className="font-semibold">Add </span><span className="font-extrabold">{formatMoney(amount, { currency })}</span></span> : 'Add expense'}
             </Button>
           </div>
         }
       >
         <form
-          className="flex flex-col gap-8"
+          className="relative -mx-6 -mt-3 px-6 pt-10 md:-mx-7 md:px-7"
           onSubmit={(e) => {
             e.preventDefault()
             save()
           }}
         >
-          {!editing && data.trips.length > 1 ? (
-            <Field label="Trip" htmlFor="exp-trip">
-              <div className="relative">
-                <select id="exp-trip" value={draft.tripId} onChange={(e) => changeTrip(e.target.value)} className={cx(inputClass, 'appearance-none pr-11 font-semibold')}>
-                  {[...openTrips, ...data.trips.filter((t) => !openTrips.includes(t))].map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                      {tripStatus(t).phase === 'completed' ? ' (completed)' : ''}
-                    </option>
-                  ))}
-                </select>
-                <CaretDown size={18} weight="bold" className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-ink-3" aria-hidden />
-              </div>
-            </Field>
-          ) : null}
+          <div aria-hidden className="add-wash pointer-events-none absolute inset-x-0 top-0 h-[300px]" />
 
-          {/* Amount and title lead: the two things you always know. */}
-          <div className="flex flex-col items-center gap-4">
+          <div className="relative flex flex-col items-center">
             <label className="sr-only" htmlFor="exp-amount">
               Amount
             </label>
-            <div className={cx('flex w-full items-start justify-center rounded-[28px] px-4 pt-5 pb-4 transition-shadow', submitted && errors.amount ? 'bg-loss-soft' : 'panel-strong focus-within:shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--accent)_55%,transparent),0_0_0_4px_var(--accent-soft)]')}>
-              <span className="mt-2.5 mr-1 text-[28px] font-semibold text-ink-3">{currencySymbol(currency).trim()}</span>
-  {/* Mirror sizes the field to its digits so the symbol sits right beside the number */}
-              <span className="inline-grid max-w-[calc(100%-40px)]">
-                <span aria-hidden className="num invisible col-start-1 row-start-1 overflow-hidden pr-1 text-[56px] leading-[64px] font-[650] tracking-[-0.045em] whitespace-pre">
+            <div className="flex items-start justify-center">
+              <span className="mt-[7px] mr-0.5 text-[20px] font-semibold text-ink-3">{currencySymbol(currency).trim()}</span>
+              {/* Mirror sizes the field to its digits so the symbol sits right beside the number */}
+              <span className="inline-grid max-w-[260px]">
+                <span aria-hidden className="num invisible col-start-1 row-start-1 overflow-hidden text-[44px] leading-[52px] font-[640] tracking-[-0.045em] whitespace-pre">
                   {draft.amount || '0'}
                 </span>
-              <input
+                <input
                   ref={amountRef}
                   id="exp-amount"
                   size={1}
@@ -297,7 +347,7 @@ export function ExpenseSheet() {
                   value={draft.amount}
                   onChange={(e) => {
                     const v = e.target.value
-                    if (/^[\d,]*\.?\d{0,2}$/.test(v)) set('amount', v)
+                    if (/^[\d,]*\.?\d{0,2}$/.test(v)) set('amount', groupDigits(v))
                   }}
                   onBlur={() => {
                     // Only fill exact amounts if none have been typed yet, never overwrite the person's numbers.
@@ -305,190 +355,110 @@ export function ExpenseSheet() {
                     if (draft.method === 'exact' && !typed) setDraft((d) => ({ ...d, inputs: seedInputs('exact', d.participants) }))
                   }}
                   aria-invalid={submitted && !!errors.amount}
-                  className="num col-start-1 row-start-1 w-full min-w-0 bg-transparent text-left text-[56px] leading-[64px] font-[650] tracking-[-0.045em] text-ink caret-accent outline-none placeholder:text-faint"
+                  className="num col-start-1 row-start-1 w-full min-w-0 bg-transparent text-left text-[44px] leading-[52px] font-[640] tracking-[-0.045em] text-ink caret-accent outline-none placeholder:text-faint"
                 />
               </span>
             </div>
-            {submitted && errors.amount ? <p className="-mt-2 text-meta text-loss">{errors.amount}</p> : null}
-            <TextInput
-              aria-label="What was it for"
-              placeholder="What was it for? Dinner, cab, hotel"
-              value={draft.title}
-              invalid={submitted && !!errors.title}
-              maxLength={60}
-              className="text-center font-semibold"
-              onChange={(e) => {
-                const title = e.target.value
-                setDraft((d) => ({ ...d, title, category: d.categoryTouched ? d.category : (guessCategory(title) ?? d.category) }))
-              }}
-            />
-            {submitted && errors.title ? <p className="-mt-2 text-meta text-loss">{errors.title}</p> : null}
+            {submitted && errors.amount ? <p className="mt-1 text-meta text-loss">{errors.amount}</p> : null}
           </div>
 
-          <fieldset>
-            <legend className="mb-2.5 pl-1 text-meta font-semibold text-ink-2">Category</legend>
-            <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6 pb-1 md:mx-0 md:grid md:grid-cols-5 md:px-0">
-              {CATEGORIES.map((c) => {
-                const on = draft.category === c.id
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => setDraft((d) => ({ ...d, category: c.id, categoryTouched: true }))}
-                    className={cx('press flex w-[68px] shrink-0 flex-col items-center gap-2 rounded-[18px] py-1.5 text-caption md:w-auto', on ? 'font-semibold text-ink' : 'font-medium text-ink-3 hover:text-ink-2')}
-                  >
-                    <CategoryTile id={c.id} size={46} selected={on} />
-                    {c.short}
-                  </button>
-                )
-              })}
+          <div className="relative mt-7">
+            <div className="panel-strong rounded-[24px] transition-shadow focus-within:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--accent)_45%,transparent),0_0_0_5px_var(--accent-soft)]">
+              <div className="relative flex min-h-[64px] items-center">
+                <button
+                  type="button"
+                  onClick={() => setPanel('category')}
+                  aria-label={shownCategory ? `Category ${categoryById[shownCategory].short}. Change` : 'Choose a category'}
+                  className="press absolute top-1/2 left-2.5 flex size-[46px] -translate-y-1/2 items-center justify-center rounded-[16px] bg-well"
+                >
+                  {shownCategory ? <CategoryIcon id={shownCategory} size={30} /> : <Tag size={24} weight="regular" className="text-ink-3" aria-hidden />}
+                </button>
+                <input
+                  aria-label="What was it for"
+                  placeholder="What was it for?"
+                  value={draft.title}
+                  maxLength={60}
+                  aria-invalid={submitted && !!errors.title}
+                  onChange={(e) => {
+                    const title = e.target.value
+                    setDraft((d) => ({ ...d, title, category: d.categoryTouched ? d.category : (autoCategory(title) ?? d.category) }))
+                  }}
+                  className="h-16 w-full bg-transparent px-[58px] text-center text-[19px] font-medium text-ink caret-accent outline-none placeholder:font-normal placeholder:text-faint"
+                />
+              </div>
             </div>
-          </fieldset>
+            {submitted && errors.title ? <p className="mt-2 text-center text-meta text-loss">{errors.title}</p> : null}
+          </div>
 
-          <fieldset>
-            <legend className="mb-2.5 pl-1 text-meta font-semibold text-ink-2">Paid by</legend>
-            <div className="no-scrollbar -mx-6 flex gap-2 overflow-x-auto px-6 md:mx-0 md:flex-wrap md:px-0">
-              {members.map((m) => {
-                const on = draft.paidBy === m.id
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => set('paidBy', m.id)}
-                    className={cx(
-                      'press inline-flex h-[46px] shrink-0 items-center gap-2 rounded-full py-1 pr-4 pl-1 text-[14px] font-medium',
-                      on ? 'luminous' : 'glass-control text-ink-2 hover:text-ink',
-                    )}
-                  >
-                    <Avatar person={m} size={36} />
-                    {m.isYou ? 'You' : firstName(m.name)}
-                  </button>
-                )
-              })}
-              <button
-                type="button"
-                aria-expanded={addOpen === 'payer'}
-                onClick={() => setAddOpen(addOpen === 'payer' ? null : 'payer')}
-                className="glass-control press inline-flex h-[46px] shrink-0 items-center gap-1.5 rounded-full px-4 text-[14px] font-medium text-accent-ink"
-              >
-                <Plus size={16} weight="bold" aria-hidden />
-                Add person
-              </button>
-            </div>
-            {addOpen === 'payer' ? <AddPersonPanel known={known} newName={newName} setNewName={setNewName} onPick={(p) => { if (trip) { addExistingMember(trip.id, p.id); joined(p.id, true) } }} onAdd={addNew} /> : null}
-          </fieldset>
-
-          {showSplit ? (
-          <fieldset>
-            <div className="mb-2.5 flex items-baseline justify-between gap-3 pl-1">
-              <legend className="text-meta font-semibold text-ink-2">Split between</legend>
-              <button type="button" onClick={() => setShowSplit(false)} className="press -my-2 inline-flex h-9 items-center rounded-full px-2 text-[14px] font-semibold text-accent-ink">
-                Done
-              </button>
-            </div>
-            <Segmented label="Split method" value={draft.method} onChange={changeMethod} options={METHODS} />
-            <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
-              {members.map((m) => {
-                const on = draft.participants.includes(m.id)
-                const share = split.shares[m.id] ?? 0
-                return (
-                  <li key={m.id} className={cx('flex min-h-[62px] items-center gap-3 px-3.5 py-2 transition-colors', !on && 'bg-well/60')}>
-                    <button
-                      type="button"
-                      role="checkbox"
-                      aria-checked={on}
-                      aria-label={`Include ${m.name}`}
-                      onClick={() => toggleParticipant(m.id)}
-                      className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                    >
-                      <span
-                        className={cx(
-                          'flex size-6 shrink-0 items-center justify-center rounded-full transition-all duration-300 ease-[var(--ease-glide)]',
-                          on ? 'bg-accent text-[var(--on-accent)]' : 'bg-well',
-                        )}
-                      >
-                        {on ? <Check size={13} weight="bold" aria-hidden /> : null}
-                      </span>
-                      <Avatar person={m} size={32} className={cx(draft.method !== 'equal' && 'hidden sm:inline-flex', !on && 'opacity-50 grayscale')} />
-                      <span className={cx('truncate font-semibold', !on && 'text-ink-3')}>{m.isYou ? 'You' : m.name}</span>
-                    </button>
-                    {on && draft.method !== 'equal' ? (
-                      <ShareInput
-                        method={draft.method}
-                        value={draft.inputs[m.id] ?? ''}
-                        currency={currency}
-                        name={m.name}
-                        onChange={(v) => setDraft((d) => ({ ...d, inputs: { ...d.inputs, [m.id]: v } }))}
-                      />
-                    ) : null}
-                    {on && draft.method === 'exact' ? null : (
-                      <span className={cx('num w-[78px] shrink-0 text-right', on ? 'font-semibold' : 'text-meta text-ink-3')}>{on ? formatMoney(share, { currency }) : 'Not in'}</span>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
-            <button type="button" aria-expanded={addOpen === 'split'} onClick={() => setAddOpen(addOpen === 'split' ? null : 'split')} className="press mt-2 inline-flex h-10 items-center gap-1.5 rounded-full px-2 text-[14px] font-semibold text-accent-ink">
-              <Plus size={15} weight="bold" aria-hidden />
-              Add person
+          <div className="relative mt-6 flex items-center justify-center gap-0.5 text-[13px]">
+            <button type="button" onClick={() => setPanel('date')} aria-label={`Date: ${dateLabel(draft.date)}. Change`} className="press rounded-full px-1.5 py-2 font-semibold text-ink">
+              {dateLabel(draft.date)}
             </button>
-            {addOpen === 'split' ? <AddPersonPanel known={known} newName={newName} setNewName={setNewName} onPick={(p) => { if (trip) { addExistingMember(trip.id, p.id); joined(p.id, false) } }} onAdd={addNew} /> : null}
-            {submitted && errors.split ? <p className="mt-2 pl-1 text-meta text-loss">{split.message && split.message.length > 6 ? split.message : errors.split}</p> : null}
-          </fieldset>
-          ) : (
-            <div>
-              <p className="mb-2.5 pl-1 text-meta font-semibold text-ink-2">Split</p>
-              <button
-                type="button"
-                onClick={() => setShowSplit(true)}
-                className="panel-strong press flex min-h-[68px] w-full items-center gap-4 rounded-[20px] px-5 py-3.5 text-left"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-semibold">Split equally</span>
-                  <span className="num block truncate text-caption text-ink-3">
-                    {draft.participants.length === members.length ? 'Everyone' : `${draft.participants.length} of ${members.length} people`}
-                    {amount > 0 && draft.participants.length ? ` · ${formatMoney(Math.round(amount / draft.participants.length), { currency })} each` : ''}
-                  </span>
-                </span>
-                <span className="text-[14px] font-semibold text-accent-ink">Change</span>
-              </button>
-            </div>
-          )}
-
-          {showMore ? (
-            <div className="flex flex-col gap-5">
-              <Field label="When" htmlFor="exp-date" error={submitted ? errors.date : undefined}>
-                <TextInput id="exp-date" type="datetime-local" value={draft.date} invalid={submitted && !!errors.date} onChange={(e) => set('date', e.target.value)} />
-              </Field>
-              {draft.receipt ? (
-                <Field label="Receipt" htmlFor="exp-receipt">
-                  <div className="flex h-[54px] items-center gap-2 rounded-[16px] bg-gain-soft pr-1 pl-4">
-                    <ReceiptIcon size={20} weight="duotone" className="shrink-0 text-gain" aria-hidden />
-                    <button type="button" id="exp-receipt" onClick={() => setScanOpen(true)} className="min-w-0 flex-1 truncate text-left text-body font-semibold text-ink">
-                      {draft.receipt.merchant || 'Receipt attached'}
-                    </button>
-                    <button type="button" aria-label="Remove receipt" onClick={() => set('receipt', undefined)} className="press flex size-10 items-center justify-center rounded-full text-ink-2 hover:bg-well">
-                      <X size={16} weight="bold" aria-hidden />
-                    </button>
-                  </div>
-                </Field>
-              ) : null}
-              <Field label="Note" optional htmlFor="exp-notes">
-                <TextArea id="exp-notes" rows={2} placeholder="Anything the group should know" value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
-              </Field>
-            </div>
-          ) : (
-            <button type="button" onClick={() => setShowMore(true)} className="press -mt-2 inline-flex h-10 items-center gap-1.5 self-start rounded-full px-2 text-[14px] font-semibold text-accent-ink">
-              <CaretDown size={14} weight="bold" aria-hidden />
-              Date and note
-              <span className="font-medium text-ink-3">· {sameDay(draft.date) ? 'Today' : 'Earlier'}</span>
+            <span aria-hidden className="text-faint">·</span>
+            <button type="button" onClick={() => setPanel('note')} className="press rounded-full px-1.5 py-2 font-semibold text-ink">
+              {noteState}
             </button>
-          )}
+          </div>
           <button type="submit" hidden />
         </form>
       </Sheet>
+
+      <CategorySheet
+        open={panel === 'category' && state.open}
+        onClose={() => setPanel(null)}
+        value={shownCategory}
+        auto={!draft.categoryTouched}
+        onPick={(c) => (setDraft((d) => ({ ...d, category: c, categoryTouched: true })), setPanel(null))}
+        onAuto={() => (setDraft((d) => ({ ...d, categoryTouched: false, category: autoCategory(d.title) ?? 'other' })), setPanel(null))}
+      />
+      <DateSheet
+        open={panel === 'date' && state.open}
+        onClose={() => setPanel(null)}
+        value={draft.date}
+        tripStart={trip?.startDate}
+        tripEnd={trip?.endDate}
+        onPick={(iso) => set('date', `${iso}T${draft.date.slice(11, 16) || '12:00'}`)}
+      />
+      <NoteSheet
+        open={panel === 'note' && state.open}
+        onClose={() => setPanel(null)}
+        notes={draft.notes}
+        onNotes={(v) => set('notes', v)}
+        receipt={draft.receipt}
+        onScan={() => setScanOpen(true)}
+        onRemoveReceipt={() => set('receipt', undefined)}
+      />
+      <TripSheet open={panel === 'trip' && state.open} onClose={() => setPanel(null)} trips={tripChoices} value={draft.tripId} onPick={changeTrip} />
+      <PayerSheet
+        open={panel === 'payer' && state.open}
+        onClose={() => setPanel('split')}
+        members={members}
+        value={draft.paidBy}
+        onPick={(id) => set('paidBy', id)}
+        addPerson={addPerson(true)}
+      />
+      <SplitSheet
+        open={(panel === 'split' || panel === 'payer') && state.open}
+        onClose={() => setPanel(null)}
+        members={members}
+        participants={draft.participants}
+        method={draft.method}
+        inputs={draft.inputs}
+        split={split}
+        currency={currency}
+        amount={amount}
+        paidBy={payer}
+        canFinish={split.valid}
+        showReset={draft.method !== 'equal' && !split.valid}
+        onReset={() => setDraft((d) => ({ ...d, inputs: seedInputs(d.method, d.participants) }))}
+        onMethod={changeMethod}
+        onToggle={toggleParticipant}
+        onAll={selectAll}
+        onInput={(id, v) => setDraft((d) => ({ ...d, inputs: { ...d.inputs, [id]: v } }))}
+        onPayer={() => setPanel('payer')}
+        status={<SplitStatus method={draft.method} amount={amount} split={split} remaining={remaining} currency={currency} />}
+        addPerson={addPerson(false)}
+      />
 
       <ReceiptScanner
         open={scanOpen && state.open}
@@ -500,45 +470,17 @@ export function ExpenseSheet() {
             ...d,
             receipt: r,
             title: d.title || r.merchant,
-            amount: d.amount || (r.total ? toInput(r.total) : ''),
-            category: d.categoryTouched ? d.category : (guessCategory(r.merchant) ?? d.category),
+            amount: d.amount || (r.total ? groupDigits(toInput(r.total)) : ''),
+            category: d.categoryTouched ? d.category : (autoCategory(r.merchant) ?? d.category),
           }))
           setScanOpen(false)
-          setShowMore(true)
         }}
       />
     </>
   )
 }
 
-function sameDay(local: string) {
-  const d = new Date(local)
-  return !Number.isNaN(d.getTime()) && d.toDateString() === new Date().toDateString()
-}
-
-function ShareInput({ method, value, onChange, currency, name }: { method: SplitMethod; value: string; onChange: (v: string) => void; currency: Trip['currency']; name: string }) {
-  const suffix = method === 'percent' ? '%' : method === 'shares' ? '×' : ''
-  const prefix = method === 'exact' ? currencySymbol(currency).trim() : ''
-  return (
-    <div className="relative w-[96px] shrink-0">
-      {prefix ? <span className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-meta text-ink-3">{prefix}</span> : null}
-      <input
-        inputMode="decimal"
-        aria-label={method === 'exact' ? `${name}'s amount` : method === 'percent' ? `${name}'s percentage` : `${name}'s shares`}
-        value={value}
-        onChange={(e) => {
-          const v = e.target.value
-          const ok = method === 'shares' ? /^\d{0,3}(\.\d{0,1})?$/.test(v) : /^[\d,]*\.?\d{0,2}$/.test(v)
-          if (ok) onChange(v)
-        }}
-        className={cx(inputClass, 'num h-11 rounded-[14px] text-right text-meta font-semibold', prefix ? 'pl-7' : 'pl-3', suffix ? 'pr-7' : 'pr-3')}
-      />
-      {suffix ? <span className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-meta text-ink-3">{suffix}</span> : null}
-    </div>
-  )
-}
-
-/** Live ledger: tells you whether the split adds up before you save. */
+/** Live ledger: tells you whether the split adds up before you finish. */
 function SplitStatus({
   method,
   amount,
@@ -557,16 +499,17 @@ function SplitStatus({
   if (amount <= 0) {
     text = 'Enter an amount to split'
   } else if (Object.keys(split.shares).length === 0) {
-    text = 'Choose who shared it'
+    text = 'Pick at least one person'
+    tone = 'warn'
   } else if (method === 'equal') {
     const n = Object.keys(split.shares).length
-    text = n === 0 ? 'Choose who shared it' : `${formatMoney(Math.round(amount / n), { currency })} each, ${n} ${n === 1 ? 'person' : 'people'}`
-    tone = n === 0 ? 'warn' : 'ok'
+    text = `${formatMoney(Math.round(amount / n), { currency })} each, ${n} ${n === 1 ? 'person' : 'people'}`
+    tone = 'ok'
   } else if (method === 'shares') {
     text = split.valid ? `${split.assigned} shares in total` : 'Give at least one share'
     tone = split.valid ? 'ok' : 'warn'
   } else if (split.valid) {
-    text = method === 'percent' ? '100% assigned' : `${formatMoney(amount, { currency })} assigned`
+    text = method === 'percent' ? 'Adds up to 100%' : `Adds up to ${formatMoney(amount, { currency })}`
     tone = 'ok'
   } else if (method === 'percent') {
     const r = Math.round(remaining * 100) / 100
@@ -577,8 +520,8 @@ function SplitStatus({
     tone = 'warn'
   }
   return (
-    <p aria-live="polite" className={cx('num min-w-0 flex-1 text-meta font-semibold', tone === 'ok' ? 'text-gain' : tone === 'warn' ? 'text-sun' : 'text-ink-3')}>
-      {tone === 'ok' ? <CheckCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline" aria-hidden /> : tone === 'warn' ? <WarningCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline" aria-hidden /> : null}
+    <p aria-live="polite" className={cx('num text-meta font-semibold', tone === 'ok' ? 'text-ink' : tone === 'warn' ? 'text-loss' : 'text-ink-3')}>
+      {tone === 'ok' ? <CheckCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline text-gain" aria-hidden /> : tone === 'warn' ? <WarningCircle size={17} weight="fill" className="mr-1 -mt-0.5 inline" aria-hidden /> : null}
       {text}
     </p>
   )

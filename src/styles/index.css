@@ -739,3 +739,7 @@
 .p .ft { font-size: 9px; font-weight: 700; letter-spacing: 0.13em; margin: 0; }
 .stp { width: 70px; height: 70px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-weight: 700; font-size: 8px; letter-spacing: 0.05em; line-height: 1.2; flex: none; }
 .stp b { font-size: 9.5px; }
+
+/* A pale wash behind the amount in the Add expense form, a whisper of the sky */
+.add-wash { background: radial-gradient(180px 120px at 86% 20px, rgba(255, 236, 200, 0.5), transparent 70%), linear-gradient(180deg, transparent 0, #d9e7f5 56px, transparent 100%); }
+:root[data-sky='night'] .add-wash { background: radial-gradient(180px 120px at 86% 20px, rgba(182, 156, 255, 0.26), transparent 70%), linear-gradient(180deg, transparent 0, rgba(40, 24, 90, 0.7) 56px, transparent 100%); }
