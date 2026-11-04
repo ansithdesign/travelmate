@@ -25,6 +25,8 @@ export const localRepository: Repository = {
       const photo = <T extends Photo | undefined>(ph: T): T => ((ph && LEGACY_PHOTO[ph.id]) || ph) as unknown as T
       return {
         ...data,
+        // The sample profile was renamed: update saved copies that still hold the old sample values.
+        people: data.people.map((p) => (p.isYou && p.name === 'Ansith Kumar' ? { ...p, name: 'Ansith Mohd', email: p.email === 'ansith@tripmate.app' ? 'ansith.design@gmail.com' : p.email } : p)),
         expenses: data.expenses.map((e) => ({ ...e, category: (LEGACY_CATEGORY[e.category] ?? e.category) as CategoryId })),
         trips: data.trips.map((t) => ({ ...t, cover: photo(t.cover), journal: { ...t.journal, photos: t.journal.photos.map((x) => photo(x)) } })),
       }

@@ -18,7 +18,7 @@ export function createSeed(): AppData {
   }
 
   const people: Person[] = [
-    { id: 'me', name: 'Ansith Kumar', email: 'ansith@tripmate.app', isYou: true },
+    { id: 'me', name: 'Ansith Mohd', email: 'ansith.design@gmail.com', isYou: true },
     { id: 'meera', name: 'Meera Iyer', email: 'meera.iyer@example.in' },
     { id: 'rohan', name: 'Rohan Kapoor', email: 'rohan.k@example.in' },
     { id: 'aditi', name: 'Aditi Rao', email: 'aditi.rao@example.in' },
