@@ -13,7 +13,7 @@ import { computeSplit, defaultValues } from '../../utils/split'
 import { Avatar } from '../ui/Avatar'
 import { Button } from '../ui/Button'
 import { TextInput } from '../ui/Field'
-import { Sheet } from '../ui/Sheet'
+import { FullScreen } from '../ui/FullScreen'
 import { useToast } from '../ui/Toast'
 import { ReceiptScanner } from '../receipts/ReceiptScanner'
 import { guessCategory } from '../../utils/guessCategory'
@@ -281,13 +281,14 @@ export function ExpenseSheet() {
 
   return (
     <>
-      <Sheet
+      <FullScreen
         open={state.open}
         onClose={closeExpense}
         title={editing ? 'Edit expense' : 'New expense'}
-        description={
+        wash
+        subtitle={
           trip && !editing && data.trips.length > 1 ? (
-            <button type="button" onClick={() => setPanel('trip')} className="press -ml-1 inline-flex items-center gap-1 rounded-full px-1 text-meta font-medium text-ink-3">
+            <button type="button" onClick={() => setPanel('trip')} className="press inline-flex items-center gap-1 rounded-full px-1 text-[12.5px] font-medium text-ink-3">
               {trip.name}
               <CaretDown size={12} weight="bold" aria-hidden />
             </button>
@@ -295,7 +296,6 @@ export function ExpenseSheet() {
             trip?.name
           )
         }
-        size="lg"
         footer={
           <div>
             <button type="button" onClick={() => setPanel('split')} aria-label="Paid by and split, edit" className="press mb-3.5 flex w-full items-center gap-4 rounded-[24px] bg-panel-strong px-[18px] py-5 text-left shadow-[inset_0_0_0_1px_var(--line)]">
@@ -317,14 +317,12 @@ export function ExpenseSheet() {
         }
       >
         <form
-          className="relative -mx-6 -mt-3 px-6 pt-10 md:-mx-7 md:px-7"
+          className="relative pt-10 pb-6"
           onSubmit={(e) => {
             e.preventDefault()
             save()
           }}
         >
-          <div aria-hidden className="add-wash pointer-events-none absolute inset-x-0 top-0 h-[300px]" />
-
           <div className="relative flex flex-col items-center">
             <label className="sr-only" htmlFor="exp-amount">
               Amount
@@ -401,7 +399,7 @@ export function ExpenseSheet() {
           </div>
           <button type="submit" hidden />
         </form>
-      </Sheet>
+      </FullScreen>
 
       <CategorySheet
         open={panel === 'category' && state.open}

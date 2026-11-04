@@ -8,7 +8,7 @@ const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:n
 
 let openCount = 0
 
-function usePresence(open: boolean, ms = 340) {
+export function usePresence(open: boolean, ms = 340) {
   const [mounted, setMounted] = useState(open)
   const [visible, setVisible] = useState(false)
   useEffect(() => {
@@ -24,7 +24,7 @@ function usePresence(open: boolean, ms = 340) {
   return { mounted, visible }
 }
 
-function useModalBehaviour(open: boolean, panel: React.RefObject<HTMLDivElement | null>, onClose: () => void) {
+export function useModalBehaviour(open: boolean, panel: React.RefObject<HTMLDivElement | null>, onClose: () => void) {
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   useEffect(() => {
