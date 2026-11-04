@@ -135,6 +135,9 @@ export interface Trip {
   name: string
   destination: string
   region?: string
+  /** Where the destination is, for the map on Home */
+  lat?: number
+  lon?: number
   startDate: string
   endDate: string
   cover?: Photo

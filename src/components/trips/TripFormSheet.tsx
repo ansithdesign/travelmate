@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CaretDown, Check, MapPin, UploadSimple } from '@phosphor-icons/react'
 import { COVER_LIBRARY } from '../../data/photos'
-import { DESTINATIONS } from '../../data/destinations'
+import { DESTINATIONS, coordsFor } from '../../data/destinations'
 import { searchPlaces, type Place } from '../../services/places'
 import { useStore } from '../../store/store'
 import { useUI } from '../../store/ui'
@@ -22,6 +22,8 @@ interface Draft {
   name: string
   destination: string
   region: string
+  lat?: number
+  lon?: number
   startDate: string
   endDate: string
   cover?: Photo
@@ -53,6 +55,8 @@ export function TripFormSheet() {
             name: editing.name,
             destination: editing.destination,
             region: editing.region ?? '',
+            lat: editing.lat,
+            lon: editing.lon,
             startDate: editing.startDate,
             endDate: editing.endDate,
             cover: editing.cover,
@@ -103,6 +107,8 @@ export function TripFormSheet() {
       name,
       destination: draft.destination.trim(),
       region: draft.region.trim() || undefined,
+      lat: draft.lat ?? coordsFor(draft.destination)?.lat,
+      lon: draft.lon ?? coordsFor(draft.destination)?.lon,
       startDate: draft.startDate,
       endDate: draft.endDate,
       cover: draft.cover,
@@ -145,7 +151,7 @@ export function TripFormSheet() {
         <DestinationPicker
           value={draft.destination}
           error={show('destination')}
-          onChange={(name, region) => setDraft((d) => ({ ...d, destination: name, region: region ?? d.region }))}
+          onChange={(name, region, lat, lon) => setDraft((d) => ({ ...d, destination: name, region: region ?? d.region, lat, lon }))}
         />
         <InputField label="Trip name" optional placeholder={draft.destination ? `${draft.destination} trip` : 'Kashmir in winter'} value={draft.name} onChange={(e) => set('name', e.target.value)} maxLength={60} />
 
@@ -190,7 +196,7 @@ export function TripFormSheet() {
   )
 }
 
-function DestinationPicker({ value, onChange, error }: { value: string; onChange: (name: string, region?: string) => void; error?: string }) {
+function DestinationPicker({ value, onChange, error }: { value: string; onChange: (name: string, region?: string, lat?: number, lon?: number) => void; error?: string }) {
   const id = useId()
   const listId = `${id}-list`
   const [open, setOpen] = useState(false)
@@ -239,7 +245,7 @@ function DestinationPicker({ value, onChange, error }: { value: string; onChange
 
   function pick(i: number) {
     const d = matches[i]
-    if (d) onChange(d.name, d.region)
+    if (d) onChange(d.name, d.region, (d as Place).lat ?? coordsFor(d.name)?.lat, (d as Place).lon ?? coordsFor(d.name)?.lon)
     setOpen(false)
   }
 

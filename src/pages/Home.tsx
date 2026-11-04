@@ -1,223 +1,185 @@
-import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { CaretRight, CheckCircle, Plus } from '@phosphor-icons/react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { CaretRight, MagnifyingGlass, Plus, X } from '@phosphor-icons/react'
 import { phaseLabel } from '../components/trips/status'
-import { CategoryIcon } from '../components/icons/CategoryIcon'
-import { ExpenseDetailSheet } from '../components/expenses/ExpenseDetailSheet'
-import { ExpenseRow } from '../components/expenses/ExpenseRow'
+import { DotMap, fitView, project } from '../components/home/WorldMap'
 import { BrandMark } from '../components/shared/BrandMark'
-import { ContentSheet, Dot, SheetBody, SkyHero } from '../components/shared/Page'
-import { Avatar } from '../components/ui/Avatar'
-import { Button } from '../components/ui/Button'
-import { ScrollRow } from '../components/ui/ScrollRow'
 import { Cover } from '../components/ui/Cover'
-import { Figure } from '../components/ui/Money'
-import { useToast } from '../components/ui/Toast'
+import { coordsFor } from '../data/destinations'
 import { useAllTripViews } from '../hooks/useTrip'
 import { useStore } from '../store/store'
 import { useUI } from '../store/ui'
-import type { CategoryId, Expense } from '../types'
 import { cx } from '../utils/cx'
 import { firstName } from '../utils/id'
-import { formatMoney } from '../utils/money'
 
-/** The categories offered on Home for one-tap adding. */
-const QUICK: { id: CategoryId; label: string }[] = [
-  { id: 'food', label: 'Food' },
-  { id: 'cabs', label: 'Cabs' },
-  { id: 'drinks', label: 'Drinks' },
-  { id: 'groceries', label: 'Groceries' },
-  { id: 'stay', label: 'Stay' },
-  { id: 'activities', label: 'Activities' },
-  { id: 'shopping', label: 'Shopping' },
-  { id: 'other', label: 'Other' },
-]
+const NAV_H = 96
+
+/** Nudge markers apart so close trips (two in the same region) can each be tapped. */
+function spread(pts: [number, number][], w: number): [number, number][] {
+  const p = pts.map(([x, y]) => [x, y] as [number, number])
+  for (let it = 0; it < 40; it++) {
+    for (let i = 0; i < p.length; i++) {
+      for (let j = i + 1; j < p.length; j++) {
+        const dx = p[j][0] - p[i][0]
+        const dy = p[j][1] - p[i][1]
+        const d = Math.hypot(dx, dy) || 0.01
+        if (d < 46) {
+          const push = (46 - d) / 2
+          const ux = dx === 0 && dy === 0 ? 1 : dx / d
+          const uy = dx === 0 && dy === 0 ? 0 : dy / d
+          p[i][0] -= ux * push
+          p[i][1] -= uy * push
+          p[j][0] += ux * push
+          p[j][1] += uy * push
+        }
+      }
+    }
+  }
+  return p.map(([x, y]) => [Math.min(Math.max(x, 40), w - 40), y])
+}
 
 export function Home() {
   const views = useAllTripViews()
-  const { me, saveTrip } = useStore()
-  const { openTrip, openExpense } = useUI()
+  const { openTrip } = useUI()
   const navigate = useNavigate()
-  const toast = useToast()
+  const box = useRef<HTMLDivElement>(null)
+  const [size, setSize] = useState({ w: 390, h: 760 })
   const [picked, setPicked] = useState<string | null>(null)
-  const [open, setOpen] = useState<Expense | null>(null)
-  const { data } = useStore()
+  const [list, setList] = useState(false)
 
-  // Rail order: what is happening or coming first, then trips that just ended, then the journal.
-  const ordered = useMemo(() => {
-    const rank = { ongoing: 0, upcoming: 1, ended: 2, completed: 3 } as const
-    return [...views].sort((a, b) => rank[a.status.phase] - rank[b.status.phase] || (a.status.phase === 'completed' ? b.trip.endDate.localeCompare(a.trip.endDate) : a.trip.startDate.localeCompare(b.trip.startDate)))
-  }, [views])
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight }))
+    setSize({ w: el.clientWidth, h: el.clientHeight })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [views.length])
+
+  // Newest at the top: what is coming up first, then the journal.
+  const ordered = useMemo(() => [...views].sort((a, b) => b.trip.startDate.localeCompare(a.trip.startDate)), [views])
 
   if (views.length === 0) return <FirstRun />
 
-  const view = ordered.find((v) => v.trip.id === picked) ?? ordered[0]
-  const { trip, status, ledger, expenses, settled } = view
-  const cur = trip.currency
-  const myNet = ledger.net[me.id] ?? 0
-  const others = ordered.filter((v) => v.trip.id !== trip.id)
+  const placed = ordered
+    .map((v) => ({ v, at: v.trip.lat !== undefined && v.trip.lon !== undefined ? { lat: v.trip.lat, lon: v.trip.lon } : coordsFor(v.trip.destination) }))
+    .filter((x): x is { v: (typeof ordered)[number]; at: { lat: number; lon: number } } => !!x.at)
+  const chosen = ordered.find((v) => v.trip.id === picked)
+  const mapTop = 88
+  const peekTop = size.h - NAV_H - (chosen ? 150 : 150)
+  const mapH = Math.max(220, peekTop - mapTop - 20)
+  const view = fitView(placed.map((x) => x.at), size.w, mapH)
+  const open = (id: string) => navigate(`/trips/${id}`)
 
   return (
-    <>
-      <SkyHero className="pt-[max(28px,env(safe-area-inset-top))] pb-2 lg:pt-12">
-        <div className="on-sky">
-          <header className="flex items-center justify-between gap-3">
-            <h1 className="text-[40px] leading-[1.02] font-semibold tracking-[-0.04em]">
-              Trips
-              <Dot />
-            </h1>
-            <Link to="/profile" aria-label="Profile" className="press rounded-full">
-              <Avatar
-                person={me}
-                size={42}
-                className="backdrop-blur-[10px] tracking-[0.04em] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_6px_16px_-8px_rgba(5,12,34,0.6)]"
-                style={{ background: 'linear-gradient(160deg, rgba(255,255,255,0.2), rgba(8,18,48,0.42) 70%)', fontSize: 14 }}
-              />
-            </Link>
-          </header>
-
-          {/* Story rail: each trip is a round cover whose ring fills as the budget is used.
-              The selected trip's ring turns gold and its name gets an underline. */}
-          <ScrollRow role="tablist" aria-label="Your trips" className="-mx-6 mt-7 flex gap-5 px-6 lg:mx-0 lg:px-0">
-            <button type="button" onClick={() => openTrip()} className="press shrink-0 text-center" aria-label="Plan a new trip">
-              <span className="flex size-[72px] items-center justify-center rounded-full bg-[rgba(8,18,48,0.34)] text-white">
-                <Plus size={26} weight="bold" aria-hidden />
-              </span>
-              <span className="mt-2 block text-caption font-medium text-ink-3">New</span>
-              <span aria-hidden className="mt-1 block h-[3px]" />
-            </button>
-            {ordered.map((v, i) => {
-              const on = v.trip.id === trip.id
-              const ratio = v.trip.budget ? Math.min(1, v.ledger.total / v.trip.budget) : v.status.phase === 'completed' ? 1 : 0.12
-              const ring = on ? '#ffd479' : '#ffffff'
-              return (
-                <button key={v.trip.id} type="button" role="tab" aria-selected={on} onClick={() => (on ? navigate(`/trips/${v.trip.id}`) : setPicked(v.trip.id))} className="press shrink-0 text-center" aria-label={on ? `Open ${v.trip.name}` : v.trip.name}>
-                  <span className="relative block size-[72px] rounded-full p-[3px]" style={{ background: `conic-gradient(${ring} ${ratio * 360}deg, rgba(255,255,255,0.3) 0)` }}>
-                    <Cover photo={v.trip.cover} seed={i + 1} className="size-full rounded-full border-[3px] border-[var(--sky-1)]" />
-                    {v.status.phase === 'ongoing' ? (
-                      <span className="absolute -top-1 right-0 flex items-center gap-1 rounded-full bg-[#1f9d63] px-2 py-[3px] text-[10px] leading-none font-bold tracking-wide text-white shadow-[0_2px_8px_rgba(8,60,30,0.4)]">
-                        <span aria-hidden className="size-1.5 animate-pulse rounded-full bg-white" />
-                        LIVE
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className={cx('mt-2 block max-w-[76px] truncate text-caption', on ? 'font-bold text-ink' : 'font-medium text-ink-3')}>{v.trip.name.split(/[ ,]/)[0]}</span>
-                  <span aria-hidden className={cx('mx-auto mt-1 block h-[3px] w-5 rounded-full bg-[#ffd479] transition-opacity duration-300', on ? 'opacity-100' : 'opacity-0')} />
-                </button>
-              )
-            })}
-            <span aria-hidden className="w-4 shrink-0" />
-          </ScrollRow>
-
-          {/* The selected trip's numbers sit straight on the sky */}
-          <div className="mt-7">
-            <Link to={`/trips/${trip.id}`} className="press -ml-1 flex w-fit max-w-full items-center gap-2.5 rounded-full py-1 pr-2 pl-1 text-meta leading-none font-semibold text-ink-3 hover:text-ink">
-              <span className="truncate leading-5">
-                {trip.name} · {phaseLabel(trip, status)}
-              </span>
-              <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-white">
-                <CaretRight size={12} weight="bold" aria-hidden />
-              </span>
-            </Link>
-            <Figure value={ledger.total} currency={cur} size="xl" className="mt-1.5" />
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className={cx('level num', myNet > 0 ? 'ok' : myNet < 0 ? 'act' : 'quiet')}>
-                {myNet > 0 ? `You get back ${formatMoney(myNet, { currency: cur })}` : myNet < 0 ? `You owe ${formatMoney(-myNet, { currency: cur })}` : 'You are all square'}
-              </span>
-              {trip.budget ? <span className="text-caption font-medium text-ink-3">{Math.round((ledger.total / trip.budget) * 100)}% of budget</span> : null}
-            </div>
-          </div>
-        </div>
-
-        {/* Add in one tap: category icons that open the expense form with that category chosen */}
-        <section aria-labelledby="quick-add" className="panel mt-7 rounded-[30px] p-5">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 id="quick-add" className="text-heading">
-              Add in one tap
-            </h2>
-            <span className="text-caption text-ink-3">then type the amount</span>
-          </div>
-          <div className="mt-4 grid grid-cols-4 gap-x-1 gap-y-4">
-            {QUICK.map((c) => (
-              <button key={c.id} type="button" onClick={() => openExpense({ tripId: trip.id, category: c.id })} className="press flex flex-col items-center gap-1.5 rounded-[18px] py-1 text-center">
-                <CategoryIcon id={c.id} size={44} />
-                <span className="text-[12px] font-medium text-ink-2">{c.label}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      </SkyHero>
-
-      <ContentSheet>
-        <SheetBody className="pt-4">
-          {status.phase === 'ended' ? (
-            <div className="panel mb-6 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-[28px] p-5">
-              <p className="min-w-0 flex-1 text-meta text-ink-2">{trip.name} ended {status.days === 1 ? 'yesterday' : `${status.days} days ago`}. Mark it complete to keep it as a journal.</p>
-              <Button
-                size="sm"
-                variant="secondary"
-                icon={CheckCircle}
-                iconWeight="duotone"
-                onClick={() => {
-                  saveTrip({ ...trip, completed: true, completedAt: new Date().toISOString() })
-                  toast.success(`${trip.name} marked complete`)
-                }}
+    <div ref={box} className="relative -mb-[calc(124px+env(safe-area-inset-bottom))] h-dvh overflow-hidden">
+      <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,var(--sky-2),var(--sky-3)_60%,var(--sky-2))]" />
+      <div className="absolute left-0" style={{ top: mapTop, width: size.w, height: mapH }}>
+        <DotMap view={view} />
+        {spread(placed.map(({ at }) => project(view, at.lon, at.lat)), size.w).map(([x, y], i) => {
+          const { v } = placed[i]
+          const on = v.trip.id === picked
+          const sz = on ? 52 : 38
+          return (
+            <button
+              key={v.trip.id}
+              type="button"
+              onClick={() => (on ? open(v.trip.id) : (setPicked(v.trip.id), setList(false)))}
+              aria-label={on ? `Open ${v.trip.name}` : v.trip.name}
+              aria-pressed={on}
+              className="press absolute -translate-x-1/2 -translate-y-1/2 transition-[left,top] duration-300"
+              style={{ left: x, top: y, zIndex: on ? 5 : 1 }}
+            >
+              <span
+                className={cx('block overflow-hidden rounded-full transition-[width,height,box-shadow] duration-300 ease-[var(--ease-out-expo)]', on ? 'shadow-[0_0_0_3px_#ffd479,0_10px_20px_-6px_rgba(5,20,50,0.7)]' : 'shadow-[0_0_0_3px_#fff,0_8px_16px_-6px_rgba(5,20,50,0.6)]')}
+                style={{ width: sz, height: sz }}
               >
-                Mark complete
-              </Button>
-            </div>
-          ) : null}
+                <Cover photo={v.trip.cover} seed={i + 1} className="size-full rounded-full" />
+              </span>
+            </button>
+          )
+        })}
+      </div>
 
-          <div className="mx-auto flex w-full max-w-[680px] flex-col gap-9">
-            <section aria-labelledby="just-in">
-              <div className="flex min-h-11 items-center justify-between gap-3 px-0.5">
-                <h2 id="just-in" className="text-title">
-                  Just in
-                </h2>
-                {expenses.length ? (
-                  <Link to={`/trips/${trip.id}/expenses`} className="inline-flex h-10 items-center gap-1 text-[14px] font-semibold text-accent-ink">
-                    See all {expenses.length} <CaretRight size={14} weight="bold" aria-hidden />
-                  </Link>
-                ) : null}
+      {/* A floating pill on top: what this page is, and a way to add a trip */}
+      <div className="absolute inset-x-4 top-[max(18px,env(safe-area-inset-top))] z-[6] flex h-[50px] items-center gap-2.5 rounded-full bg-panel-strong pr-1.5 pl-[18px] shadow-[var(--shadow-float)]">
+        <MagnifyingGlass size={18} weight="bold" className="shrink-0 text-ink-2" aria-hidden />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-[14.5px] leading-[18px] font-semibold">Your trips</span>
+          <span className="block truncate text-[12px] leading-[14px] text-ink-3">
+            {ordered.length} {ordered.length === 1 ? 'trip' : 'trips'} · anywhere
+          </span>
+        </span>
+        <button type="button" onClick={() => openTrip()} aria-label="Plan a new trip" className="press flex size-[38px] shrink-0 items-center justify-center rounded-full bg-well text-ink">
+          <Plus size={17} weight="bold" aria-hidden />
+        </button>
+      </div>
+
+      {/* The sheet over the map */}
+      <div
+        className="absolute inset-x-0 bottom-0 z-[5] overflow-hidden rounded-t-[28px] bg-haze shadow-[0_-18px_40px_-22px_rgba(5,20,50,0.55)] transition-[top] duration-500 ease-[var(--ease-out-expo)]"
+        style={{ top: list ? 92 : peekTop }}
+      >
+        <button type="button" onClick={() => setList((l) => !l)} aria-label={list ? 'Lower the sheet' : 'Lift the sheet'} aria-expanded={list} className="flex w-full justify-center pt-2.5 pb-2">
+          <span className="h-[5px] w-10 rounded-full bg-line-strong" />
+        </button>
+        <p className="mb-2.5 text-center text-[14.5px] font-bold">{chosen && !list ? chosen.trip.destination : `${ordered.length} ${ordered.length === 1 ? 'trip' : 'trips'}`}</p>
+        <div className={cx('absolute inset-x-0 top-[62px] bottom-0 no-scrollbar', list ? 'overflow-y-auto' : 'overflow-hidden')}>
+          {list ? (
+            <ul className="px-[18px] pb-[160px]">
+              {ordered.map((v, i) => (
+                <li key={v.trip.id}>
+                  <button type="button" onClick={() => open(v.trip.id)} className="press mb-[18px] block w-full text-left">
+                    <span className="relative block h-[196px] overflow-hidden rounded-[24px]">
+                      <Cover photo={v.trip.cover} seed={i + 1} className="size-full" />
+                      <span className="absolute top-3 right-3 flex size-[34px] items-center justify-center rounded-full bg-white/90 text-[#14224a]">
+                        <CaretRight size={14} weight="bold" aria-hidden />
+                      </span>
+                    </span>
+                    <span className="block px-0.5 pt-2.5">
+                      <span className="block text-[16px] font-semibold">{v.trip.name}</span>
+                      <span className="block text-[13.5px] text-ink-3">
+                        {v.trip.destination} · {phaseLabel(v.trip, v.status)}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : chosen ? (
+            <div className="px-4">
+              <div className="panel-strong flex items-center gap-3 rounded-[24px] p-2.5">
+                <button type="button" onClick={() => open(chosen.trip.id)} className="press flex min-w-0 flex-1 items-center gap-3 text-left" aria-label={`Open ${chosen.trip.name}`}>
+                  <Cover photo={chosen.trip.cover} seed={1} className="size-[72px] shrink-0 rounded-[18px]" />
+                  <span className="min-w-0">
+                    <span className="block truncate text-[16px] font-semibold">{chosen.trip.name}</span>
+                    <span className="block truncate text-[13px] text-ink-3">
+                      {chosen.trip.destination} · {phaseLabel(chosen.trip, chosen.status)}
+                    </span>
+                  </span>
+                </button>
+                <button type="button" onClick={() => setPicked(null)} aria-label="Close" className="press flex size-8 shrink-0 items-center justify-center self-start rounded-full bg-well">
+                  <X size={14} weight="bold" aria-hidden />
+                </button>
               </div>
-              {expenses.length ? (
-                <ul className="panel-strong rows mt-3 overflow-hidden rounded-[28px]">
-                  {expenses.slice(0, 3).map((e) => (
-                    <li key={e.id}>
-                      <ExpenseRow expense={e} currency={cur} settled={settled} onOpen={() => setOpen(e)} />
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="panel mt-3 rounded-[28px] p-6 text-body text-ink-3">Nothing yet. Tap a category above when someone pays for something.</p>
-              )}
-            </section>
+            </div>
+          ) : (
+            <div className="px-[18px]">
+              <Cover photo={ordered[0].trip.cover} seed={1} className="h-[120px] rounded-[24px]" />
+            </div>
+          )}
+        </div>
+      </div>
 
-            {others.length ? (
-              <section aria-labelledby="other-trips">
-                <h2 id="other-trips" className="px-0.5 text-meta font-semibold text-ink-3">
-                  Other trips
-                </h2>
-                <ScrollRow className="-mx-6 mt-3 flex gap-2.5 px-6">
-                  {others.map((v) => {
-                    const n = v.ledger.net[me.id] ?? 0
-                    const note = v.status.phase === 'completed' && v.settled ? 'settled' : n < 0 ? `owe ${formatMoney(-n, { currency: v.trip.currency, round: true })}` : n > 0 ? `owed ${formatMoney(n, { currency: v.trip.currency, round: true })}` : phaseLabel(v.trip, v.status)
-                    return (
-                      <Link key={v.trip.id} to={`/trips/${v.trip.id}`} className="glass-control press inline-flex h-12 shrink-0 items-center gap-2.5 rounded-full pr-5 pl-1.5 text-[14px] font-medium whitespace-nowrap">
-                        <Cover photo={v.trip.cover} seed={2} className="size-9 shrink-0 rounded-full" />
-                        {v.trip.name.split(/[ ,]/)[0]} · {note}
-                      </Link>
-                    )
-                  })}
-                  <span aria-hidden className="w-6 shrink-0" />
-                </ScrollRow>
-              </section>
-            ) : null}
-          </div>
-        </SheetBody>
-      </ContentSheet>
-      <ExpenseDetailSheet expense={open ? (data.expenses.find((x) => x.id === open.id) ?? null) : null} onClose={() => setOpen(null)} />
-    </>
+      <button
+        type="button"
+        onClick={() => setList((l) => !l)}
+        className="press absolute left-1/2 z-[7] flex h-11 -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-[18px] text-[14px] font-semibold whitespace-nowrap text-[var(--on-ink)] shadow-[0_14px_26px_-10px_rgba(5,20,50,0.7)]"
+        style={{ top: list ? size.h - NAV_H - 62 : peekTop - 58 }}
+      >
+        {list ? 'Map' : 'List'}
+      </button>
+    </div>
   )
 }
 

@@ -1,6 +1,8 @@
 export interface Place {
   name: string
   region: string
+  lat?: number
+  lon?: number
 }
 
 /**
@@ -14,7 +16,7 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=10&language=en&format=json`
   const res = await fetch(url, { signal })
   if (!res.ok) throw new Error(`Place search failed (${res.status})`)
-  const json = (await res.json()) as { results?: { name: string; admin1?: string; country?: string }[] }
+  const json = (await res.json()) as { results?: { name: string; admin1?: string; country?: string; latitude?: number; longitude?: number }[] }
   const seen = new Set<string>()
   const out: Place[] = []
   for (const r of json.results ?? []) {
@@ -22,7 +24,7 @@ export async function searchPlaces(query: string, signal?: AbortSignal): Promise
     const key = `${r.name}|${region}`.toLowerCase()
     if (seen.has(key)) continue
     seen.add(key)
-    out.push({ name: r.name, region })
+    out.push({ name: r.name, region, lat: r.latitude, lon: r.longitude })
   }
   return out
 }

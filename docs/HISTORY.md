@@ -73,3 +73,11 @@ A running record of what was built and why, in order. Dates are 2026-11-03 onwar
 - Sheets, the full-screen form, the tab bar and toasts are held to the same column.
 - Sheet footers keep at least 22 px of space below the primary button.
 - The category filter on Expenses moved from a row of chips into the Filters sheet.
+
+## Map Home
+
+- Home is a dot-matrix world map filling the screen, with a floating "Your trips" pill and a plus button to plan a trip.
+- Each trip is a photo marker at its destination. Tapping one selects it and shows a card; tapping it again opens the trip. Markers that sit close together are nudged apart so each can be tapped.
+- A bottom sheet rests low over the map and lifts into a list of large photo cards. A floating List / Map button flips between them.
+- Trips now store a latitude and longitude, taken from the destination search or from the built-in list of places. Trips with no known location are left off the map but still show in the list.
+- Home shows no money. Balances live in Settle and inside each trip.
