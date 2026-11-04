@@ -5,7 +5,7 @@ const RULES: [RegExp, CategoryId][] = [
   [/hotel|stay|hostel|homestay|houseboat|villa|cottage|airbnb|resort|room|lodge/i, 'stay'],
   [/fuel|petrol|diesel|toll|fastag/i, 'fuel'],
   [/scooter|bike rental|car rental|rental|self.?drive|rent a/i, 'rentals'],
-  [/cab|taxi|uber|ola\b|rapido|auto|transfer|ride|train|bus|metro|ferry/i, 'cabs'],
+  [/cab|taxi|uber|\bola\b|rapido|auto|transfer|ride|train|bus|metro|ferry/i, 'cabs'],
   [/grocer|supermarket|mart|vegetables|fruits|water bottle|provisions/i, 'groceries'],
   [/cafe|coffee|chai|tea|juice|drinks|bar|beer|feni|wine|cocktail/i, 'drinks'],
   [/dinner|lunch|breakfast|brunch|food|restaurant|thali|dhaba|wazwan|snack|meal/i, 'food'],
